@@ -6,7 +6,6 @@ import {
   Badge,
   Indicator,
   Image,
-  Avatar,
 } from "@mantine/core";
 import { Link } from "react-router-dom";
 import TitleWithDot from "../elements/titleWithDot";
