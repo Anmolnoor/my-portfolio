@@ -1,11 +1,15 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { RouterProvider } from "react-router-dom";
-import "./index.css";
-import router from "./router/routes";
+import App from "./App";
 
-ReactDOM.createRoot(document.getElementById("root")).render(
+const portal = document.getElementById("root");
+
+if (portal === null) {
+  throw new Error("Root element not found");
+}
+
+ReactDOM.createRoot(portal).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <App />
   </React.StrictMode>
 );
