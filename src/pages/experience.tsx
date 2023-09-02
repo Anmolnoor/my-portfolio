@@ -96,16 +96,6 @@ const Experience = () => {
   return (
     <NewCard title={"Experience"} viewAll link={"/experience"}>
       <Stack>
-        {/* {experience.map((item) => (
-          <NewCard title={item.title} viewAll={false} link={"/experience"}>
-            <Stack>
-              <div>{item.company}</div>
-              <div>{item.duration}</div>
-              <div>{item.description}</div>
-            </Stack>
-          </NewCard>
-        ))} */}
-
         {internshipsAndExperience.map((item) => (
           <Card withBorder p={"lg"}>
             <Card.Section p={"xs"}>

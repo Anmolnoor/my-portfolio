@@ -23,7 +23,7 @@ const NewCard = ({ viewAll = false, link = "/", ...props }: NewCardProps) => {
               component={Link}
               to={route.at(-1)?.pathname === "/" ? link : "/"}
               variant="default"
-              radius={"10%"}
+              radius={"md"}
               title={route.at(-1)?.pathname === "/" ? "View All" : "Back"}
               size="sm"
               color={"blue"}

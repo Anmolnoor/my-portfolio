@@ -7,7 +7,8 @@ import { IconLink } from "@tabler/icons-react";
 const projects = [
   {
     title: "Vendro",
-    description: "alternative to Shopify.",
+    description:
+      "Developed a cost-effective and user-friendly retail store platform as an alternative to traditional ecommerce platforms, addressing the challenges faced by small businesses in setting up an online store.",
     link: "/vendro",
   },
   {
