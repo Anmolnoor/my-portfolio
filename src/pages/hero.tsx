@@ -8,15 +8,15 @@ import {
   Image,
 } from "@mantine/core";
 import { Link } from "react-router-dom";
-import TitleWithDot from "../elements/titleWithDot";
-import TitleWithSubTitle from "../elements/titleWithSubTitle";
+import TitleWithDot from "../components/elements/titleWithDot";
+import TitleWithSubTitle from "../components/elements/titleWithSubTitle";
 
 const Hero = () => {
   return (
     <Card>
       <Card.Section>
         <Group position="apart">
-          <TitleWithDot title="Software Engineer" />
+          <TitleWithDot title="Software Sorcerer" />
           <Badge
             color="green"
             variant="light"
@@ -25,8 +25,8 @@ const Hero = () => {
             leftSection={
               <Indicator
                 withBorder
-                offset={-10}
-                size={11}
+                offset={-6}
+                size={10}
                 position="middle-start"
                 color="green"
               >
@@ -58,7 +58,7 @@ const Hero = () => {
           <TitleWithSubTitle
             title="Anmol Noor"
             order={1}
-            subTitle="I'm a passionate Computer Engineer with a strong affinity for coding and innovative software solutions."
+            subTitle="In the world of 0s and 1s, I'm the one who bridges the gap."
           />
           <Group spacing={"lg"}>
             <Button
@@ -66,7 +66,7 @@ const Hero = () => {
               to={"mailto:anmolnoor59@gmail.com"}
               color="gray"
             >
-              Get in touch
+              Tap Into My Inbox
             </Button>
             <Button
               component={Link}
@@ -74,7 +74,7 @@ const Hero = () => {
               to={"https://cal.com/anmolnoor"}
               color="blue"
             >
-              Book a Meeting
+              Settle a Sit-Down
             </Button>
           </Group>
         </Stack>
