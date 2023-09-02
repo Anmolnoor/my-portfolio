@@ -30,9 +30,7 @@ const NewCard = ({ viewAll = false, link = "/", ...props }: NewCardProps) => {
             >
               {route.at(-1)?.pathname === "/" ? "View All" : "Back"}
             </Button>
-          ) : (
-            <Button></Button>
-          )}
+          ) : null}
         </Group>
       </Card.Section>
       <Card.Section p="sm">{props.children}</Card.Section>
