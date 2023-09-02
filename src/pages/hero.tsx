@@ -11,13 +11,14 @@ import {
 import { Link } from "react-router-dom";
 import TitleWithDot from "../components/elements/titleWithDot";
 import TitleWithSubTitle from "../components/elements/titleWithSubTitle";
+import { IconCalendarStats, IconSend } from "@tabler/icons-react";
 
 const Hero = () => {
   return (
     <Card>
       <Card.Section>
         <Group position="apart">
-          <TitleWithDot title="Software Sorcerer" />
+          <TitleWithDot title="Software Engineer" />
           <Badge
             color="green"
             variant="light"
@@ -41,7 +42,7 @@ const Hero = () => {
       </Card.Section>
       <Card.Section>
         <Stack
-          spacing={"xs"}
+          spacing={"md"}
           justify="center"
           align="center"
           my={"lg"}
@@ -65,7 +66,7 @@ const Hero = () => {
             cols={2}
             breakpoints={[
               {
-                maxWidth: 387,
+                maxWidth: 315,
                 cols: 1,
               },
             ]}
@@ -75,15 +76,17 @@ const Hero = () => {
               target="_blank"
               to={"https://cal.com/anmolnoor"}
               color="blue"
+              rightIcon={<IconCalendarStats size="1.2rem" stroke={1.1} />}
             >
-              Settle a Sit-Down
+              Book
             </Button>{" "}
             <Button
               component={Link}
               to={"mailto:anmolnoor59@gmail.com"}
               color="gray"
+              leftIcon={<IconSend size="1.2rem" stroke={1.1} />}
             >
-              Tap Into My Inbox
+              email
             </Button>
           </SimpleGrid>
         </Stack>

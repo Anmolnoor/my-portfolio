@@ -10,8 +10,7 @@ import Skills from "../pages/skills";
 import Experience from "../pages/experience";
 import Pocket from "../pages/pocket";
 import Projects from "../pages/projects";
-import NewCard from "../components/elements/newCard";
-import { Card, Stack } from "@mantine/core";
+import Vendro from "../pages/vendro";
 
 export const NotFound = () => {
   return <div>Not found!</div>;
@@ -28,16 +27,7 @@ const router = createBrowserRouter(
       <Route path="/experience" element={<Experience />} />
       <Route path="/skills" element={<Skills items={10} />} />
       <Route path="/pocket" element={<Pocket />} />
-      <Route
-        path="/vendro"
-        element={
-          <NewCard title="Vendro" viewAll={true} link="/projects">
-            <Stack>
-              <Card withBorder>under construction</Card>
-            </Stack>
-          </NewCard>
-        }
-      />
+      <Route path="/vendro" element={<Vendro />} />
 
       <Route path="*" element={<div>Not found!</div>} />
     </Route>
