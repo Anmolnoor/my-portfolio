@@ -5,7 +5,7 @@ import {
   IconBrandLinkedin,
   IconBrandInstagram,
 } from "@tabler/icons-react";
-import TitleWithDot from "../elements/titleWithDot";
+import TitleWithDot from "../components/elements/titleWithDot";
 
 const FollowMe = () => {
   return (
@@ -15,51 +15,51 @@ const FollowMe = () => {
         <Group spacing={"xs"} noWrap>
           <ActionIcon
             title="Twitter handle"
-            variant="outline"
+            variant="default"
             size="lg"
             color={"blue"}
-            radius={"lg"}
+            radius={"10%"}
             onClick={() =>
               window.open("https://twitter.com/noor_anmol", "_blank")
             }
           >
-            <IconBrandTwitter size="1.1rem" stroke={1.5} />
+            <IconBrandTwitter size="1.1rem" stroke={1.1} />
           </ActionIcon>
           <ActionIcon
             title="Github handle"
             size="lg"
-            variant="outline"
+            variant="default"
             color={"blue"}
-            radius={"lg"}
+            radius={"10%"}
             onClick={() =>
               window.open("https://github.com/anmolnoor", "_blank")
             }
           >
-            <IconBrandGithub size="1.1rem" stroke={1.5} />
+            <IconBrandGithub size="1.1rem" stroke={1.1} />
           </ActionIcon>
           <ActionIcon
             title="Linkedin handle"
             size="lg"
-            variant="outline"
+            variant="default"
             color={"blue"}
-            radius={"lg"}
+            radius={"10%"}
             onClick={() =>
               window.open("https://www.linkedin.com/in/anmolnoor/", "_blank")
             }
           >
-            <IconBrandLinkedin size="1.1rem" stroke={1.5} />
+            <IconBrandLinkedin size="1.1rem" stroke={1.1} />
           </ActionIcon>
           <ActionIcon
             title="Instagram handle"
             size="lg"
-            variant="outline"
+            variant="default"
             color={"blue"}
-            radius={"lg"}
+            radius={"10%"}
             onClick={() =>
               window.open("https://www.instagram.com/_anmol_noor/", "_blank")
             }
           >
-            <IconBrandInstagram size="1.1rem" stroke={1.5} />
+            <IconBrandInstagram size="1.1rem" stroke={1.1} />
           </ActionIcon>
         </Group>
       </Group>

@@ -1,6 +1,6 @@
 import { Card, Group, Stack, Text, Title } from "@mantine/core";
 import { randomId } from "@mantine/hooks";
-import NewCard from "../elements/newCard";
+import NewCard from "../components/elements/newCard";
 
 const expertise = [
   {
