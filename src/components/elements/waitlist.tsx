@@ -94,12 +94,14 @@ export default function SignUpFormReact() {
         "Content-Type": "application/x-www-form-urlencoded",
       },
     })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .then((res: any) => [res.ok, res.json(), res])
       .then(([ok, dataPromise, res]) => {
         if (ok) {
           resetForm();
           setFormState(SUCCESS);
         } else {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           dataPromise.then((data: any) => {
             setFormState(ERROR);
             setErrorMessage(data.message || res.statusText);
@@ -273,6 +275,7 @@ export default function SignUpFormReact() {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function isValidEmail(email: any) {
   return /.+@.+/.test(email);
 }
