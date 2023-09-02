@@ -6,6 +6,7 @@ import {
   Badge,
   Indicator,
   Image,
+  SimpleGrid,
 } from "@mantine/core";
 import { Link } from "react-router-dom";
 import TitleWithDot from "../components/elements/titleWithDot";
@@ -60,14 +61,15 @@ const Hero = () => {
             order={1}
             subTitle="In the world of 0s and 1s, I'm the one who bridges the gap."
           />
-          <Group spacing={"lg"}>
-            <Button
-              component={Link}
-              to={"mailto:anmolnoor59@gmail.com"}
-              color="gray"
-            >
-              Tap Into My Inbox
-            </Button>
+          <SimpleGrid
+            cols={2}
+            breakpoints={[
+              {
+                maxWidth: 387,
+                cols: 1,
+              },
+            ]}
+          >
             <Button
               component={Link}
               target="_blank"
@@ -75,8 +77,15 @@ const Hero = () => {
               color="blue"
             >
               Settle a Sit-Down
+            </Button>{" "}
+            <Button
+              component={Link}
+              to={"mailto:anmolnoor59@gmail.com"}
+              color="gray"
+            >
+              Tap Into My Inbox
             </Button>
-          </Group>
+          </SimpleGrid>
         </Stack>
       </Card.Section>
     </Card>

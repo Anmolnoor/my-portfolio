@@ -2,6 +2,7 @@ import { IconLink } from "@tabler/icons-react";
 import NewCard from "../components/elements/newCard";
 import { ActionIcon, Card, Group, Stack, Text, Title } from "@mantine/core";
 import { Link } from "react-router-dom";
+import { useMediaQuery } from "@mantine/hooks";
 
 // const experience = [
 //   {
@@ -86,6 +87,12 @@ const internshipsAndExperience = [
 ];
 
 const Experience = () => {
+  const mediaQuery = useMediaQuery("(min-width: 420px)");
+
+  const getDots = (str: string) => {
+    return str.length > 12 ? "..." : "";
+  };
+
   return (
     <NewCard title={"Experience"} viewAll link={"/experience"}>
       <Stack>
@@ -103,7 +110,11 @@ const Experience = () => {
           <Card withBorder p={"lg"}>
             <Card.Section p={"xs"}>
               <Group position="apart">
-                <Title order={3}>{item.company}</Title>
+                <Title order={3}>
+                  {mediaQuery
+                    ? item.company
+                    : item.company.slice(0, 12) + getDots(item.company)}
+                </Title>
                 {item.link === "#" ? null : (
                   <ActionIcon
                     component={Link}
