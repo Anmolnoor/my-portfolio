@@ -1,39 +1,8 @@
 import { IconLink } from "@tabler/icons-react";
 import NewCard from "../components/elements/newCard";
-import { ActionIcon, Card, Group, Stack, Text, Title } from "@mantine/core";
+import { ActionIcon, Card, Group, Stack, Text } from "@mantine/core";
 import { Link } from "react-router-dom";
-import { useMediaQuery } from "@mantine/hooks";
-
-// const experience = [
-//   {
-//     title: "Frontend Engineer",
-//     company: "Huddle01",
-//     duration: "May 2021 - Present",
-//     description:
-//       "As a Frontend Engineer at Huddle01, I contributed to the development of the Huddle01 website, specializing in frontend development. During this role, I had the opportunity to work extensively with technologies such as webRTC, Mediasoup, and Sockets.",
-//   },
-//   {
-//     title: "React Native Intern",
-//     company: "Fortec Solution",
-//     duration: "Jan 2021 - Feb 2021",
-//     description:
-//       "During my tenure as a React Native Intern at Fortec Solution, I was entrusted with the development of a Complaint Ticket Booking App for Protocol Solutions. This project entailed creating a fully automated Ticket Generator using React Native for the frontend and interfacing with a PHP-based API. Additionally, I played a pivotal role in enhancing the App's UI/UX.",
-//   },
-//   {
-//     title: "Team Lead",
-//     company: "SWPL",
-//     duration: "Jan 2020 - Dec 2020",
-//     description:
-//       "As a Team Lead at SWPL, I successfully managed a team of five skilled developers. Together, we undertook the development of two significant projects, namely 'Rural Paisa' and 'Full Stop,' both executed within the MERN Stack.",
-//   },
-//   {
-//     title: "Web Developer Internship",
-//     company: "ALS",
-//     duration: "Dec 2019 - Jan 2020",
-//     description:
-//       "During my one-month Web Developer Internship at ALS, I engaged in a diverse range of projects. This included the creation of a Single Page website (landing page), development of a College ERP system, and the establishment of an E-commerce platform utilizing ReactJS.",
-//   },
-// ];
+import { GetTitle } from "../utils/title";
 
 const internshipsAndExperience = [
   {
@@ -87,12 +56,6 @@ const internshipsAndExperience = [
 ];
 
 const Experience = () => {
-  const mediaQuery = useMediaQuery("(min-width: 420px)");
-
-  const getDots = (str: string) => {
-    return str.length > 12 ? "..." : "";
-  };
-
   return (
     <NewCard title={"Experience"} viewAll link={"/experience"}>
       <Stack>
@@ -100,11 +63,7 @@ const Experience = () => {
           <Card withBorder p={"lg"}>
             <Card.Section p={"xs"}>
               <Group position="apart">
-                <Title order={3}>
-                  {mediaQuery
-                    ? item.company
-                    : item.company.slice(0, 12) + getDots(item.company)}
-                </Title>
+                {GetTitle(item.company)}
                 {item.link === "#" ? null : (
                   <ActionIcon
                     component={Link}

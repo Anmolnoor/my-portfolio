@@ -79,14 +79,14 @@ const Hero = () => {
               rightIcon={<IconCalendarStats size="1.2rem" stroke={1.1} />}
             >
               Book
-            </Button>{" "}
+            </Button>
             <Button
               component={Link}
               to={"mailto:anmolnoor59@gmail.com"}
               color="gray"
               leftIcon={<IconSend size="1.2rem" stroke={1.1} />}
             >
-              email
+              E-Mail
             </Button>
           </SimpleGrid>
         </Stack>

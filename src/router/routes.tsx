@@ -11,6 +11,7 @@ import Experience from "../pages/experience";
 import Pocket from "../pages/pocket";
 import Projects from "../pages/projects";
 import Vendro from "../pages/vendro";
+import Blog from "../pages/blog";
 
 export const NotFound = () => {
   return <div>Not found!</div>;
@@ -27,6 +28,7 @@ const router = createBrowserRouter(
       <Route path="/experience" element={<Experience />} />
       <Route path="/skills" element={<Skills items={10} />} />
       <Route path="/pocket" element={<Pocket />} />
+      <Route path="/blog" element={<Blog />} />
       <Route path="/vendro" element={<Vendro />} />
 
       <Route path="*" element={<div>Not found!</div>} />
