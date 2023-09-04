@@ -1,8 +1,9 @@
 import NewCard from "../components/elements/newCard";
-import { ActionIcon, Card, Group, Stack, Text, Title } from "@mantine/core";
-import TitleWithDot from "../components/elements/titleWithDot";
+import { ActionIcon, Card, Group, Stack, Text } from "@mantine/core";
 import { Link } from "react-router-dom";
 import { IconLink } from "@tabler/icons-react";
+import { GetTitle } from "../utils/title";
+import { GetDescription } from "../utils/description";
 
 const projects = [
   {
@@ -147,9 +148,7 @@ const Projects = () => {
           <Card withBorder p={"lg"}>
             <Card.Section p={"xs"}>
               <Group position="apart">
-                <Title order={3}>
-                  <TitleWithDot title={item.title} />
-                </Title>
+                {GetTitle(item.title)}
                 <ActionIcon
                   component={Link}
                   to={item.link}
@@ -165,7 +164,7 @@ const Projects = () => {
               </Group>
             </Card.Section>
             <Card.Section p={"xs"}>
-              <Text>{item.description}</Text>
+              <Text>{GetDescription({ text: item.description })}</Text>
             </Card.Section>
           </Card>
         ))}

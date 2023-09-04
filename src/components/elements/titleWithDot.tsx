@@ -1,4 +1,4 @@
-import { Indicator, Text } from "@mantine/core";
+import { Indicator, Title } from "@mantine/core";
 
 interface TitleWithDotProps {
   title: string;
@@ -8,11 +8,11 @@ interface TitleWithDotProps {
 
 const TitleWithDot = ({
   title,
-  size = 10,
+  size = 11,
   color = "gray",
 }: TitleWithDotProps) => {
   return (
-    <Text pl={"lg"}>
+    <Title order={5} pl={"lg"}>
       <Indicator
         size={size}
         position="middle-start"
@@ -22,7 +22,7 @@ const TitleWithDot = ({
       >
         {title}
       </Indicator>
-    </Text>
+    </Title>
   );
 };
 
