@@ -6,7 +6,7 @@ import {
   Stack,
   Text,
 } from "@mantine/core";
-import { useMediaQuery } from "@mantine/hooks";
+import { randomId, useMediaQuery } from "@mantine/hooks";
 import {
   IconSun,
   IconMoonStars,
@@ -80,6 +80,7 @@ export function NabBar() {
         <Group justify="space-between" w={isMobile ? 300 : 450} align="center">
           {NavBaroptions.map((option) => (
             <NavbarBtn
+              key={randomId()}
               title={option.title}
               link={option.link}
               icon={option.icon}
