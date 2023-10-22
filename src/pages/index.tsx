@@ -1,4 +1,11 @@
-import { ActionIcon, Card, Group, Stack, Text } from "@mantine/core";
+import {
+  ActionIcon,
+  Card,
+  Group,
+  SimpleGrid,
+  Stack,
+  Text,
+} from "@mantine/core";
 
 import Hero from "./hero";
 import { FunFacts, Interests } from "./other";
@@ -9,6 +16,8 @@ import {
   IconFileDownload,
   IconLink,
 } from "@tabler/icons-react";
+import { useMediaQuery } from "@mantine/hooks";
+import { projects } from "../assets/projects";
 
 const navigationOptions = [
   {
@@ -29,10 +38,29 @@ const navigationOptions = [
 ];
 
 const HomePage = () => {
+  const isMobile = useMediaQuery("(max-width: 500px)");
+  const latestProjects = projects.slice(0, 2);
+
   return (
     <Card withBorder p={"sm"}>
       <Stack gap={"lg"}>
         <Hero />
+        <SimpleGrid cols={isMobile ? 1 : 2} spacing={"md"}>
+          {latestProjects.map((item) => (
+            <Card
+              component={Link}
+              withBorder
+              title={"Latest Projects"}
+              to={item.link}
+              target="_blank"
+            >
+              <Text ta={"center"}>{item.title}</Text>
+              <Text ta={"center"} c={"dimmed"}>
+                {item.description.slice(0, 40) + "..."}
+              </Text>
+            </Card>
+          ))}
+        </SimpleGrid>
         <Interests />
         <FunFacts />
         {navigationOptions.map((option) => (
