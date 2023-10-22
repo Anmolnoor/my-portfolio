@@ -1,11 +1,12 @@
 import { Box, Container, Affix, Space } from "@mantine/core";
 import { NabBar } from "../header/navbar";
-import { Outlet } from "react-router-dom";
+import { Outlet, ScrollRestoration } from "react-router-dom";
 import FollowMe from "../../pages/follow";
 
 const MainLayout = () => {
   return (
-    <Container size={"xs"}>
+    <Container size={"md"}>
+      <ScrollRestoration />
       <Box my={"lg"}>
         <Outlet />
       </Box>
