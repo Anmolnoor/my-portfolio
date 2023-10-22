@@ -1,17 +1,18 @@
 import NewCard from "../components/elements/newCard";
-import { ActionIcon, Card, Group, Stack, Text } from "@mantine/core";
+import { ActionIcon, Card, Group, Stack } from "@mantine/core";
 import { Link } from "react-router-dom";
 import { IconLink } from "@tabler/icons-react";
 import { GetTitle } from "../utils/title";
 import { GetDescription } from "../utils/description";
 import { projects } from "../assets/projects";
+import { randomId } from "@mantine/hooks";
 
 const Projects = () => {
   return (
     <NewCard title={"Projects"} viewAll link={"/projects"}>
       <Stack>
         {projects.map((item) => (
-          <Card withBorder p={"lg"}>
+          <Card key={randomId()} withBorder p={"lg"}>
             <Card.Section p={"xs"}>
               <Group justify="space-between">
                 {GetTitle(item.title)}
@@ -30,7 +31,7 @@ const Projects = () => {
               </Group>
             </Card.Section>
             <Card.Section p={"xs"}>
-              <Text>{GetDescription({ text: item.description })}</Text>
+              {GetDescription({ text: item.description })}
             </Card.Section>
           </Card>
         ))}

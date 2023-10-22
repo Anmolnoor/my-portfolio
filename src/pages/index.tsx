@@ -16,7 +16,7 @@ import {
   IconFileDownload,
   IconLink,
 } from "@tabler/icons-react";
-import { useMediaQuery } from "@mantine/hooks";
+import { randomId, useMediaQuery } from "@mantine/hooks";
 import { projects } from "../assets/projects";
 import NewCard from "../components/elements/newCard";
 
@@ -40,6 +40,7 @@ const navigationOptions = [
 
 const HomePage = () => {
   const isMobile = useMediaQuery("(max-width: 500px)");
+  const isTablet = useMediaQuery("(max-width: 720px)");
   const latestProjects = projects.slice(0, 2);
 
   return (
@@ -50,6 +51,7 @@ const HomePage = () => {
           <SimpleGrid cols={isMobile ? 1 : 2} spacing={"md"}>
             {latestProjects.map((item) => (
               <Card
+                key={randomId()}
                 component={Link}
                 withBorder
                 title={"Latest Projects"}
@@ -82,27 +84,35 @@ const HomePage = () => {
         </NewCard>
         <Interests />
         <FunFacts />
-        {navigationOptions.map((option) => (
-          <Card component={Link} to={option.link} withBorder px={"md"}>
-            <Group gap={"lg"} align="center" justify="space-between">
-              <Group gap={"xs"} align="center">
-                {option.icon}
-                <Text ta={"center"}>{option.title}</Text>
+        <SimpleGrid cols={isTablet ? 1 : 3} spacing={"md"}>
+          {navigationOptions.map((option) => (
+            <Card
+              key={randomId()}
+              component={Link}
+              to={option.link}
+              withBorder
+              px={"md"}
+            >
+              <Group gap={"lg"} align="center" justify="space-between">
+                <Group gap={"xs"} align="center">
+                  {option.icon}
+                  <Text ta={"center"}>{option.title}</Text>
+                </Group>
+                <ActionIcon
+                  component={Link}
+                  to={option.link}
+                  variant="default"
+                  radius={"md"}
+                  title={option.title}
+                  size="lg"
+                  color={"blue"}
+                >
+                  <IconLink size="1.2rem" stroke={1.1} />
+                </ActionIcon>
               </Group>
-              <ActionIcon
-                component={Link}
-                to={option.link}
-                variant="default"
-                radius={"md"}
-                title={option.title}
-                size="lg"
-                color={"blue"}
-              >
-                <IconLink size="1.2rem" stroke={1.1} />
-              </ActionIcon>
-            </Group>
-          </Card>
-        ))}
+            </Card>
+          ))}
+        </SimpleGrid>
       </Stack>
     </Card>
   );

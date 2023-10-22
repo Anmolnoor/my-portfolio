@@ -1,3 +1,4 @@
+import { randomId } from "@mantine/hooks";
 import NewCard from "../components/elements/newCard";
 import { Card, Stack, Text } from "@mantine/core";
 
@@ -16,7 +17,7 @@ export const Interests = () => {
       <Stack gap={"md"}>
         {interests.map((interest) => {
           return (
-            <Card withBorder>
+            <Card withBorder key={randomId()}>
               <Text size={"sm"} c={"dimmed"}>
                 {interest}
               </Text>
@@ -33,7 +34,7 @@ export const FunFacts = () => {
     <NewCard title={"Unusual Intel"}>
       <Stack gap={"md"}>
         {funFacts.map((fact) => (
-          <Card withBorder>
+          <Card withBorder key={randomId()}>
             <Text size={"sm"} c={"dimmed"}>
               {fact}
             </Text>

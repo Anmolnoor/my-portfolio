@@ -3,6 +3,7 @@ import NewCard from "../components/elements/newCard";
 import { ActionIcon, Card, Group, Stack, Text } from "@mantine/core";
 import { Link } from "react-router-dom";
 import { GetTitle } from "../utils/title";
+import { randomId } from "@mantine/hooks";
 
 const internshipsAndExperience = [
   {
@@ -60,7 +61,7 @@ const Experience = () => {
     <NewCard title={"Experience"} viewAll link={"/experience"}>
       <Stack>
         {internshipsAndExperience.map((item) => (
-          <Card withBorder p={"lg"}>
+          <Card withBorder p={"lg"} key={randomId()}>
             <Card.Section p={"xs"}>
               <Group justify="space-between">
                 {GetTitle(item.company)}
