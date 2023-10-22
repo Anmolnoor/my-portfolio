@@ -1,30 +1,14 @@
-import {
-  ColorScheme,
-  ColorSchemeProvider,
-  MantineProvider,
-} from "@mantine/core";
+import { MantineProvider } from "@mantine/core";
 import { RouterProvider } from "react-router-dom";
 import router from "./router/routes";
-import { useState } from "react";
+
+// css imports
+import "@mantine/core/styles.css";
 
 export default function App() {
-  const [colorScheme, setColorScheme] = useState<ColorScheme>("dark");
-  const toggleColorScheme = (value?: ColorScheme) => {
-    setColorScheme(value || (colorScheme === "dark" ? "light" : "dark"));
-  };
-
   return (
-    <ColorSchemeProvider
-      colorScheme={colorScheme}
-      toggleColorScheme={toggleColorScheme}
-    >
-      <MantineProvider
-        theme={{ colorScheme }}
-        withGlobalStyles
-        withNormalizeCSS
-      >
-        <RouterProvider router={router} />
-      </MantineProvider>
-    </ColorSchemeProvider>
+    <MantineProvider defaultColorScheme="dark">
+      <RouterProvider router={router} />
+    </MantineProvider>
   );
 }

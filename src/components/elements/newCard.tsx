@@ -16,7 +16,7 @@ const NewCard = ({ viewAll = false, link = "/", ...props }: NewCardProps) => {
   return (
     <Card withBorder>
       <Card.Section p="sm">
-        <Group position="apart">
+        <Group justify="space-between">
           <TitleWithDot title={props.title} />
           {viewAll ? (
             <Button

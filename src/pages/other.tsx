@@ -13,7 +13,7 @@ const funFacts = ["Totally hooked on VSCode.", "A Linux lover, no doubt."];
 export const Interests = () => {
   return (
     <NewCard title={"Passions Beyond the Keyboard"}>
-      <Stack spacing={"md"}>
+      <Stack gap={"md"}>
         {interests.map((interest) => {
           return (
             <Card withBorder>
@@ -31,7 +31,7 @@ export const Interests = () => {
 export const FunFacts = () => {
   return (
     <NewCard title={"Unusual Intel"}>
-      <Stack spacing={"md"}>
+      <Stack gap={"md"}>
         {funFacts.map((fact) => (
           <Card withBorder>
             <Text size={"sm"} c={"dimmed"}>

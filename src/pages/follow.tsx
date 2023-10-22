@@ -10,9 +10,9 @@ import TitleWithDot from "../components/elements/titleWithDot";
 const FollowMe = () => {
   return (
     <Card withBorder>
-      <Group position="apart" align="center">
+      <Group justify="space-between" align="center">
         <TitleWithDot title="Follow Me" />
-        <Group spacing={"xs"} noWrap>
+        <Group>
           <ActionIcon
             title="Twitter handle"
             variant="default"

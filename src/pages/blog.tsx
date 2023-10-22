@@ -6,7 +6,7 @@ const Blog = () => {
   return (
     <NewCard title={"Blog"} viewAll>
       {/* msg : coming soon */}
-      <Stack align="center" spacing={"lg"} my={"lg"}>
+      <Stack align="center" gap={"lg"} my={"lg"}>
         {GetTitle("Coming Soon")}
       </Stack>
     </NewCard>

@@ -1,4 +1,12 @@
-import { Group, ActionIcon, useMantineColorScheme, Card } from "@mantine/core";
+import {
+  Group,
+  ActionIcon,
+  useMantineColorScheme,
+  Card,
+  Stack,
+  Text,
+} from "@mantine/core";
+import { useMediaQuery } from "@mantine/hooks";
 import {
   IconSun,
   IconMoonStars,
@@ -6,112 +14,100 @@ import {
   IconDeviceLaptop,
   IconHistory,
   IconJumpRope,
-  IconFileDownload,
-  IconBrandPocket,
-  IconArticle,
 } from "@tabler/icons-react";
 import { Link } from "react-router-dom";
 
+const NavBaroptions = [
+  {
+    title: "Home",
+    link: "/",
+    icon: <IconHome size="1rem" stroke={1} />,
+  },
+  {
+    title: "Projects",
+    link: "/projects",
+    icon: <IconDeviceLaptop size="1rem" stroke={1} />,
+  },
+  {
+    title: "Exp",
+    link: "/experience",
+    icon: <IconHistory size="1rem" stroke={1} />,
+  },
+  {
+    title: "Skills",
+    link: "/skills",
+    icon: <IconJumpRope size="1rem" stroke={1} />,
+  },
+];
+
+interface NavbarBtnProps {
+  title: string;
+  link: string;
+  icon: React.ReactNode;
+}
+
+const NavbarBtn = ({ title, link, icon }: NavbarBtnProps) => {
+  return (
+    <Stack gap={5} align="center">
+      <ActionIcon
+        component={Link}
+        to={link}
+        variant="default"
+        radius={"md"}
+        title={title}
+        size="md"
+        color={"blue"}
+      >
+        {icon}
+      </ActionIcon>
+      <Group gap={"xs"} align="center">
+        <Text ta={"center"} c={"dimmed"} size="xs">
+          {title}
+        </Text>
+      </Group>
+    </Stack>
+  );
+};
+
 export function NabBar() {
+  const isMobile = useMediaQuery("(max-width: 500px)");
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
   const dark = colorScheme === "dark";
 
   return (
-    <Card withBorder>
-      <Group position="apart" align="center" grow>
-        <ActionIcon
-          component={Link}
-          to="/"
-          variant="default"
-          radius={"md"}
-          title="\"
-          size="lg"
-          color={"blue"}
-        >
-          <IconHome size="1.2rem" stroke={1.1} />
-        </ActionIcon>
-        <ActionIcon
-          component={Link}
-          to="/projects"
-          variant="default"
-          radius={"md"}
-          title="Projects"
-          size="lg"
-          color={"blue"}
-        >
-          <IconDeviceLaptop size="1.2rem" stroke={1.1} />
-        </ActionIcon>
-        <ActionIcon
-          component={Link}
-          to="/experience"
-          variant="default"
-          radius={"md"}
-          title="Experience"
-          size="lg"
-          color={"blue"}
-        >
-          <IconHistory size="1.2rem" stroke={1.1} />
-        </ActionIcon>
-        <ActionIcon
-          component={Link}
-          to="/skills"
-          variant="default"
-          radius={"md"}
-          title="Skills"
-          size="lg"
-          color={"blue"}
-        >
-          <IconJumpRope size="1.2rem" stroke={1.1} />
-        </ActionIcon>
-
-        <ActionIcon
-          component={Link}
-          to="/pocket"
-          variant="default"
-          radius={"md"}
-          title="Tech Pocket"
-          size="lg"
-          color={"blue"}
-        >
-          <IconBrandPocket size="1.2rem" stroke={1.1} />
-        </ActionIcon>
-        <ActionIcon
-          component={Link}
-          to="/blog"
-          variant="default"
-          radius={"md"}
-          title="Blogs"
-          size="lg"
-          color={"blue"}
-        >
-          <IconArticle size="1.2rem" stroke={1.1} />
-        </ActionIcon>
-        <ActionIcon
-          component={Link}
-          to="/"
-          variant="default"
-          radius={"md"}
-          title="Résumé"
-          size="lg"
-          color={"blue"}
-        >
-          <IconFileDownload size="1.2rem" stroke={1.1} />
-        </ActionIcon>
-        <ActionIcon
-          variant="default"
-          radius={"md"}
-          color={dark ? "yellow" : "blue"}
-          onClick={() => toggleColorScheme()}
-          title="Toggle color scheme"
-          size="lg"
-        >
-          {dark ? (
-            <IconSun size="1.2rem" stroke={1.1} />
-          ) : (
-            <IconMoonStars size="1.2rem" stroke={1.1} />
-          )}
-        </ActionIcon>
-      </Group>
+    <Card withBorder w={"100vw"} px={"xl"}>
+      <Stack align="center">
+        <Group justify="space-between" w={isMobile ? 300 : 450} align="center">
+          {NavBaroptions.map((option) => (
+            <NavbarBtn
+              title={option.title}
+              link={option.link}
+              icon={option.icon}
+            />
+          ))}
+          <Stack gap={5} align="center">
+            <ActionIcon
+              variant="default"
+              radius={"md"}
+              color={dark ? "yellow" : "blue"}
+              onClick={() => toggleColorScheme()}
+              title="Toggle color scheme"
+              size="md"
+            >
+              {dark ? (
+                <IconSun size="1rem" stroke={1} />
+              ) : (
+                <IconMoonStars size="1rem" stroke={1} />
+              )}
+            </ActionIcon>
+            <Group gap={"xs"} align="center">
+              <Text ta={"center"} c={"dimmed"} size="xs">
+                {dark ? "Light" : "Dark"}
+              </Text>
+            </Group>
+          </Stack>
+        </Group>
+      </Stack>
     </Card>
   );
 }

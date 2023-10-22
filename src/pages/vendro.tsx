@@ -28,7 +28,7 @@ const Vendro = () => {
       >
         <SignUpFormReact />
       </Modal>
-      <Stack spacing={"md"}>
+      <Stack gap={"md"}>
         <Card shadow="sm" p="lg">
           <Card.Section p={"sm"}>
             Our retail store platform was developed to address the challenges
@@ -63,7 +63,7 @@ const Vendro = () => {
         {/* store front demo card */}
         <Card shadow="sm" p="lg" withBorder>
           <Card.Section p={"sm"} withBorder>
-            <Group position="apart">
+            <Group justify="space-between">
               <TitleWithDot title={"Store front - demo "} />
 
               <ActionIcon
@@ -81,7 +81,7 @@ const Vendro = () => {
             </Group>
           </Card.Section>
           <Card.Section p={"sm"}>
-            <Stack spacing={"md"}>
+            <Stack gap={"md"}>
               <Image
                 src={"/vendro-demo-store-front.png"}
                 alt={"Vendro demo store front"}
@@ -118,7 +118,7 @@ const Vendro = () => {
             <TitleWithDot title={"Admin Panel - Demo "} />
           </Card.Section>
           <Card.Section p={"sm"}>
-            <Stack spacing={"md"}>
+            <Stack gap={"md"}>
               <Image
                 src={"/vendro-demo-admin.png"}
                 alt={"Vendro admin panel demo"}

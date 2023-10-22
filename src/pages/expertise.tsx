@@ -56,10 +56,10 @@ interface ExpertiseProps {
 const Expertise = (props: ExpertiseProps) => {
   return (
     <NewCard title={"Expertise"} viewAll>
-      <Text size={"sm"} c="dimmed" align="center" my={"lg"}>
+      <Text size={"sm"} c="dimmed" ta="center" my={"lg"}>
         I specialize in a range of technologies and development areas
       </Text>
-      <Stack w={"100%"} spacing={"lg"} p={"lg"}>
+      <Stack w={"100%"} gap={"lg"} p={"lg"}>
         {expertise.map((item, index) => {
           return (
             index < props.items && (
@@ -70,7 +70,7 @@ const Expertise = (props: ExpertiseProps) => {
                   </Title>
                 </Card.Section>
                 <Card.Section p="sm">
-                  <Group spacing={"sm"} position="center" w={"100%"} p={"xs"}>
+                  <Group gap={"sm"} justify="center" w={"100%"} p={"xs"}>
                     {item.subTitles.map((subTitle) => (
                       <Card withBorder shadow="sm" p={"xs"} key={randomId()}>
                         <Text c="dimmed">{subTitle}</Text>
