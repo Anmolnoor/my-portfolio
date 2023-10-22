@@ -17,7 +17,7 @@ const Hero = () => {
   return (
     <Card>
       <Card.Section>
-        <Group position="apart">
+        <Group justify="space-between">
           <TitleWithDot title="Software Engineer" />
           <Badge
             color="green"
@@ -41,20 +41,13 @@ const Hero = () => {
         </Group>
       </Card.Section>
       <Card.Section>
-        <Stack
-          spacing={"md"}
-          justify="center"
-          align="center"
-          my={"lg"}
-          py={"lg"}
-        >
+        <Stack gap={"md"} justify="center" align="center" my={"lg"} py={"lg"}>
           <Image
             src={"/anmol.jpg"}
             alt="Anmol Noor"
-            width={180}
-            height={180}
             radius={"50%"}
-            withPlaceholder
+            style={{ objectFit: "cover" }}
+            w={200}
           />
 
           <TitleWithSubTitle
@@ -62,21 +55,13 @@ const Hero = () => {
             order={1}
             subTitle="In the world of 0s and 1s, I'm the one who bridges the gap."
           />
-          <SimpleGrid
-            cols={2}
-            breakpoints={[
-              {
-                maxWidth: 315,
-                cols: 1,
-              },
-            ]}
-          >
+          <SimpleGrid cols={2} maw={315}>
             <Button
               component={Link}
               target="_blank"
               to={"https://cal.com/anmolnoor"}
               color="blue"
-              rightIcon={<IconCalendarStats size="1.2rem" stroke={1.1} />}
+              rightSection={<IconCalendarStats size="1.2rem" stroke={1.1} />}
             >
               Book
             </Button>
@@ -84,7 +69,7 @@ const Hero = () => {
               component={Link}
               to={"mailto:anmolnoor59@gmail.com"}
               color="gray"
-              leftIcon={<IconSend size="1.2rem" stroke={1.1} />}
+              leftSection={<IconSend size="1.2rem" stroke={1.1} />}
             >
               E-Mail
             </Button>

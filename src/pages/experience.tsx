@@ -62,7 +62,7 @@ const Experience = () => {
         {internshipsAndExperience.map((item) => (
           <Card withBorder p={"lg"}>
             <Card.Section p={"xs"}>
-              <Group position="apart">
+              <Group justify="space-between">
                 {GetTitle(item.company)}
                 {item.link === "#" ? null : (
                   <ActionIcon
@@ -81,7 +81,7 @@ const Experience = () => {
               </Group>
             </Card.Section>
             <Card.Section p="xs" pt={0}>
-              <Group position="left">
+              <Group justify="left">
                 <Text size={"md"} c="dimmed">
                   - {item.position} - {item.duration}
                 </Text>

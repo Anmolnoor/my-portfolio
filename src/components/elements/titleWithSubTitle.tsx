@@ -12,7 +12,7 @@ const TitleWithSubTitle = ({ order = 2, ...props }: TitleWithSubTitleProps) => {
       <Title order={order}>{props.title}</Title>
 
       <Stack p={0} w={"77%"}>
-        <Text size="lg" color="dimmed" sx={{ textAlign: "center" }}>
+        <Text size="lg" c="dimmed" ta="center">
           {props.subTitle}
         </Text>
       </Stack>

@@ -147,7 +147,7 @@ const Projects = () => {
         {projects.map((item) => (
           <Card withBorder p={"lg"}>
             <Card.Section p={"xs"}>
-              <Group position="apart">
+              <Group justify="space-between">
                 {GetTitle(item.title)}
                 <ActionIcon
                   component={Link}
