@@ -1,4 +1,4 @@
-import { randomId } from "@mantine/hooks";
+import { randomId, useMediaQuery } from "@mantine/hooks";
 import NewCard from "../components/elements/newCard";
 import { Card, Group, Image, SimpleGrid, Text } from "@mantine/core";
 import { Link } from "react-router-dom";
@@ -187,17 +187,10 @@ const pocketTech = [
 ];
 
 const Pocket = () => {
+  const isMobile = useMediaQuery("(max-width: 500px)");
   return (
     <NewCard title={"Tech Pocket"} viewAll>
-      <SimpleGrid
-        cols={3}
-        breakpoints={[
-          {
-            maxWidth: 550,
-            cols: 2,
-          },
-        ]}
-      >
+      <SimpleGrid cols={isMobile ? 2 : 3}>
         {pocketTech.map((tech) => (
           <Card
             component={Link}
@@ -208,14 +201,13 @@ const Pocket = () => {
             key={randomId()}
           >
             <Card.Section p={"xs"}>
-              <Group position="center" spacing={"sm"}>
+              <Group justify="center" gap={"sm"}>
                 <Image
                   fit="contain"
                   src={tech.logo}
                   alt={tech.name}
-                  width={20}
-                  height={20}
-                  withPlaceholder
+                  w={20}
+                  h={20}
                 />
                 <Text size={"sm"}>{tech.name}</Text>
               </Group>

@@ -23,7 +23,7 @@ interface SkillsProps {
 const Skills = (props: SkillsProps) => {
   return (
     <NewCard title={"Skills"} viewAll link="/skills">
-      <Stack spacing={"xs"}>
+      <Stack gap={"xs"}>
         {skills.map((skill, index) => {
           return (
             index < props.items && (
