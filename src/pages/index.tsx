@@ -73,7 +73,7 @@ const HomePage = () => {
                     <IconLink size=".8rem" stroke={1} />
                   </ActionIcon>
                 </Group>
-                <Text size="sm" ta={"center"} c={"dimmed"}>
+                <Text size="sm" ta={"left"} c={"dimmed"}>
                   {item.description.slice(0, 40) + "..."}
                 </Text>
               </Card>
