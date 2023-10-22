@@ -18,6 +18,7 @@ import {
 } from "@tabler/icons-react";
 import { useMediaQuery } from "@mantine/hooks";
 import { projects } from "../assets/projects";
+import NewCard from "../components/elements/newCard";
 
 const navigationOptions = [
   {
@@ -45,22 +46,40 @@ const HomePage = () => {
     <Card withBorder p={"sm"}>
       <Stack gap={"lg"}>
         <Hero />
-        <SimpleGrid cols={isMobile ? 1 : 2} spacing={"md"}>
-          {latestProjects.map((item) => (
-            <Card
-              component={Link}
-              withBorder
-              title={"Latest Projects"}
-              to={item.link}
-              target="_blank"
-            >
-              <Text ta={"center"}>{item.title}</Text>
-              <Text ta={"center"} c={"dimmed"}>
-                {item.description.slice(0, 40) + "..."}
-              </Text>
-            </Card>
-          ))}
-        </SimpleGrid>
+        <NewCard title={"Latest Projects"}>
+          <SimpleGrid cols={isMobile ? 1 : 2} spacing={"md"}>
+            {latestProjects.map((item) => (
+              <Card
+                component={Link}
+                withBorder
+                title={"Latest Projects"}
+                to={item.link}
+                target="_blank"
+              >
+                <Group gap={"xs"} align="center" justify="space-between">
+                  <Text fw={700} ta={"left"}>
+                    {item.title}
+                  </Text>
+                  <ActionIcon
+                    component={Link}
+                    to={item.link}
+                    variant="default"
+                    radius={"md"}
+                    title={item.title}
+                    size="sm"
+                    color={"blue"}
+                    target="_blank"
+                  >
+                    <IconLink size=".8rem" stroke={1} />
+                  </ActionIcon>
+                </Group>
+                <Text size="sm" ta={"center"} c={"dimmed"}>
+                  {item.description.slice(0, 40) + "..."}
+                </Text>
+              </Card>
+            ))}
+          </SimpleGrid>
+        </NewCard>
         <Interests />
         <FunFacts />
         {navigationOptions.map((option) => (
