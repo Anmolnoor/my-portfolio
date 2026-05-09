@@ -1,0 +1,46 @@
+---
+title: Hello, World — Why I'm Starting a Blog
+slug: hello-world
+date: 2026-05-09
+excerpt: A short note on why I'm finally writing things down — the projects, the gotchas, and the bits worth sharing from building real software.
+readingMinutes: 2
+cover: /blog/helloworld.png
+tags:
+  - meta
+  - writing
+---
+
+I've been shipping software for a while now — MERN stacks, React Native apps,
+Web3 things on Solana, real-time media with WebRTC. A lot of small lessons get
+buried in commits and Slack threads. This blog is where I'll dig some of them
+back up.
+
+## What you'll find here
+
+Notes on:
+
+- **Architecture decisions** — what worked, what I'd do differently
+- **Web3 + Solana** — building, debugging, and shipping on-chain
+- **Realtime systems** — WebRTC, MediaSoup, and the joys of NAT traversal
+- **Frontend craft** — React patterns, performance wins, design-system bits
+
+## A small code example
+
+Here's the kind of thing you can expect — short, useful, and copy-pasteable:
+
+```ts
+type Result<T, E = Error> =
+  | { ok: true; value: T }
+  | { ok: false; error: E };
+
+const tryParse = <T>(input: string): Result<T> => {
+  try {
+    return { ok: true, value: JSON.parse(input) as T };
+  } catch (error) {
+    return { ok: false, error: error as Error };
+  }
+};
+```
+
+More posts soon. If you spot something off, the source is on
+[GitHub](https://github.com/anmolnoor/my-portfolio).

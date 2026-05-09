@@ -5,12 +5,13 @@ import FollowMe from "../../pages/follow";
 
 const MainLayout = () => {
   return (
-    <Container size={"md"}>
+    <Container size={"md"} pt={"md"}>
+      <FollowMe />
       <ScrollRestoration />
       <Box my={"lg"}>
         <Outlet />
       </Box>
-      <FollowMe />
+      
       <Space h={100} />
       <Affix
         withinPortal={false}
