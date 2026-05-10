@@ -80,6 +80,13 @@ const components: MDXComponents = {
       {children}
     </Table>
   ),
+  img: ({ src, alt }) => (
+    <img
+      src={src}
+      alt={alt}
+      style={{ maxWidth: "100%", height: "auto", display: "block" }}
+    />
+  ),
 };
 
 export default components;
