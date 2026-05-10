@@ -1,58 +1,33 @@
-import { Box } from "@mantine/core";
 import type { ReactNode } from "react";
+import { cn } from "@/lib/utils";
 
 interface IconTileProps {
   children: ReactNode;
   variant?: "neutral" | "blue" | "green";
-  size?: number;
+  className?: string;
 }
 
-const variantStyles: Record<NonNullable<IconTileProps["variant"]>, {
-  bg: string;
-  border: string;
-  color: string;
-}> = {
-  neutral: {
-    bg: "var(--mantine-color-default)",
-    border: "var(--mantine-color-default-border)",
-    color: "var(--mantine-color-text)",
-  },
-  blue: {
-    bg: "var(--mantine-color-blue-light)",
-    border: "var(--mantine-color-blue-light-hover)",
-    color: "var(--mantine-color-blue-6)",
-  },
-  green: {
-    bg: "var(--mantine-color-green-light)",
-    border: "var(--mantine-color-green-light-hover)",
-    color: "var(--mantine-color-green-7)",
-  },
+const variantClasses: Record<NonNullable<IconTileProps["variant"]>, string> = {
+  neutral: "border-border bg-muted text-foreground",
+  blue: "border-primary/20 bg-primary/10 text-primary",
+  green:
+    "border-green-500/20 bg-green-500/10 text-green-700 dark:text-green-400",
 };
 
 const IconTile = ({
   children,
   variant = "neutral",
-  size = 44,
-}: IconTileProps) => {
-  const v = variantStyles[variant];
-  return (
-    <Box
-      w={size}
-      h={size}
-      style={{
-        flexShrink: 0,
-        background: v.bg,
-        border: `1px solid ${v.border}`,
-        color: v.color,
-        borderRadius: "var(--mantine-radius-md)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      {children}
-    </Box>
-  );
-};
+  className,
+}: IconTileProps) => (
+  <div
+    className={cn(
+      "flex h-11 w-11 shrink-0 items-center justify-center rounded-md border",
+      variantClasses[variant],
+      className
+    )}
+  >
+    {children}
+  </div>
+);
 
 export default IconTile;

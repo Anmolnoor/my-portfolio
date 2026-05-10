@@ -1,34 +1,31 @@
-import { Button, Card, Group, Stack, Text, Title } from "@mantine/core";
-import { IconCalendarStats, IconSend } from "@tabler/icons-react";
+import { CalendarClock, Send } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 const Contact = () => {
   return (
-    <Card withBorder radius="md" p="xl">
-      <Stack gap="md">
-        <Title order={2}>Contact</Title>
-        <Text c="dimmed">
+    <Card className="p-8">
+      <div className="flex flex-col gap-4">
+        <h2 className="text-3xl font-bold tracking-tight">Contact</h2>
+        <p className="text-muted-foreground">
           The fastest way to reach me is email or by booking a call.
-        </Text>
-        <Group gap="sm">
-          <Button
-            component={Link}
-            to="https://cal.com/anmolnoor"
-            target="_blank"
-            leftSection={<IconCalendarStats size="1rem" stroke={1.4} />}
-          >
-            Book a call
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <Button asChild>
+            <Link to="https://cal.com/anmolnoor" target="_blank">
+              <CalendarClock />
+              Book a call
+            </Link>
           </Button>
-          <Button
-            component="a"
-            href="mailto:anmolnoor59@gmail.com"
-            variant="default"
-            leftSection={<IconSend size="1rem" stroke={1.4} />}
-          >
-            anmolnoor59@gmail.com
+          <Button asChild variant="outline">
+            <a href="mailto:anmolnoor59@gmail.com">
+              <Send />
+              anmolnoor59@gmail.com
+            </a>
           </Button>
-        </Group>
-      </Stack>
+        </div>
+      </div>
     </Card>
   );
 };

@@ -1,41 +1,39 @@
-import NewCard from "../components/elements/newCard";
-import { ActionIcon, Card, Group, Stack } from "@mantine/core";
+import { Link as LinkIcon } from "lucide-react";
 import { Link } from "react-router-dom";
-import { IconLink } from "@tabler/icons-react";
-import { GetTitle } from "../utils/title";
-import { GetDescription } from "../utils/description";
-import { projects } from "../assets/projects";
-import { randomId } from "@mantine/hooks";
+import NewCard from "@/components/elements/newCard";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { projects } from "@/assets/projects";
+import { GetTitle } from "@/utils/title";
+import { GetDescription } from "@/utils/description";
 
 const Projects = () => {
   return (
-    <NewCard title={"Projects"} viewAll link={"/projects"}>
-      <Stack>
-        {projects.map((item) => (
-          <Card key={randomId()} withBorder p={"lg"}>
-            <Card.Section p={"xs"}>
-              <Group justify="space-between">
+    <NewCard title="Projects" viewAll link="/projects">
+      <div className="flex flex-col gap-4">
+        {projects.map((item, idx) => {
+          const isExternal = item.link.startsWith("http");
+          return (
+            <Card key={`${item.title}-${idx}`} className="p-6">
+              <div className="flex items-center justify-between gap-4 pb-2">
                 {GetTitle(item.title)}
-                <ActionIcon
-                  component={Link}
-                  to={item.link}
-                  variant="default"
-                  radius={"10%"}
-                  title={item.title}
-                  size="lg"
-                  color={"blue"}
-                  target="_blank"
-                >
-                  <IconLink size="1.2rem" stroke={1.1} />
-                </ActionIcon>
-              </Group>
-            </Card.Section>
-            <Card.Section p={"xs"}>
-              {GetDescription({ text: item.description })}
-            </Card.Section>
-          </Card>
-        ))}
-      </Stack>
+                <Button asChild variant="outline" size="icon">
+                  <Link
+                    to={item.link}
+                    target={isExternal ? "_blank" : undefined}
+                    title={item.title}
+                  >
+                    <LinkIcon className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+              <div className="pt-2">
+                <GetDescription text={item.description} />
+              </div>
+            </Card>
+          );
+        })}
+      </div>
     </NewCard>
   );
 };

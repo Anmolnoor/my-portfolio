@@ -1,81 +1,50 @@
-import {
-  Stack,
-  Group,
-  Button,
-  Card,
-  Badge,
-  Indicator,
-  Image,
-  SimpleGrid,
-} from "@mantine/core";
+import { CalendarClock, Send } from "lucide-react";
 import { Link } from "react-router-dom";
-import TitleWithDot from "../components/elements/titleWithDot";
-import TitleWithSubTitle from "../components/elements/titleWithSubTitle";
-import { IconCalendarStats, IconSend } from "@tabler/icons-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import TitleWithDot from "@/components/elements/titleWithDot";
+import TitleWithSubTitle from "@/components/elements/titleWithSubTitle";
 
 const Hero = () => {
   return (
-    <Card>
-      <Card.Section>
-        <Group justify="space-between">
-          <TitleWithDot title="Software Engineer" />
-          <Badge
-            color="green"
-            variant="light"
-            p={"sm"}
-            pl={"lg"}
-            leftSection={
-              <Indicator
-                withBorder
-                offset={-6}
-                size={10}
-                position="middle-start"
-                color="green"
-              >
-                {}
-              </Indicator>
-            }
-          >
-            available
-          </Badge>
-        </Group>
-      </Card.Section>
-      <Card.Section>
-        <Stack gap={"md"} justify="center" align="center" my={"lg"} py={"lg"}>
-          <Image
-            src={"/anmol.jpg"}
-            alt="Anmol Noor"
-            radius={"50%"}
-            style={{ objectFit: "cover" }}
-            w={200}
-          />
-
-          <TitleWithSubTitle
-            title="Anmol Noor"
-            order={1}
-            subTitle="In the world of 0s and 1s, I'm the one who bridges the gap."
-          />
-          <SimpleGrid cols={2} maw={315}>
-            <Button
-              component={Link}
-              target="_blank"
-              to={"https://cal.com/anmolnoor"}
-              color="blue"
-              rightSection={<IconCalendarStats size="1.2rem" stroke={1.1} />}
-            >
+    <Card className="p-6">
+      <div className="flex items-center justify-between">
+        <TitleWithDot title="Software Engineer" />
+        <Badge variant="success" className="gap-2 px-3 py-1">
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
+          </span>
+          available
+        </Badge>
+      </div>
+      <div className="my-6 flex flex-col items-center gap-4 py-6">
+        <img
+          src="/anmol.jpg"
+          alt="Anmol Noor"
+          className="h-48 w-48 rounded-full object-cover"
+        />
+        <TitleWithSubTitle
+          title="Anmol Noor"
+          order={1}
+          subTitle="In the world of 0s and 1s, I'm the one who bridges the gap."
+        />
+        <div className="grid w-full max-w-sm grid-cols-2 gap-3">
+          <Button asChild>
+            <Link to="https://cal.com/anmolnoor" target="_blank">
               Book
-            </Button>
-            <Button
-              component={Link}
-              to={"mailto:anmolnoor59@gmail.com"}
-              color="gray"
-              leftSection={<IconSend size="1.2rem" stroke={1.1} />}
-            >
+              <CalendarClock />
+            </Link>
+          </Button>
+          <Button asChild variant="outline">
+            <a href="mailto:anmolnoor59@gmail.com">
+              <Send />
               E-Mail
-            </Button>
-          </SimpleGrid>
-        </Stack>
-      </Card.Section>
+            </a>
+          </Button>
+        </div>
+      </div>
     </Card>
   );
 };

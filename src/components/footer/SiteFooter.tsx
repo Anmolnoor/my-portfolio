@@ -1,34 +1,28 @@
-import { Box, Container, Group, Text } from "@mantine/core";
-import {
-  IconBrandGithub,
-  IconBrandLinkedin,
-  IconBrandX,
-  IconMail,
-} from "@tabler/icons-react";
+import { Github, Linkedin, Mail, Twitter } from "lucide-react";
 
 const socials = [
   {
     label: "GitHub",
     href: "https://github.com/anmolnoor",
-    Icon: IconBrandGithub,
+    Icon: Github,
     external: true,
   },
   {
     label: "LinkedIn",
     href: "https://www.linkedin.com/in/anmolnoor/",
-    Icon: IconBrandLinkedin,
+    Icon: Linkedin,
     external: true,
   },
   {
     label: "X (Twitter)",
     href: "https://twitter.com/noor_anmol",
-    Icon: IconBrandX,
+    Icon: Twitter,
     external: true,
   },
   {
     label: "Email",
     href: "mailto:anmolnoor59@gmail.com",
-    Icon: IconMail,
+    Icon: Mail,
     external: false,
   },
 ];
@@ -36,42 +30,27 @@ const socials = [
 const SiteFooter = () => {
   const year = new Date().getFullYear();
   return (
-    <Box
-      component="footer"
-      style={{
-        borderTop: "1px solid var(--mantine-color-default-border)",
-        marginTop: 48,
-      }}
-    >
-      <Container size="lg" py="xl">
-        <Group justify="space-between" align="center" wrap="wrap" gap="md">
-          <Text size="sm" c="dimmed">
-            © {year} Anmol Noor. All rights reserved.
-          </Text>
-          <Group gap="xl">
-            {socials.map(({ label, href, Icon, external }) => (
-              <a
-                key={label}
-                href={href}
-                target={external ? "_blank" : undefined}
-                rel={external ? "noreferrer" : undefined}
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 8,
-                  textDecoration: "none",
-                  color: "var(--mantine-color-dimmed)",
-                  fontSize: 14,
-                }}
-              >
-                <Icon size="1rem" stroke={1.4} />
-                {label}
-              </a>
-            ))}
-          </Group>
-        </Group>
-      </Container>
-    </Box>
+    <footer className="mt-12 border-t">
+      <div className="container mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-8">
+        <p className="text-sm text-muted-foreground">
+          © {year} Anmol Noor. All rights reserved.
+        </p>
+        <div className="flex items-center gap-6">
+          {socials.map(({ label, href, Icon, external }) => (
+            <a
+              key={label}
+              href={href}
+              target={external ? "_blank" : undefined}
+              rel={external ? "noreferrer" : undefined}
+              className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <Icon className="h-4 w-4" />
+              {label}
+            </a>
+          ))}
+        </div>
+      </div>
+    </footer>
   );
 };
 

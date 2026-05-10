@@ -1,26 +1,23 @@
-import { Button, Card, Stack, Text, Title } from "@mantine/core";
-import { IconFileDownload } from "@tabler/icons-react";
+import { FileDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 const Resume = () => {
   return (
-    <Card withBorder radius="md" p="xl">
-      <Stack gap="md">
-        <Title order={2}>Resume</Title>
-        <Text c="dimmed">
+    <Card className="p-8">
+      <div className="flex flex-col gap-4">
+        <h2 className="text-3xl font-bold tracking-tight">Resume</h2>
+        <p className="text-muted-foreground">
           A printable resume is on the way. In the meantime, my project list
           and writing reflect my current focus.
-        </Text>
-        <Button
-          component="a"
-          href="/resume.pdf"
-          target="_blank"
-          variant="default"
-          leftSection={<IconFileDownload size="1rem" stroke={1.4} />}
-          style={{ alignSelf: "flex-start" }}
-        >
-          Download PDF
+        </p>
+        <Button asChild variant="outline" className="self-start">
+          <a href="/resume.pdf" target="_blank">
+            <FileDown />
+            Download PDF
+          </a>
         </Button>
-      </Stack>
+      </div>
     </Card>
   );
 };

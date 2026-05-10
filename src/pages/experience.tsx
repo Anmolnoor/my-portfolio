@@ -1,9 +1,9 @@
-import { IconLink } from "@tabler/icons-react";
-import NewCard from "../components/elements/newCard";
-import { ActionIcon, Card, Group, Stack, Text } from "@mantine/core";
+import { Link as LinkIcon } from "lucide-react";
 import { Link } from "react-router-dom";
-import { GetTitle } from "../utils/title";
-import { randomId } from "@mantine/hooks";
+import NewCard from "@/components/elements/newCard";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { GetTitle } from "@/utils/title";
 
 const internshipsAndExperience = [
   {
@@ -58,39 +58,26 @@ const internshipsAndExperience = [
 
 const Experience = () => {
   return (
-    <NewCard title={"Experience"} viewAll link={"/experience"}>
-      <Stack>
-        {internshipsAndExperience.map((item) => (
-          <Card withBorder p={"lg"} key={randomId()}>
-            <Card.Section p={"xs"}>
-              <Group justify="space-between">
-                {GetTitle(item.company)}
-                {item.link === "#" ? null : (
-                  <ActionIcon
-                    component={Link}
-                    to={item.link}
-                    variant="default"
-                    radius={"10%"}
-                    title={item.link}
-                    size="lg"
-                    color={"blue"}
-                    target="_blank"
-                  >
-                    <IconLink size="1.2rem" stroke={1.1} />
-                  </ActionIcon>
-                )}
-              </Group>
-            </Card.Section>
-            <Card.Section p="xs" pt={0}>
-              <Group justify="left">
-                <Text size={"md"} c="dimmed">
-                  - {item.position} - {item.duration}
-                </Text>
-              </Group>
-            </Card.Section>
+    <NewCard title="Experience" viewAll link="/experience">
+      <div className="flex flex-col gap-4">
+        {internshipsAndExperience.map((item, idx) => (
+          <Card key={`${item.company}-${idx}`} className="p-6">
+            <div className="flex items-center justify-between gap-4">
+              {GetTitle(item.company)}
+              {item.link !== "#" && (
+                <Button asChild variant="outline" size="icon">
+                  <Link to={item.link} target="_blank" title={item.link}>
+                    <LinkIcon className="h-4 w-4" />
+                  </Link>
+                </Button>
+              )}
+            </div>
+            <p className="mt-2 text-sm text-muted-foreground">
+              - {item.position} - {item.duration}
+            </p>
           </Card>
         ))}
-      </Stack>
+      </div>
     </NewCard>
   );
 };

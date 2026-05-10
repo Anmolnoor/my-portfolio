@@ -1,20 +1,7 @@
-import {
-  Avatar,
-  Box,
-  Card,
-  Group,
-  SimpleGrid,
-  Stack,
-  Text,
-} from "@mantine/core";
-import { useMediaQuery } from "@mantine/hooks";
-import {
-  IconBolt,
-  IconBriefcase,
-  IconMapPin,
-  IconTarget,
-} from "@tabler/icons-react";
 import type { ReactNode } from "react";
+import { Briefcase, MapPin, Target, Zap } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card } from "@/components/ui/card";
 import SectionHeader from "./SectionHeader";
 
 const MetaRow = ({
@@ -26,82 +13,64 @@ const MetaRow = ({
   label: string;
   value: string;
 }) => (
-  <Group gap="sm" wrap="nowrap" align="flex-start">
-    <Box
-      style={{
-        color: "var(--mantine-color-dimmed)",
-        marginTop: 2,
-        flexShrink: 0,
-      }}
-    >
-      {icon}
-    </Box>
-    <Stack gap={0}>
-      <Text size="xs" c="dimmed">
-        {label}
-      </Text>
-      <Text size="sm" fw={500}>
-        {value}
-      </Text>
-    </Stack>
-  </Group>
+  <div className="flex items-start gap-3">
+    <span className="mt-0.5 shrink-0 text-muted-foreground">{icon}</span>
+    <div>
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className="text-sm font-medium">{value}</p>
+    </div>
+  </div>
 );
 
 const AboutMe = () => {
-  const isMobile = useMediaQuery("(max-width: 720px)");
   return (
-    <div>
+    <section>
       <SectionHeader title="About Me" />
-      <Card withBorder radius="md" p="lg">
-        <SimpleGrid cols={isMobile ? 1 : 2} spacing="xl">
-          <Group gap="md" align="flex-start" wrap="nowrap">
-            <Avatar
-              src="/anmol.jpg"
-              alt="Anmol Noor"
-              size={72}
-              radius="50%"
-              color="blue"
-            >
-              AN
+      <Card className="p-6">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+          <div className="flex items-start gap-4">
+            <Avatar className="h-[72px] w-[72px]">
+              <AvatarImage src="/anmol.jpg" alt="Anmol Noor" />
+              <AvatarFallback className="bg-primary/10 text-primary">
+                AN
+              </AvatarFallback>
             </Avatar>
-            <Stack gap={4} style={{ flex: 1, minWidth: 0 }}>
-              <Text fw={700} size="lg">
-                Anmol Noor
-              </Text>
-              <Text size="sm" c="dimmed">
+            <div className="min-w-0 flex-1 space-y-1">
+              <p className="text-lg font-bold">Anmol Noor</p>
+              <p className="text-sm text-muted-foreground">
                 I'm a software engineer and builder who loves turning ideas into
                 robust products. I enjoy full-stack development, distributed
                 systems, and developer tooling. Outside of code, you'll find me
                 tinkering with infrastructure, reading, or exploring new
                 technologies.
-              </Text>
-            </Stack>
-          </Group>
-          <SimpleGrid cols={2} spacing="md">
+              </p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
             <MetaRow
-              icon={<IconMapPin size={16} stroke={1.4} />}
+              icon={<MapPin className="h-4 w-4" />}
               label="Location"
               value="India"
             />
             <MetaRow
-              icon={<IconTarget size={16} stroke={1.4} />}
+              icon={<Target className="h-4 w-4" />}
               label="Focus"
               value="Software · Systems · AI Tools"
             />
             <MetaRow
-              icon={<IconBriefcase size={16} stroke={1.4} />}
+              icon={<Briefcase className="h-4 w-4" />}
               label="Experience"
               value="5+ years"
             />
             <MetaRow
-              icon={<IconBolt size={16} stroke={1.4} />}
+              icon={<Zap className="h-4 w-4" />}
               label="Currently"
               value="Building, learning, shipping"
             />
-          </SimpleGrid>
-        </SimpleGrid>
+          </div>
+        </div>
       </Card>
-    </div>
+    </section>
   );
 };
 

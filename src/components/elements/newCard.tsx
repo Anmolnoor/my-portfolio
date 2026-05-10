@@ -1,39 +1,39 @@
-import { Button, Card, Group } from "@mantine/core";
-import React from "react";
-import TitleWithDot from "./titleWithDot";
-import { links } from "../../router/routes";
+import type { ReactNode } from "react";
 import { Link, useMatches } from "react-router-dom";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import TitleWithDot from "./titleWithDot";
+import type { links } from "../../router/routes";
 
 interface NewCardProps {
-  children: React.ReactNode;
+  children: ReactNode;
   title: string;
   viewAll?: boolean;
   link?: links;
 }
 
-const NewCard = ({ viewAll = false, link = "/", ...props }: NewCardProps) => {
+const NewCard = ({
+  viewAll = false,
+  link = "/",
+  title,
+  children,
+}: NewCardProps) => {
   const route = useMatches();
+  const isHome = route.at(-1)?.pathname === "/";
+  const buttonLabel = isHome ? "View All" : "Back";
+  const buttonTo = isHome ? link : "/";
+
   return (
-    <Card withBorder>
-      <Card.Section p="sm">
-        <Group justify="space-between">
-          <TitleWithDot title={props.title} />
-          {viewAll ? (
-            <Button
-              component={Link}
-              to={route.at(-1)?.pathname === "/" ? link : "/"}
-              variant="default"
-              radius={"md"}
-              title={route.at(-1)?.pathname === "/" ? "View All" : "Back"}
-              size="sm"
-              color={"blue"}
-            >
-              {route.at(-1)?.pathname === "/" ? "View All" : "Back"}
-            </Button>
-          ) : null}
-        </Group>
-      </Card.Section>
-      <Card.Section p="sm">{props.children}</Card.Section>
+    <Card>
+      <div className="flex items-center justify-between p-4">
+        <TitleWithDot title={title} />
+        {viewAll && (
+          <Button asChild variant="outline" size="sm">
+            <Link to={buttonTo}>{buttonLabel}</Link>
+          </Button>
+        )}
+      </div>
+      <div className="p-4 pt-0">{children}</div>
     </Card>
   );
 };

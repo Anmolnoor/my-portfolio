@@ -1,50 +1,40 @@
 import { useState } from "react";
 import { getDots } from "./helper";
-import { Text } from "@mantine/core";
 
 interface Props {
   text: string;
   length?: number;
 }
 
-/**
- *
- * @param text - text to be converted to dotted string
- * @param length - length of the string to be returned
- * @returns - dotted string of the given length with the first letter capitalized and the rest in lower case along with a show more button.
- */
 export const GetDescription = ({ text, length = 80 }: Props) => {
   const [show, setShow] = useState(false);
-  const lengthOFText = text.length;
+  const lengthOfText = text.length;
 
-  const getBtn = (
+  const ToggleBtn = (
     <span
-      style={{
-        cursor: "pointer",
-        paddingLeft: "10px",
-        fontStyle: "italic",
-      }}
+      className="cursor-pointer pl-2 italic"
       onClick={() => setShow(!show)}
     >
       {show ? " show less" : "show more"}
     </span>
   );
 
-  if (lengthOFText <= length || show) {
+  if (lengthOfText <= length || show) {
     return (
-      <Text>
+      <p className="text-foreground">
         {text.charAt(0).toUpperCase() +
-          text.slice(1, show ? lengthOFText : length)}
-        {show && getBtn}
-      </Text>
+          text.slice(1, show ? lengthOfText : length)}
+        {show && ToggleBtn}
+      </p>
     );
   }
+
   return (
-    <Text>
+    <p className="text-foreground">
       {text.charAt(0).toUpperCase() +
         text.slice(1, length) +
         getDots(text.length)}
-      {getBtn}
-    </Text>
+      {ToggleBtn}
+    </p>
   );
 };

@@ -1,15 +1,14 @@
-import { Card, Group, SimpleGrid, Stack, Text } from "@mantine/core";
-import { useMediaQuery } from "@mantine/hooks";
 import { Link } from "react-router-dom";
-import { IconArticle, IconBroadcast, IconStack2 } from "@tabler/icons-react";
-import { getAllPosts } from "../../utils/posts";
+import { FileText, Layers, Radio } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { getAllPosts } from "@/utils/posts";
 import IconTile from "./IconTile";
 import SectionHeader from "./SectionHeader";
 
 const blogIcons = [
-  <IconArticle size={20} stroke={1.4} />,
-  <IconStack2 size={20} stroke={1.4} />,
-  <IconBroadcast size={20} stroke={1.4} />,
+  <FileText className="h-5 w-5" />,
+  <Layers className="h-5 w-5" />,
+  <Radio className="h-5 w-5" />,
 ];
 
 const formatDate = (iso: string) => {
@@ -23,58 +22,44 @@ const formatDate = (iso: string) => {
 };
 
 const WritingList = () => {
-  const isMobile = useMediaQuery("(max-width: 600px)");
-  const isTablet = useMediaQuery("(max-width: 900px)");
-  const cols = isMobile ? 1 : isTablet ? 2 : 3;
-
   const posts = getAllPosts().slice(0, 3);
 
   if (posts.length === 0) return null;
 
   return (
-    <div>
+    <section>
       <SectionHeader
         title="Writing / Blog"
         linkLabel="View all posts"
         linkTo="/blog"
       />
-      <SimpleGrid cols={cols} spacing="md">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {posts.map((post, i) => (
-          <Card
+          <Link
             key={post.slug}
-            withBorder
-            radius="md"
-            p="md"
-            component={Link}
             to={`/blog/${post.slug}`}
-            style={{ textDecoration: "none", color: "inherit" }}
+            className="group text-inherit no-underline"
           >
-            <Group align="flex-start" gap="md" wrap="nowrap" mb="sm">
-              <IconTile variant="blue">{blogIcons[i % blogIcons.length]}</IconTile>
-              <Stack gap={2} style={{ flex: 1, minWidth: 0 }}>
-                <Text fw={700} lineClamp={2}>
-                  {post.title}
-                </Text>
-              </Stack>
-            </Group>
-            <Text size="sm" c="dimmed" lineClamp={2} mb="md">
-              {post.excerpt}
-            </Text>
-            <Group gap="xs">
-              <Text size="xs" c="dimmed">
-                {formatDate(post.date)}
-              </Text>
-              <Text size="xs" c="dimmed">
-                ·
-              </Text>
-              <Text size="xs" c="dimmed">
-                {post.readingMinutes} min read
-              </Text>
-            </Group>
-          </Card>
+            <Card className="h-full p-4 transition-colors group-hover:bg-muted/40">
+              <div className="mb-3 flex items-start gap-3">
+                <IconTile variant="blue">
+                  {blogIcons[i % blogIcons.length]}
+                </IconTile>
+                <p className="line-clamp-2 font-bold">{post.title}</p>
+              </div>
+              <p className="mb-4 line-clamp-2 text-sm text-muted-foreground">
+                {post.excerpt}
+              </p>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <span>{formatDate(post.date)}</span>
+                <span>·</span>
+                <span>{post.readingMinutes} min read</span>
+              </div>
+            </Card>
+          </Link>
         ))}
-      </SimpleGrid>
-    </div>
+      </div>
+    </section>
   );
 };
 

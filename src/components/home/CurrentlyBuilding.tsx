@@ -1,47 +1,38 @@
-import { Card, Group, SimpleGrid, Stack, Text } from "@mantine/core";
-import { useMediaQuery } from "@mantine/hooks";
 import { Link } from "react-router-dom";
-import { currentlyBuilding } from "../../assets/currentlyBuilding";
+import { Card } from "@/components/ui/card";
+import { currentlyBuilding } from "@/assets/currentlyBuilding";
 import IconTile from "./IconTile";
 import { getIcon } from "./iconRegistry";
 
 const CurrentlyBuilding = () => {
-  const isMobile = useMediaQuery("(max-width: 720px)");
   return (
-    <SimpleGrid cols={isMobile ? 1 : 2} spacing="xl">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
       {currentlyBuilding.map((item) => {
         const inner = (
-          <Card withBorder p="md" radius="md">
-            <Group wrap="nowrap" gap="md" align="center">
+          <Card className="p-4 transition-colors hover:bg-muted/40">
+            <div className="flex items-center gap-4">
               <IconTile variant={item.iconKey === "code" ? "neutral" : "green"}>
                 {getIcon(item.iconKey)}
               </IconTile>
-              <Stack gap={2} style={{ flex: 1, minWidth: 0 }}>
-                <Group gap="sm" wrap="nowrap">
-                  <Text
-                    size="xs"
-                    fw={700}
-                    c="blue.6"
-                    style={{ letterSpacing: 1.2, textTransform: "uppercase" }}
-                  >
+              <div className="min-w-0 flex-1 space-y-0.5">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold uppercase tracking-widest text-primary">
                     {item.label}
-                  </Text>
-                  <Text fw={600} truncate>
-                    {item.title}
-                  </Text>
-                </Group>
-                <Text size="sm" c="dimmed" lineClamp={2}>
+                  </span>
+                  <span className="truncate font-semibold">{item.title}</span>
+                </div>
+                <p className="line-clamp-2 text-sm text-muted-foreground">
                   {item.description}
-                </Text>
-              </Stack>
-            </Group>
+                </p>
+              </div>
+            </div>
           </Card>
         );
         return item.link ? (
           <Link
             key={item.title}
             to={item.link}
-            style={{ textDecoration: "none", color: "inherit" }}
+            className="text-inherit no-underline"
           >
             {inner}
           </Link>
@@ -49,7 +40,7 @@ const CurrentlyBuilding = () => {
           <div key={item.title}>{inner}</div>
         );
       })}
-    </SimpleGrid>
+    </div>
   );
 };
 

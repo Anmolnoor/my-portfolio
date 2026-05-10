@@ -1,6 +1,5 @@
-import { Card, Group, Stack, Text, Title } from "@mantine/core";
-import { randomId } from "@mantine/hooks";
-import NewCard from "../components/elements/newCard";
+import NewCard from "@/components/elements/newCard";
+import { Card } from "@/components/ui/card";
 
 const expertise = [
   {
@@ -29,7 +28,7 @@ const expertise = [
   },
   {
     title: "CSS Frameworks",
-    subTitles: ["TailwindCSS", "Bootstrap", "Material UI", "Maintine"],
+    subTitles: ["TailwindCSS", "Bootstrap", "Material UI", "Mantine"],
   },
   {
     title: "Version Control",
@@ -53,36 +52,33 @@ interface ExpertiseProps {
   items: number;
 }
 
-const Expertise = (props: ExpertiseProps) => {
+const Expertise = ({ items }: ExpertiseProps) => {
   return (
-    <NewCard title={"Expertise"} viewAll>
-      <Text size={"sm"} c="dimmed" ta="center" my={"lg"}>
+    <NewCard title="Expertise" viewAll>
+      <p className="my-6 text-center text-sm text-muted-foreground">
         I specialize in a range of technologies and development areas
-      </Text>
-      <Stack w={"100%"} gap={"lg"} p={"lg"}>
-        {expertise.map((item, index) => {
-          return (
-            index < props.items && (
-              <Card shadow="sm" padding="md" withBorder radius={"md"}>
-                <Card.Section inheritPadding p="xs" withBorder>
-                  <Title order={3} c="dimmed">
-                    {item.title}
-                  </Title>
-                </Card.Section>
-                <Card.Section p="sm">
-                  <Group gap={"sm"} justify="center" w={"100%"} p={"xs"}>
-                    {item.subTitles.map((subTitle) => (
-                      <Card withBorder shadow="sm" p={"xs"} key={randomId()}>
-                        <Text c="dimmed">{subTitle}</Text>
-                      </Card>
-                    ))}
-                  </Group>
-                </Card.Section>
-              </Card>
-            )
-          );
-        })}
-      </Stack>
+      </p>
+      <div className="flex flex-col gap-6 p-4">
+        {expertise.slice(0, items).map((item) => (
+          <Card key={item.title} className="p-4">
+            <div className="border-b pb-3">
+              <h3 className="text-2xl font-semibold text-muted-foreground">
+                {item.title}
+              </h3>
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-2 p-3">
+              {item.subTitles.map((subTitle) => (
+                <Card
+                  key={subTitle}
+                  className="px-3 py-2 text-sm text-muted-foreground"
+                >
+                  {subTitle}
+                </Card>
+              ))}
+            </div>
+          </Card>
+        ))}
+      </div>
     </NewCard>
   );
 };

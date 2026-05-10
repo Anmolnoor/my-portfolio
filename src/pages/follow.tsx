@@ -1,68 +1,52 @@
-import { Group, ActionIcon, Card } from "@mantine/core";
-import {
-  IconBrandTwitter,
-  IconBrandGithub,
-  IconBrandLinkedin,
-  IconBrandInstagram,
-} from "@tabler/icons-react";
-import TitleWithDot from "../components/elements/titleWithDot";
+import { Github, Instagram, Linkedin, Twitter } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import TitleWithDot from "@/components/elements/titleWithDot";
+
+const handles = [
+  {
+    title: "Twitter",
+    href: "https://twitter.com/noor_anmol",
+    Icon: Twitter,
+  },
+  {
+    title: "GitHub",
+    href: "https://github.com/anmolnoor",
+    Icon: Github,
+  },
+  {
+    title: "LinkedIn",
+    href: "https://www.linkedin.com/in/anmolnoor/",
+    Icon: Linkedin,
+  },
+  {
+    title: "Instagram",
+    href: "https://www.instagram.com/_anmol_noor/",
+    Icon: Instagram,
+  },
+];
 
 const FollowMe = () => {
   return (
-    <Card withBorder>
-      <Group justify="space-between" align="center">
+    <Card className="p-4">
+      <div className="flex items-center justify-between">
         <TitleWithDot title="Follow Me" />
-        <Group>
-          <ActionIcon
-            title="Twitter handle"
-            variant="default"
-            size="lg"
-            color={"blue"}
-            radius={"10%"}
-            onClick={() =>
-              window.open("https://twitter.com/noor_anmol", "_blank")
-            }
-          >
-            <IconBrandTwitter size="1.1rem" stroke={1.1} />
-          </ActionIcon>
-          <ActionIcon
-            title="Github handle"
-            size="lg"
-            variant="default"
-            color={"blue"}
-            radius={"10%"}
-            onClick={() =>
-              window.open("https://github.com/anmolnoor", "_blank")
-            }
-          >
-            <IconBrandGithub size="1.1rem" stroke={1.1} />
-          </ActionIcon>
-          <ActionIcon
-            title="Linkedin handle"
-            size="lg"
-            variant="default"
-            color={"blue"}
-            radius={"10%"}
-            onClick={() =>
-              window.open("https://www.linkedin.com/in/anmolnoor/", "_blank")
-            }
-          >
-            <IconBrandLinkedin size="1.1rem" stroke={1.1} />
-          </ActionIcon>
-          <ActionIcon
-            title="Instagram handle"
-            size="lg"
-            variant="default"
-            color={"blue"}
-            radius={"10%"}
-            onClick={() =>
-              window.open("https://www.instagram.com/_anmol_noor/", "_blank")
-            }
-          >
-            <IconBrandInstagram size="1.1rem" stroke={1.1} />
-          </ActionIcon>
-        </Group>
-      </Group>
+        <div className="flex items-center gap-2">
+          {handles.map(({ title, href, Icon }) => (
+            <Button
+              key={title}
+              asChild
+              variant="outline"
+              size="icon"
+              title={`${title} handle`}
+            >
+              <a href={href} target="_blank" rel="noreferrer">
+                <Icon className="h-4 w-4" />
+              </a>
+            </Button>
+          ))}
+        </div>
+      </div>
     </Card>
   );
 };

@@ -1,6 +1,5 @@
-import { Card, Stack, Text } from "@mantine/core";
-import NewCard from "../components/elements/newCard";
-import { randomId } from "@mantine/hooks";
+import NewCard from "@/components/elements/newCard";
+import { Card } from "@/components/ui/card";
 
 const skills = [
   "Web3 Developer",
@@ -20,20 +19,16 @@ interface SkillsProps {
   items: number;
 }
 
-const Skills = (props: SkillsProps) => {
+const Skills = ({ items }: SkillsProps) => {
   return (
-    <NewCard title={"Skills"} viewAll link="/skills">
-      <Stack gap={"xs"}>
-        {skills.map((skill, index) => {
-          return (
-            index < props.items && (
-              <Card withBorder key={randomId()}>
-                <Text>{skill}</Text>
-              </Card>
-            )
-          );
-        })}
-      </Stack>
+    <NewCard title="Skills" viewAll link="/skills">
+      <div className="flex flex-col gap-2">
+        {skills.slice(0, items).map((skill) => (
+          <Card key={skill} className="p-4">
+            <p>{skill}</p>
+          </Card>
+        ))}
+      </div>
     </NewCard>
   );
 };

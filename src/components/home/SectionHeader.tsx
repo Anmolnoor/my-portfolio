@@ -1,6 +1,5 @@
-import { Group, Text } from "@mantine/core";
-import { IconArrowRight } from "@tabler/icons-react";
 import { Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
 
 interface SectionHeaderProps {
   title: string;
@@ -10,33 +9,20 @@ interface SectionHeaderProps {
 
 const SectionHeader = ({ title, linkLabel, linkTo }: SectionHeaderProps) => {
   return (
-    <Group justify="space-between" align="center" mb="sm">
-      <Text
-        size="xs"
-        fw={700}
-        c="blue.6"
-        style={{ letterSpacing: 1.4, textTransform: "uppercase" }}
-      >
+    <div className="mb-3 flex items-center justify-between">
+      <span className="text-xs font-bold uppercase tracking-widest text-primary">
         {title}
-      </Text>
+      </span>
       {linkLabel && linkTo && (
         <Link
           to={linkTo}
-          style={{
-            textDecoration: "none",
-            color: "var(--mantine-color-blue-6)",
-            fontSize: 13,
-            fontWeight: 500,
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 4,
-          }}
+          className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
         >
           {linkLabel}
-          <IconArrowRight size="0.9rem" stroke={1.6} />
+          <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       )}
-    </Group>
+    </div>
   );
 };
 

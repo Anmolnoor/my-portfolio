@@ -1,73 +1,63 @@
-import { Badge, Card, Group, SimpleGrid, Stack, Text } from "@mantine/core";
-import { useMediaQuery } from "@mantine/hooks";
 import { Link } from "react-router-dom";
-import { projects } from "../../assets/projects";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { projects } from "@/assets/projects";
 import IconTile from "./IconTile";
 import SectionHeader from "./SectionHeader";
 import { getIcon } from "./iconRegistry";
 
 const SelectedProjects = () => {
-  const isMobile = useMediaQuery("(max-width: 600px)");
-  const isTablet = useMediaQuery("(max-width: 900px)");
-  const cols = isMobile ? 1 : isTablet ? 2 : 3;
-
   const featured = projects.filter((p) => p.featured).slice(0, 3);
 
   return (
-    <div>
+    <section>
       <SectionHeader
         title="Selected Projects"
         linkLabel="View all projects"
         linkTo="/projects"
       />
-      <SimpleGrid cols={cols} spacing="md">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {featured.map((project) => {
           const isExternal = project.link.startsWith("http");
           return (
-            <Card
+            <Link
               key={project.title}
-              withBorder
-              radius="md"
-              p="md"
-              component={Link}
               to={project.link}
               target={isExternal ? "_blank" : undefined}
-              style={{ textDecoration: "none", color: "inherit" }}
+              className="group text-inherit no-underline"
             >
-              <Group align="flex-start" gap="md" wrap="nowrap" mb="sm">
-                <IconTile>{getIcon(project.iconKey)}</IconTile>
-                <Stack gap={2} style={{ flex: 1, minWidth: 0 }}>
-                  <Text fw={700}>{project.title}</Text>
-                  {project.tagline && (
-                    <Text size="sm" c="blue.6">
-                      {project.tagline}
-                    </Text>
-                  )}
-                </Stack>
-              </Group>
-              <Text size="sm" c="dimmed" lineClamp={3} mb="md">
-                {project.description}
-              </Text>
-              {project.techTags && project.techTags.length > 0 && (
-                <Group gap={6}>
-                  {project.techTags.map((tag) => (
-                    <Badge
-                      key={tag}
-                      variant="default"
-                      size="sm"
-                      radius="sm"
-                      fw={500}
-                    >
-                      {tag}
-                    </Badge>
-                  ))}
-                </Group>
-              )}
-            </Card>
+              <Card className="h-full p-4 transition-colors group-hover:bg-muted/40">
+                <div className="mb-3 flex items-start gap-3">
+                  <IconTile>{getIcon(project.iconKey)}</IconTile>
+                  <div className="min-w-0 flex-1 space-y-0.5">
+                    <p className="font-bold">{project.title}</p>
+                    {project.tagline && (
+                      <p className="text-sm text-primary">{project.tagline}</p>
+                    )}
+                  </div>
+                </div>
+                <p className="mb-4 line-clamp-3 text-sm text-muted-foreground">
+                  {project.description}
+                </p>
+                {project.techTags && project.techTags.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5">
+                    {project.techTags.map((tag) => (
+                      <Badge
+                        key={tag}
+                        variant="secondary"
+                        className="rounded-sm font-medium"
+                      >
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </Card>
+            </Link>
           );
         })}
-      </SimpleGrid>
-    </div>
+      </div>
+    </section>
   );
 };
 

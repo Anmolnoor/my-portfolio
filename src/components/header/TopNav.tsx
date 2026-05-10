@@ -1,17 +1,16 @@
-import {
-  ActionIcon,
-  Box,
-  Burger,
-  Container,
-  Drawer,
-  Group,
-  Stack,
-  Text,
-  useMantineColorScheme,
-} from "@mantine/core";
-import { useDisclosure, useMediaQuery } from "@mantine/hooks";
-import { IconMoonStars, IconSun } from "@tabler/icons-react";
+import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
+import { Menu, Moon, Sun } from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { useTheme } from "@/components/theme-provider";
+import { cn } from "@/lib/utils";
 
 const navItems = [
   { label: "Projects", to: "/projects" },
@@ -22,29 +21,11 @@ const navItems = [
 ];
 
 const Logo = () => (
-  <Link to="/" style={{ textDecoration: "none" }}>
-    <Group gap="xs">
-      <Box
-        w={32}
-        h={32}
-        style={{
-          borderRadius: "var(--mantine-radius-md)",
-          background:
-            "linear-gradient(135deg, var(--mantine-color-blue-1), var(--mantine-color-blue-3))",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          border: "1px solid var(--mantine-color-blue-3)",
-        }}
-      >
-        <Text fw={800} size="sm" c="blue.7">
-          AN
-        </Text>
-      </Box>
-      <Text fw={600} c="var(--mantine-color-text)">
-        Anmol Noor
-      </Text>
-    </Group>
+  <Link to="/" className="flex items-center gap-2 no-underline">
+    <span className="flex h-8 w-8 items-center justify-center rounded-md border border-primary/30 bg-primary/10 text-xs font-extrabold text-primary">
+      AN
+    </span>
+    <span className="font-semibold text-foreground">Anmol Noor</span>
   </Link>
 );
 
@@ -60,94 +41,77 @@ const NavLinkItem = ({
   <NavLink
     to={to}
     onClick={onClick}
-    style={({ isActive }) => ({
-      textDecoration: "none",
-      fontSize: 14,
-      fontWeight: 500,
-      color: isActive
-        ? "var(--mantine-color-blue-6)"
-        : "var(--mantine-color-dimmed)",
-      transition: "color 120ms ease",
-    })}
+    className={({ isActive }) =>
+      cn(
+        "text-sm font-medium transition-colors",
+        isActive
+          ? "text-primary"
+          : "text-muted-foreground hover:text-foreground"
+      )
+    }
   >
     {label}
   </NavLink>
 );
 
 const ThemeToggle = () => {
-  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
-  const dark = colorScheme === "dark";
+  const { resolvedTheme, toggleTheme } = useTheme();
   return (
-    <ActionIcon
-      variant="default"
-      size="lg"
-      radius="md"
-      onClick={() => toggleColorScheme()}
+    <Button
+      variant="outline"
+      size="icon"
+      onClick={toggleTheme}
       aria-label="Toggle color scheme"
     >
-      {dark ? (
-        <IconSun size="1.1rem" stroke={1.4} />
+      {resolvedTheme === "dark" ? (
+        <Sun className="h-4 w-4" />
       ) : (
-        <IconMoonStars size="1.1rem" stroke={1.4} />
+        <Moon className="h-4 w-4" />
       )}
-    </ActionIcon>
+    </Button>
   );
 };
 
 const TopNav = () => {
-  const isMobile = useMediaQuery("(max-width: 720px)");
-  const [opened, { toggle, close }] = useDisclosure(false);
+  const [open, setOpen] = useState(false);
 
   return (
-    <Box
-      component="header"
-      style={{
-        position: "sticky",
-        top: 0,
-        zIndex: 100,
-        backdropFilter: "blur(8px)",
-        background:
-          "color-mix(in srgb, var(--mantine-color-body) 80%, transparent)",
-        borderBottom: "1px solid var(--mantine-color-default-border)",
-      }}
-    >
-      <Container size="lg" py="md">
-        <Group justify="space-between" align="center">
-          <Logo />
-          {isMobile ? (
-            <Group gap="xs">
-              <ThemeToggle />
-              <Burger opened={opened} onClick={toggle} size="sm" />
-            </Group>
-          ) : (
-            <Group gap="xl" align="center">
-              {navItems.map((item) => (
-                <NavLinkItem key={item.to} to={item.to} label={item.label} />
-              ))}
-              <ThemeToggle />
-            </Group>
-          )}
-        </Group>
-      </Container>
-      <Drawer
-        opened={opened}
-        onClose={close}
-        position="right"
-        size="xs"
-        title="Menu"
-      >
-        <Stack gap="md">
+    <header className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
+        <Logo />
+        <nav className="hidden items-center gap-8 md:flex">
           {navItems.map((item) => (
-            <NavLinkItem
-              key={item.to}
-              to={item.to}
-              label={item.label}
-              onClick={close}
-            />
+            <NavLinkItem key={item.to} to={item.to} label={item.label} />
           ))}
-        </Stack>
-      </Drawer>
-    </Box>
+          <ThemeToggle />
+        </nav>
+        <div className="flex items-center gap-2 md:hidden">
+          <ThemeToggle />
+          <Sheet open={open} onOpenChange={setOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" aria-label="Open menu">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right">
+              <SheetHeader>
+                <SheetTitle>Menu</SheetTitle>
+              </SheetHeader>
+              <nav className="mt-6 flex flex-col gap-4">
+                {navItems.map((item) => (
+                  <NavLinkItem
+                    key={item.to}
+                    to={item.to}
+                    label={item.label}
+                    onClick={() => setOpen(false)}
+                  />
+                ))}
+              </nav>
+            </SheetContent>
+          </Sheet>
+        </div>
+      </div>
+    </header>
   );
 };
 

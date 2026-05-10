@@ -1,18 +1,17 @@
-import { Box, Container } from "@mantine/core";
 import { Outlet, ScrollRestoration } from "react-router-dom";
 import TopNav from "../header/TopNav";
 import SiteFooter from "../footer/SiteFooter";
 
 const MainLayout = () => {
   return (
-    <Box mih="100vh" style={{ display: "flex", flexDirection: "column" }}>
+    <div className="flex min-h-screen flex-col">
       <TopNav />
       <ScrollRestoration />
-      <Container size="lg" py="xl" style={{ flex: 1, width: "100%" }}>
+      <main className="container mx-auto w-full max-w-6xl flex-1 px-4 py-10">
         <Outlet />
-      </Container>
+      </main>
       <SiteFooter />
-    </Box>
+    </div>
   );
 };
 
