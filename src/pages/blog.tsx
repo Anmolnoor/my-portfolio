@@ -1,35 +1,30 @@
-import { SimpleGrid, Stack, Text } from "@mantine/core";
-import { useMediaQuery } from "@mantine/hooks";
-import NewCard from "../components/elements/newCard";
-import PostCard from "../components/blog/PostCard";
-import { GetTitle } from "../utils/title";
-import { getAllPosts } from "../utils/posts";
+import PageHeader from "@/components/elements/PageHeader";
+import PostCard from "@/components/blog/PostCard";
+import { getAllPosts } from "@/utils/posts";
 
 const Blog = () => {
   const posts = getAllPosts();
-  const isMobile = useMediaQuery("(max-width: 500px)");
-  const isTablet = useMediaQuery("(max-width: 720px)");
-  const cols = isMobile ? 1 : isTablet ? 2 : 3;
 
   return (
-    <NewCard title={"Blog"} viewAll>
+    <div className="flex flex-col gap-6">
+      <PageHeader
+        eyebrow="Writing / Blog"
+        title="Notes on shipping software"
+        description="Frontend, distributed systems, Web3, real-time media, and developer tooling — written as I learn."
+      />
+
       {posts.length === 0 ? (
-        <Stack align="center" gap={"lg"} my={"lg"}>
-          {GetTitle("Coming Soon")}
-        </Stack>
+        <div className="rounded-lg border bg-card p-12 text-center">
+          <p className="font-mono text-lg font-semibold">Coming soon</p>
+        </div>
       ) : (
-        <Stack gap="md">
-          <Text c="dimmed" size="sm">
-            Notes on shipping software — frontend, Web3, realtime media.
-          </Text>
-          <SimpleGrid cols={cols} spacing="md">
-            {posts.map((post) => (
-              <PostCard key={post.slug} post={post} />
-            ))}
-          </SimpleGrid>
-        </Stack>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {posts.map((post) => (
+            <PostCard key={post.slug} post={post} />
+          ))}
+        </div>
       )}
-    </NewCard>
+    </div>
   );
 };
 

@@ -1,28 +1,13 @@
-import { Indicator, Title } from "@mantine/core";
-
 interface TitleWithDotProps {
   title: string;
-  size?: number;
-  color?: string;
 }
 
-const TitleWithDot = ({
-  title,
-  size = 11,
-  color = "gray",
-}: TitleWithDotProps) => {
+const TitleWithDot = ({ title }: TitleWithDotProps) => {
   return (
-    <Title order={5} pl={"lg"}>
-      <Indicator
-        size={size}
-        position="middle-start"
-        offset={-15}
-        color={color}
-        withBorder
-      >
-        {title}
-      </Indicator>
-    </Title>
+    <h5 className="flex items-center gap-2 text-base font-semibold">
+      <span className="h-2 w-2 rounded-full bg-muted-foreground" />
+      {title}
+    </h5>
   );
 };
 

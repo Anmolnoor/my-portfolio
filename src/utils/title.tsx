@@ -1,22 +1,13 @@
-//  title related hooks
-
-import { useMediaQuery } from "@mantine/hooks";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { getDottedString } from "./helper";
-import { Title } from "@mantine/core";
 
 const useGetMobileTitle = (title: string) => {
-  const mediaQuery = useMediaQuery("(min-width: 427px)");
-
+  const isWide = useMediaQuery("(min-width: 427px)");
   return (
-    <Title order={4}>{mediaQuery ? title : getDottedString(title, 12)}</Title>
+    <h4 className="text-xl font-semibold">
+      {isWide ? title : getDottedString(title, 12)}
+    </h4>
   );
 };
 
-/**
- *
- * @param title - title to be displayed
- * @returns - title component with media query support for mobile
- */
-export const GetTitle = (title: string) => {
-  return useGetMobileTitle(title);
-};
+export const GetTitle = (title: string) => useGetMobileTitle(title);

@@ -13,18 +13,31 @@ import Projects from "../pages/projects";
 import Vendro from "../pages/vendro";
 import Blog from "../pages/blog";
 import BlogPost from "../pages/blogPost";
+import About from "../pages/about";
+import Contact from "../pages/contact";
+import Resume from "../pages/resume";
 
 export const NotFound = () => {
   return <div>Not found!</div>;
 };
 
-export type links = "/" | "/projects" | "/experience" | "/skills" | "/pocket";
+export type links =
+  | "/"
+  | "/projects"
+  | "/experience"
+  | "/skills"
+  | "/pocket"
+  | "/about"
+  | "/contact"
+  | "/resume";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<MainLayout />} errorElement={<NotFound />}>
       <Route path="/" element={<HomePage />} />
-      <Route path="/about" element={<div>About</div>} />
+      <Route path="/about" element={<About />} />
+      <Route path="/contact" element={<Contact />} />
+      <Route path="/resume" element={<Resume />} />
       <Route path="/projects" element={<Projects />} />
       <Route path="/experience" element={<Experience />} />
       <Route path="/skills" element={<Skills items={10} />} />

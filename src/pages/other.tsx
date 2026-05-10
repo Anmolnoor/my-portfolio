@@ -1,6 +1,5 @@
-import { randomId } from "@mantine/hooks";
-import NewCard from "../components/elements/newCard";
-import { Card, Stack, Text } from "@mantine/core";
+import NewCard from "@/components/elements/newCard";
+import { Card } from "@/components/ui/card";
 
 const interests = [
   "All about the music vibe, alongside my coding adventures.",
@@ -13,34 +12,28 @@ const funFacts = ["Totally hooked on VSCode.", "A Linux lover, no doubt."];
 
 export const Interests = () => {
   return (
-    <NewCard title={"Passions Beyond the Keyboard"}>
-      <Stack gap={"md"}>
-        {interests.map((interest) => {
-          return (
-            <Card withBorder key={randomId()}>
-              <Text size={"sm"} c={"dimmed"}>
-                {interest}
-              </Text>
-            </Card>
-          );
-        })}
-      </Stack>
+    <NewCard title="Passions Beyond the Keyboard">
+      <div className="flex flex-col gap-3">
+        {interests.map((interest) => (
+          <Card key={interest} className="p-4">
+            <p className="text-sm text-muted-foreground">{interest}</p>
+          </Card>
+        ))}
+      </div>
     </NewCard>
   );
 };
 
 export const FunFacts = () => {
   return (
-    <NewCard title={"Unusual Intel"}>
-      <Stack gap={"md"}>
+    <NewCard title="Unusual Intel">
+      <div className="flex flex-col gap-3">
         {funFacts.map((fact) => (
-          <Card withBorder key={randomId()}>
-            <Text size={"sm"} c={"dimmed"}>
-              {fact}
-            </Text>
+          <Card key={fact} className="p-4">
+            <p className="text-sm text-muted-foreground">{fact}</p>
           </Card>
         ))}
-      </Stack>
+      </div>
     </NewCard>
   );
 };

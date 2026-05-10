@@ -1,26 +1,17 @@
-import { Box, Container, Affix, Space } from "@mantine/core";
-import { NabBar } from "../header/navbar";
 import { Outlet, ScrollRestoration } from "react-router-dom";
-import FollowMe from "../../pages/follow";
+import TopNav from "../header/TopNav";
+import SiteFooter from "../footer/SiteFooter";
 
 const MainLayout = () => {
   return (
-    <Container size={"md"} pt={"md"}>
-      <FollowMe />
+    <div className="flex min-h-screen flex-col">
+      <TopNav />
       <ScrollRestoration />
-      <Box my={"lg"}>
+      <main className="container mx-auto w-full max-w-6xl flex-1 px-4 py-10">
         <Outlet />
-      </Box>
-      
-      <Space h={100} />
-      <Affix
-        withinPortal={false}
-        style={{ zIndex: 999 }}
-        position={{ bottom: 0, left: 0 }}
-      >
-        <NabBar />
-      </Affix>
-    </Container>
+      </main>
+      <SiteFooter />
+    </div>
   );
 };
 

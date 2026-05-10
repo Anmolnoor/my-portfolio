@@ -1,42 +1,45 @@
-import NewCard from "../components/elements/newCard";
-import { ActionIcon, Card, Group, Stack } from "@mantine/core";
-import { Link } from "react-router-dom";
-import { IconLink } from "@tabler/icons-react";
-import { GetTitle } from "../utils/title";
-import { GetDescription } from "../utils/description";
-import { projects } from "../assets/projects";
-import { randomId } from "@mantine/hooks";
+import PageHeader from "@/components/elements/PageHeader";
+import ProjectCard from "@/components/projects/ProjectCard";
+import { projects } from "@/assets/projects";
 
 const Projects = () => {
+  const featured = projects.filter((p) => p.featured);
+  const rest = projects.filter((p) => !p.featured);
+
   return (
-    <NewCard title={"Projects"} viewAll link={"/projects"}>
-      <Stack>
-        {projects.map((item) => (
-          <Card key={randomId()} withBorder p={"lg"}>
-            <Card.Section p={"xs"}>
-              <Group justify="space-between">
-                {GetTitle(item.title)}
-                <ActionIcon
-                  component={Link}
-                  to={item.link}
-                  variant="default"
-                  radius={"10%"}
-                  title={item.title}
-                  size="lg"
-                  color={"blue"}
-                  target="_blank"
-                >
-                  <IconLink size="1.2rem" stroke={1.1} />
-                </ActionIcon>
-              </Group>
-            </Card.Section>
-            <Card.Section p={"xs"}>
-              {GetDescription({ text: item.description })}
-            </Card.Section>
-          </Card>
-        ))}
-      </Stack>
-    </NewCard>
+    <div className="flex flex-col gap-10">
+      <PageHeader
+        eyebrow="Projects"
+        title="Things I've built"
+        description="A mix of products in production, side projects, and experiments — listed roughly recent-first."
+      />
+
+      {featured.length > 0 && (
+        <section className="flex flex-col gap-3">
+          <span className="font-mono text-xs font-bold uppercase tracking-widest text-primary">
+            Featured
+          </span>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {featured.map((project) => (
+              <ProjectCard key={project.title} project={project} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {rest.length > 0 && (
+        <section className="flex flex-col gap-3">
+          <span className="font-mono text-xs font-bold uppercase tracking-widest text-muted-foreground">
+            Everything else
+          </span>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {rest.map((project) => (
+              <ProjectCard key={project.title} project={project} />
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
   );
 };
 

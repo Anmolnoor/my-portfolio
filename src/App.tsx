@@ -1,14 +1,12 @@
-import { MantineProvider } from "@mantine/core";
 import { RouterProvider } from "react-router-dom";
 import router from "./router/routes";
-
-// css imports
-import "@mantine/core/styles.css";
+import { ThemeProvider } from "./components/theme-provider";
+import "./index.css";
 
 export default function App() {
   return (
-    <MantineProvider defaultColorScheme="dark">
+    <ThemeProvider defaultTheme="dark" storageKey="portfolio-theme">
       <RouterProvider router={router} />
-    </MantineProvider>
+    </ThemeProvider>
   );
 }
