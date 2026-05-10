@@ -1,0 +1,161 @@
+---
+title: "I'm building a coding agent in public — and the lessons start before the code"
+date: 2026-05-09
+slug: foundation-cli
+tags:
+  [
+    ai-agents,
+    coding-agents,
+    software-engineering,
+    open-source,
+    learning-in-public,
+  ]
+description: "Why I'm running a public-by-choice coding agent project as a learning notebook, what I've shipped so far, the four questions I'm investigating, and three things I got wrong along the way."
+cover: /blog/fcli.png
+---
+
+## 1. The setup
+
+Sometime in the last few months, "AI coding agent" stopped feeling like a demo and started feeling like a _colleague_ — one with weird failure modes, occasional brilliance, and a strong opinion about TODO comments. I wanted to learn how to work with one seriously.
+
+Not "ask ChatGPT to write a regex" seriously. Not "let Cursor autocomplete a function" seriously. _Actually-shipped-software, multiple-commits-a-day, somebody-else-can-clone-this_ seriously.
+
+So I started a project I'd run entirely in the open: [**Foundation CLI**](https://github.com/Anmolnoor/fcli). The plan was simple — pick something I'd want to use, build it side-by-side with an agent, leave the receipts public, and write down what I learned.
+
+This post is one of those receipts.
+
+## 2. What got built (so far)
+
+Foundation CLI is a local-first, shell-native coding agent. Specifically:
+
+- An explicit **plan → approve → execute → observe** loop. Nothing happens until I see the plan and either type `[approve]` or `[deny]`.
+- **Typed capabilities** for files and git. The agent can read, write, edit, apply diffs, run git commands — but each one is a Pydantic-validated request with a known set of error codes, not a freeform shell call.
+- A **bounded replan loop** (hard caps of 32 iterations × 40 actions per iteration × 200 total per turn) so the agent can't spin forever on a stuck plan.
+- A **redacted event log** that streams every plan, action, observation, and verification outcome into a SQLite history database, plus an opt-in NDJSON / Unix-socket / HTTP-SSE feed you can pipe into your own monitor.
+- A **live status line** during a turn — one updating row by default, press `?` for an expandable view of completed steps and the in-flight one.
+- 380 tests. Ruff-clean. CI on every PR. A `doctor` subcommand that prints risk class, trust tier, and declared side effects per capability.
+
+You can read the full README in the repo. The shape of the system is genuinely useful — I use it daily — but it's also missing the things you'd need from a product (model breadth, plugin system, polished UX, a roadmap, an actual user base). And that's fine, because:
+
+## 3. The four questions I'm actually investigating
+
+The README puts these up front, and they're the thing I'd want a future version of myself to remember.
+
+### 3.1 How do you scope a project so an agent can actually _finish_ a stage?
+
+This one I'm getting opinionated about. Vague prompts (_"add tests for the file service"_) produce slop. Sharp specs with a definition-of-done (_"add tests covering FileService.read for binary, missing, oversized, and non-utf8 inputs; integrate with the executor dispatch test in tests/test_executor.py; one fixture per case; run pytest until green"_) produce clean commits.
+
+The whole `plans/v3/` directory in the repo is me iterating on this question. Each stage is a single Markdown file. Each stage maps roughly 1:1 to a commit. That correspondence is the thing — when you see it work, you stop wanting to "just chat with the agent."
+
+### 3.2 What does "good code review" look like when you didn't type the code?
+
+Honest answer: I don't have this fully figured out. But the heuristics I'm using:
+
+- **Read every diff.** Not skim — read. If I can't explain a hunk in 30 seconds, it doesn't ship.
+- **Tests are not optional.** If the change is interesting, it has a test. If the test is just exercising the happy path, it's not a test, it's a fixture.
+- **Architecture coherence > local correctness.** A change that works in isolation but introduces a fifth way to do the same thing is worse than a slightly less elegant change that uses the existing pattern.
+- **The agent's confidence ≠ my confidence.** "I added comprehensive error handling" usually means "I added six try/except blocks that swallow real bugs."
+
+This stuff is muscle memory more than a checklist. The only way I've found to build it is to actually do it, daily, in a codebase that matters.
+
+### 3.3 Where do agents need guardrails — and where can you just let them run?
+
+Strong opinions, weakly held:
+
+- **Guardrails:** type-validated request/response models for anything with side effects. Approval gates on risky ops (commits, writes outside the workspace, anything that touches git history). A bounded loop so a stuck planner can't burn a million tokens. A redacted log so you can audit what happened after the fact.
+- **No guardrails needed:** read-only operations. Planning. Refactors that the test suite will catch. Reformatting. Anything where the cost of a wrong action is "I revert one commit."
+
+The line is whether a mistake is _recoverable_. Recoverable → let it run. Not recoverable → make the agent ask. Read-only and `git stage` are auto-allowed; `git commit` requires approval, because once history moves, "undo" is no longer cheap.
+
+### 3.4 How do you keep architecture coherent across dozens of agent-driven commits?
+
+This is the hardest one. Agents are local thinkers — they'll do the right thing in the file in front of them and quietly grow a fourth implementation of the same idea two directories over.
+
+What I'm trying:
+
+- A `plans/` directory that's not just a TODO list but an architectural narrative. New stages reference earlier stages.
+- A `CHANGELOG.md` written by hand, because making the agent summarize its own work eats the lessons.
+- Periodic "say the system back to me" prompts where I make the agent describe how a subsystem works and then I fact-check it against the code.
+- And — boring but powerful — being willing to delete things. If the agent introduced an abstraction that hasn't earned its keep after a week, it goes.
+
+## 4. One concrete lesson: stages > tasks
+
+The single most useful framing change I've made: stop thinking in tasks, start thinking in **stages**.
+
+A _task_ is "add validation to the input parser." That's an instruction. It has no definition-of-done, no scope boundary, no test plan, and a thousand possible interpretations.
+
+A _stage_ is a Markdown file like [`plans/v3/03-native-git-capabilities-and-approval-boundaries.md`](https://github.com/Anmolnoor/fcli/tree/main/plans). It has:
+
+- A context paragraph (why this exists).
+- Concrete file paths to touch and the order to touch them in.
+- A verification section (what "done" looks like, end-to-end).
+- An explicit out-of-scope list.
+
+Hand the agent a stage and it produces a commit you can `git diff` once and merge. Hand it a task and you'll review three rewrites of the same logic, two of them with new abstractions you didn't ask for.
+
+The trick isn't writing better prompts. It's writing better **specs**. Stages are specs.
+
+## 5. Three things I got wrong (and what they taught me)
+
+The post would be dishonest if I only described what worked. The corrections are where most of the real learning sits.
+
+### 5.1 A boolean wasn't enough for "did the tests pass?"
+
+Early v3 had a single `verified: bool` flag per turn. The orchestrator ran the verification command, looked at the exit code, and stamped `True` or `False`. Clean and broken.
+
+The bug surfaced on a checkout where `pytest` wasn't installed: the missing-binary error was caught upstream, `verified` defaulted to True, and the agent reported a successful turn against a workspace that had never run a test.
+
+The fix wasn't "be more careful with exit codes." It was admitting the boolean was the wrong shape. v3's hardening stage replaced it with a four-state enum — `PASSED`, `FAILED`, `UNAVAILABLE`, `NOT_ATTEMPTED` — defined in `src/foundation/models/orchestration.py`. `UNAVAILABLE` distinguishes "we tried to run the check but the binary wasn't there" from `FAILED` ("we ran the check and the assertions broke"), and the presenter renders distinct notices for each.
+
+The lesson: **a binary verdict couldn't represent "we couldn't even run the check."** The moment I tried to write the right warning text, the underlying field clearly couldn't carry the information. Names matter; shapes matter more.
+
+### 5.2 You can't spec loop budgets from theory. You have to watch the agent work.
+
+The original v3 spec set the bounded replan loop to **max 4 iterations × 5 actions per iteration × 20 total**. Those numbers came from the napkin: an agent shouldn't need more than four planning rounds to converge, five actions per round felt generous, and capping the total at 20 prevented runaway turns.
+
+It was wrong by almost an order of magnitude. The first real coding turn — a multi-file refactor with verification — hit the iteration cap, looked done because the loop terminated cleanly, and left half the work undone. I thought my code was buggy. The cap was.
+
+The fix was to instrument what real turns actually consumed and raise the limits where they wanted to sit: `32 × 40 × 200`. The median turn doesn't come close; the high cap is for the long tail.
+
+The lesson: **numbers in a spec are theory; numbers in a running loop are evidence.** I'd written the original limits without watching the orchestrator under load, and the first hour of usage rendered three quarters of my a-priori reasoning irrelevant. You can't replace running the system with thinking about it.
+
+### 5.3 The agent will quietly leave you with a dirty index
+
+This is the one I felt most embarrassed by, because the failure is obvious in hindsight.
+
+The user types something like _"fix the failing test and commit"_. The agent edits the file, runs the test (it passes), stages the change, and finishes the turn — zero further actions. The orchestrator sees a clean exit. Half an hour later the user tries to push and finds a workspace with staged changes and no commit.
+
+From the agent's perspective, every action it planned succeeded. From the user's, the work isn't done. They said "commit." The commit never happened.
+
+The fix is a small invariant in the orchestrator: **if the user's stated intent contained "commit" and the final iteration ends with staged files but no `git.commit` action planned, raise a `GovernanceNotice` and flip session status to `PENDING_APPROVAL` instead of `COMPLETED`.** The agent can't silently leave a dirty index without flagging it.
+
+The lesson: **agents reason locally; they can't see "this looks finished but actually isn't."** The fix is almost always to make the implicit explicit — turn an unspoken assumption into a structured signal the system can check on.
+
+## 6. Why I'm gating contributions
+
+The repo is public _and_ I want real contributors. But late 2026 is also when GitHub trackers are getting buried in AI-generated PRs and issues that nobody actually thought about — opened by agents, never read by their submitter, often slightly wrong in ways that cost more time to triage than to fix.
+
+So I'm borrowing the contribution gate that [Mario Zechner](https://github.com/badlogic) built for [`pi-mono`](https://github.com/badlogic/pi-mono):
+
+- New issues and PRs from new contributors are auto-closed by a GitHub Action with a friendly explanation.
+- A maintainer comment of `lgtmi` on an issue allows that user's future _issues_. `lgtm` allows their future issues _and_ PRs.
+- The allowlist is just a text file in `.github/`, updated automatically by another workflow.
+
+This isn't gatekeeping for its own sake — it's a respect signal. If you took the time to read [`CONTRIBUTING.md`](https://github.com/Anmolnoor/fcli/blob/main/CONTRIBUTING.md), file a sharp issue, and engage in good faith, you'll get reopened almost immediately. If you didn't, the auto-close is doing both of us a favor.
+
+The one rule, which I'm also borrowing from pi-mono: **you must understand your code.** AI-generated code is fine. Submitting AI-generated code you don't understand is not.
+
+## 7. What's next, and how to follow
+
+v4 just shipped, alongside the rest of v0.2.0. The visible piece is a live status line during a turn — one updating row by default, press `?` for an expandable view of completed steps and the in-flight one. Underneath that, every session now writes a redacted NDJSON event log to disk by default, and you can opt into a Unix-socket or local HTTP/SSE transport so an external monitor can subscribe to a running fcli in near-real-time. The loop's no-progress detector got a fix too: idempotent re-plans no longer trip the "stuck" classifier and end clean turns as red failures.
+
+What's after that is unwritten. The next thing I'm circling is plugin shape — but I haven't earned an opinion yet. Specs land in `plans/` as I write them.
+
+If you're figuring out the same questions, two things would help:
+
+- Read a stage in [`plans/`](https://github.com/Anmolnoor/fcli/tree/main/plans) and `git log` the commits that came out of it. That's the "how was this built" tour.
+- Tell me what's working for you. Issues are open, the gate is friendly, and "I disagree with X" is a perfectly good first issue.
+
+Repo: https://github.com/Anmolnoor/fcli
+
+I'll write more as I learn.
