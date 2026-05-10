@@ -16,10 +16,12 @@ const CurrentlyBuilding = () => {
               </IconTile>
               <div className="min-w-0 flex-1 space-y-0.5">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold uppercase tracking-widest text-primary">
+                  <span className="font-mono text-xs font-bold uppercase tracking-widest text-primary">
                     {item.label}
                   </span>
-                  <span className="truncate font-semibold">{item.title}</span>
+                  <span className="truncate font-mono font-semibold">
+                    {item.title}
+                  </span>
                 </div>
                 <p className="line-clamp-2 text-sm text-muted-foreground">
                   {item.description}

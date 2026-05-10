@@ -6,7 +6,7 @@ const Resume = () => {
   return (
     <Card className="p-8">
       <div className="flex flex-col gap-4">
-        <h2 className="text-3xl font-bold tracking-tight">Resume</h2>
+        <h2 className="font-mono text-3xl font-bold tracking-tight">Resume</h2>
         <p className="text-muted-foreground">
           A printable resume is on the way. In the meantime, my project list
           and writing reflect my current focus.

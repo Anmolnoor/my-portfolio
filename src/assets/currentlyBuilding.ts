@@ -12,7 +12,7 @@ export const currentlyBuilding: CurrentlyBuildingItem[] = [
     label: "CURRENTLY BUILDING",
     title: "Foundation CLI",
     description: "A modern CLI to scaffold full-stack apps and ship faster.",
-    link: "/blog/fcli",
+    link: "/blog/foundation-cli",
   },
   {
     iconKey: "server",
@@ -20,5 +20,6 @@ export const currentlyBuilding: CurrentlyBuildingItem[] = [
     title: "Homelab / Infra",
     description:
       "Experimenting with self-hosted infra, automation, and observability.",
+    link: "/blog/homelab-current-setup",
   },
 ];

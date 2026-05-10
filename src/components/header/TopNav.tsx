@@ -22,10 +22,10 @@ const navItems = [
 
 const Logo = () => (
   <Link to="/" className="flex items-center gap-2 no-underline">
-    <span className="flex h-8 w-8 items-center justify-center rounded-md border border-primary/30 bg-primary/10 text-xs font-extrabold text-primary">
+    <span className="flex h-8 w-8 items-center justify-center rounded-md border border-primary/30 bg-primary/10 font-mono text-xs font-bold text-primary">
       AN
     </span>
-    <span className="font-semibold text-foreground">Anmol Noor</span>
+    <span className="font-mono font-semibold text-foreground">Anmol Noor</span>
   </Link>
 );
 
@@ -43,7 +43,7 @@ const NavLinkItem = ({
     onClick={onClick}
     className={({ isActive }) =>
       cn(
-        "text-sm font-medium transition-colors",
+        "font-mono text-sm font-medium transition-colors",
         isActive
           ? "text-primary"
           : "text-muted-foreground hover:text-foreground"

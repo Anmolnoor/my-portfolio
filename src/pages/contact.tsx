@@ -7,7 +7,7 @@ const Contact = () => {
   return (
     <Card className="p-8">
       <div className="flex flex-col gap-4">
-        <h2 className="text-3xl font-bold tracking-tight">Contact</h2>
+        <h2 className="font-mono text-3xl font-bold tracking-tight">Contact</h2>
         <p className="text-muted-foreground">
           The fastest way to reach me is email or by booking a call.
         </p>

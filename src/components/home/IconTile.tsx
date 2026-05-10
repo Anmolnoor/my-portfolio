@@ -21,7 +21,7 @@ const IconTile = ({
 }: IconTileProps) => (
   <div
     className={cn(
-      "flex h-11 w-11 shrink-0 items-center justify-center rounded-md border",
+      "flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border",
       variantClasses[variant],
       className
     )}

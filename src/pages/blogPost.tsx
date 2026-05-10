@@ -32,7 +32,7 @@ const BlogPost = () => {
               <ArrowLeft className="h-4 w-4" />
             </Link>
           </Button>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <div className="flex items-center gap-2 font-mono text-xs text-muted-foreground">
             <span>{formatDate(post.date)}</span>
             <span>·</span>
             <span>{post.readingMinutes} min read</span>
@@ -48,7 +48,7 @@ const BlogPost = () => {
         )}
 
         <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
+          <h1 className="font-mono text-3xl font-bold tracking-tight md:text-4xl">
             {post.title}
           </h1>
           {post.tags.length > 0 && (
@@ -56,8 +56,8 @@ const BlogPost = () => {
               {post.tags.map((tag) => (
                 <Badge
                   key={tag}
-                  variant="secondary"
-                  className="rounded-sm font-medium"
+                  variant="neon"
+                  className="rounded-sm font-mono font-medium"
                 >
                   {tag}
                 </Badge>

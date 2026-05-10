@@ -29,12 +29,14 @@ const PostCard = ({ post }: PostCardProps) => {
           />
         )}
         <div className="space-y-2 p-4">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <div className="flex items-center gap-2 font-mono text-xs text-muted-foreground">
             <span>{formatDate(post.date)}</span>
             <span>·</span>
             <span>{post.readingMinutes} min read</span>
           </div>
-          <h4 className="text-lg font-semibold tracking-tight">{post.title}</h4>
+          <h4 className="font-mono text-lg font-semibold tracking-tight">
+            {post.title}
+          </h4>
           <p className="line-clamp-3 text-sm text-muted-foreground">
             {post.excerpt}
           </p>
@@ -43,8 +45,8 @@ const PostCard = ({ post }: PostCardProps) => {
               {post.tags.map((tag) => (
                 <Badge
                   key={tag}
-                  variant="secondary"
-                  className="rounded-sm font-medium"
+                  variant="neon"
+                  className="rounded-sm font-mono font-medium"
                 >
                   {tag}
                 </Badge>

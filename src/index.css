@@ -4,48 +4,50 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
+    /* Light: warm off-white with deep lime primary */
+    --background: 60 30% 98%;
+    --foreground: 20 10% 10%;
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
+    --card-foreground: 20 10% 10%;
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 221 83% 53%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
+    --popover-foreground: 20 10% 10%;
+    --primary: 82 75% 27%;
+    --primary-foreground: 60 30% 98%;
+    --secondary: 60 10% 94%;
+    --secondary-foreground: 20 10% 15%;
+    --muted: 60 10% 94%;
+    --muted-foreground: 30 5% 40%;
+    --accent: 82 60% 90%;
+    --accent-foreground: 82 75% 22%;
+    --destructive: 0 70% 45%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 221 83% 53%;
-    --radius: 0.5rem;
+    --border: 60 8% 88%;
+    --input: 60 8% 88%;
+    --ring: 82 75% 35%;
+    --radius: 0.875rem;
   }
 
   .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 5.5%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 217 91% 60%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 217 91% 60%;
+    /* Dark: near-black olive-tinted bg with bright lime primary */
+    --background: 60 4% 6%;
+    --foreground: 60 10% 96%;
+    --card: 60 4% 9%;
+    --card-foreground: 60 10% 96%;
+    --popover: 60 4% 9%;
+    --popover-foreground: 60 10% 96%;
+    --primary: 83 75% 55%;
+    --primary-foreground: 60 4% 6%;
+    --secondary: 60 4% 14%;
+    --secondary-foreground: 60 10% 96%;
+    --muted: 60 4% 12%;
+    --muted-foreground: 60 5% 65%;
+    --accent: 60 4% 14%;
+    --accent-foreground: 83 75% 65%;
+    --destructive: 0 60% 45%;
+    --destructive-foreground: 60 10% 96%;
+    --border: 60 6% 18%;
+    --input: 60 6% 18%;
+    --ring: 83 75% 55%;
   }
 }
 
@@ -56,8 +58,15 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-      Ubuntu, sans-serif;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      sans-serif;
+  }
+  code,
+  kbd,
+  pre,
+  samp {
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo,
+      monospace;
   }
 }
 

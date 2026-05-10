@@ -32,7 +32,7 @@ const SiteFooter = () => {
   return (
     <footer className="mt-12 border-t">
       <div className="container mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-8">
-        <p className="text-sm text-muted-foreground">
+        <p className="font-mono text-sm text-muted-foreground">
           © {year} Anmol Noor. All rights reserved.
         </p>
         <div className="flex items-center gap-6">
@@ -42,7 +42,7 @@ const SiteFooter = () => {
               href={href}
               target={external ? "_blank" : undefined}
               rel={external ? "noreferrer" : undefined}
-              className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+              className="inline-flex items-center gap-2 font-mono text-sm text-muted-foreground transition-colors hover:text-foreground"
             >
               <Icon className="h-4 w-4" />
               {label}

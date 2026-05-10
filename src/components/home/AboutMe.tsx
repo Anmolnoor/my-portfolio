@@ -16,7 +16,9 @@ const MetaRow = ({
   <div className="flex items-start gap-3">
     <span className="mt-0.5 shrink-0 text-muted-foreground">{icon}</span>
     <div>
-      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+        {label}
+      </p>
       <p className="text-sm font-medium">{value}</p>
     </div>
   </div>
@@ -36,7 +38,7 @@ const AboutMe = () => {
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0 flex-1 space-y-1">
-              <p className="text-lg font-bold">Anmol Noor</p>
+              <p className="font-mono text-lg font-bold">Anmol Noor</p>
               <p className="text-sm text-muted-foreground">
                 I'm a software engineer and builder who loves turning ideas into
                 robust products. I enjoy full-stack development, distributed
@@ -50,7 +52,7 @@ const AboutMe = () => {
             <MetaRow
               icon={<MapPin className="h-4 w-4" />}
               label="Location"
-              value="India"
+              value="Vancouver, BC, Canada"
             />
             <MetaRow
               icon={<Target className="h-4 w-4" />}

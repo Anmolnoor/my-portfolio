@@ -45,12 +45,12 @@ const WritingList = () => {
                 <IconTile variant="blue">
                   {blogIcons[i % blogIcons.length]}
                 </IconTile>
-                <p className="line-clamp-2 font-bold">{post.title}</p>
+                <p className="line-clamp-2 font-mono font-bold">{post.title}</p>
               </div>
               <p className="mb-4 line-clamp-2 text-sm text-muted-foreground">
                 {post.excerpt}
               </p>
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <div className="flex items-center gap-2 font-mono text-xs text-muted-foreground">
                 <span>{formatDate(post.date)}</span>
                 <span>·</span>
                 <span>{post.readingMinutes} min read</span>
