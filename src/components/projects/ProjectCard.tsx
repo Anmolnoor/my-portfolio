@@ -37,7 +37,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
             {project.techTags.map((tag) => (
               <Badge
                 key={tag}
-                variant="secondary"
+                variant="neon"
                 className="rounded-sm font-mono font-medium"
               >
                 {tag}
