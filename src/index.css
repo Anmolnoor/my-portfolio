@@ -24,7 +24,7 @@
     --border: 60 8% 88%;
     --input: 60 8% 88%;
     --ring: 82 75% 35%;
-    --radius: 0.875rem;
+    --radius: 0;
   }
 
   .dark {
@@ -58,8 +58,8 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
-    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-      sans-serif;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo,
+      monospace;
   }
   code,
   kbd,
