@@ -1,5 +1,10 @@
 import type { ReactNode } from "react";
-import { Briefcase, MapPin, Target, Zap } from "lucide-react";
+import {
+  Briefcase,
+  MapPin,
+  Target,
+  Lightning as Zap,
+} from "@phosphor-icons/react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import SectionHeader from "./SectionHeader";

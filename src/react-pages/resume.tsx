@@ -1,4 +1,4 @@
-import { FileDown } from "lucide-react";
+import { FileArrowDown as FileDown } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Menu, Moon, Sun } from "lucide-react";
+import { List as Menu, Moon, Sun } from "@phosphor-icons/react";
 import {
   Sheet,
   SheetContent,

@@ -1,4 +1,7 @@
-import { CalendarClock, Send } from "lucide-react";
+import {
+  CalendarDots as CalendarClock,
+  PaperPlaneTilt as Send,
+} from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 

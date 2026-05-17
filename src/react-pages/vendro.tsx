@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link as LinkIcon } from "lucide-react";
+import { LinkSimple as LinkIcon } from "@phosphor-icons/react";
 import NewCard from "@/components/elements/newCard";
 import TitleWithDot from "@/components/elements/titleWithDot";
 import { Button } from "@/components/ui/button";
