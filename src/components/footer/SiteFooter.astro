@@ -43,16 +43,16 @@ const year = new Date().getFullYear();
     <p class="font-mono text-sm text-muted-foreground">
       © {year} Anmol Noor. All rights reserved.
     </p>
-    <div class="flex items-center gap-6">
+    <div class="grid w-full grid-cols-2 gap-x-6 gap-y-3 sm:flex sm:w-auto sm:items-center">
       {
         socials.map(({ label, href, Icon, external }) => (
           <a
             href={href}
             target={external ? "_blank" : undefined}
             rel={external ? "noreferrer" : undefined}
-            class="inline-flex items-center gap-2 font-mono text-sm text-muted-foreground transition-colors hover:text-foreground"
+            class="inline-flex items-center gap-2 whitespace-nowrap font-mono text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
-            <Icon className="h-4 w-4" />
+            <Icon className="h-4 w-4 shrink-0" />
             {label}
           </a>
         ))
