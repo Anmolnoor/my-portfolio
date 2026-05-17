@@ -1,5 +1,5 @@
 {
-  "name": "vite-react-temp--ts",
+  "name": "anmolnoor-portfolio",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -7,55 +7,43 @@
     "node": ">=22"
   },
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/check": "^0.9.4",
+    "@astrojs/mdx": "^5.0.6",
+    "@astrojs/react": "^5.0.5",
+    "@astrojs/sitemap": "^3.7.2",
+    "@astrojs/vercel": "^10.0.7",
     "@mdx-js/react": "^3.1.1",
-    "@mdx-js/rollup": "^3.1.1",
     "@radix-ui/react-avatar": "^1.1.11",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-separator": "^1.1.8",
     "@radix-ui/react-slot": "^1.2.4",
-    "@tanstack/react-query": "^4.29.5",
-    "axios": "^1.4.0",
+    "astro": "^6.3.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "highlight.js": "^11.11.1",
-    "localforage": "^1.10.0",
     "lucide-react": "^0.469.0",
-    "match-sorter": "^6.3.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.11.1",
     "rehype-highlight": "^7.0.2",
-    "remark-frontmatter": "^5.0.0",
     "remark-gfm": "^4.0.1",
-    "remark-mdx-frontmatter": "^5.2.0",
-    "sort-by": "^1.2.0",
     "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.19",
-    "@tanstack/eslint-plugin-query": "^4.29.4",
     "@types/node": "^20.1.4",
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
-    "@typescript-eslint/eslint-plugin": "^5.57.1",
-    "@typescript-eslint/parser": "^5.57.1",
-    "@vitejs/plugin-react-swc": "^3.0.0",
     "autoprefixer": "^10.5.0",
-    "eslint": "^8.38.0",
-    "eslint-config-prettier": "^8.8.0",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-react-refresh": "^0.3.4",
     "postcss": "^8.5.14",
     "prettier": "^2.8.8",
     "tailwindcss": "^3.4.19",
     "tailwindcss-animate": "^1.0.7",
-    "typescript": "^5.0.2",
-    "vite": "^4.3.2"
+    "typescript": "^5.0.2"
   }
 }

@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import IconTile from "@/components/home/IconTile";
@@ -12,9 +11,10 @@ interface ProjectCardProps {
 const ProjectCard = ({ project }: ProjectCardProps) => {
   const isExternal = project.link.startsWith("http");
   return (
-    <Link
-      to={project.link}
+    <a
+      href={project.link}
       target={isExternal ? "_blank" : undefined}
+      rel={isExternal ? "noreferrer" : undefined}
       className="group text-inherit no-underline"
     >
       <Card className="h-full p-4 transition-colors group-hover:bg-muted/40">
@@ -46,7 +46,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
           </div>
         )}
       </Card>
-    </Link>
+    </a>
   );
 };
 

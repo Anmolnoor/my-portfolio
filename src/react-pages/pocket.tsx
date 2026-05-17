@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import NewCard from "@/components/elements/newCard";
 import { Card } from "@/components/ui/card";
 
@@ -46,10 +45,11 @@ const Pocket = () => {
     <NewCard title="Tech Pocket" viewAll>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {pocketTech.map((tech) => (
-          <Link
+          <a
             key={tech.name}
-            to={tech.link}
+            href={tech.link}
             target="_blank"
+            rel="noreferrer"
             className="text-inherit no-underline"
           >
             <Card className="flex items-center justify-center gap-2 p-3 hover:bg-muted/40">
@@ -60,7 +60,7 @@ const Pocket = () => {
               />
               <span className="text-sm">{tech.name}</span>
             </Card>
-          </Link>
+          </a>
         ))}
       </div>
     </NewCard>

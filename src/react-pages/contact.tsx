@@ -1,5 +1,4 @@
 import { CalendarClock, Send } from "lucide-react";
-import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
@@ -13,10 +12,10 @@ const Contact = () => {
         </p>
         <div className="flex flex-wrap gap-3">
           <Button asChild>
-            <Link to="https://cal.com/anmolnoor" target="_blank">
+            <a href="https://cal.com/anmolnoor" target="_blank" rel="noreferrer">
               <CalendarClock />
               Book a call
-            </Link>
+            </a>
           </Button>
           <Button asChild variant="outline">
             <a href="mailto:anmolnoor59@gmail.com">

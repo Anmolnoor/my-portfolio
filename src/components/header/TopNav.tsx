@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Menu, Moon, Sun } from "lucide-react";
 import {
   Sheet,
@@ -21,38 +20,41 @@ const navItems = [
 ];
 
 const Logo = () => (
-  <Link to="/" className="flex items-center gap-2 no-underline">
+  <a href="/" className="flex items-center gap-2 no-underline">
     <span className="flex h-8 w-8 items-center justify-center rounded-md border border-primary/30 bg-primary/10 font-mono text-xs font-bold text-primary">
       AN
     </span>
     <span className="font-mono font-semibold text-foreground">Anmol Noor</span>
-  </Link>
+  </a>
 );
 
 const NavLinkItem = ({
   to,
   label,
+  currentPath,
   onClick,
 }: {
   to: string;
   label: string;
+  currentPath: string;
   onClick?: () => void;
-}) => (
-  <NavLink
-    to={to}
-    onClick={onClick}
-    className={({ isActive }) =>
-      cn(
+}) => {
+  const isActive = currentPath === to || currentPath.startsWith(`${to}/`);
+  return (
+    <a
+      href={to}
+      onClick={onClick}
+      className={cn(
         "font-mono text-sm font-medium transition-colors",
         isActive
           ? "text-primary"
-          : "text-muted-foreground hover:text-foreground"
-      )
-    }
-  >
-    {label}
-  </NavLink>
-);
+          : "text-muted-foreground hover:text-foreground",
+      )}
+    >
+      {label}
+    </a>
+  );
+};
 
 const ThemeToggle = () => {
   const { resolvedTheme, toggleTheme } = useTheme();
@@ -74,6 +76,11 @@ const ThemeToggle = () => {
 
 const TopNav = () => {
   const [open, setOpen] = useState(false);
+  const [currentPath, setCurrentPath] = useState("/");
+
+  useEffect(() => {
+    setCurrentPath(window.location.pathname);
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -81,7 +88,12 @@ const TopNav = () => {
         <Logo />
         <nav className="hidden items-center gap-8 md:flex">
           {navItems.map((item) => (
-            <NavLinkItem key={item.to} to={item.to} label={item.label} />
+            <NavLinkItem
+              key={item.to}
+              to={item.to}
+              label={item.label}
+              currentPath={currentPath}
+            />
           ))}
           <ThemeToggle />
         </nav>
@@ -103,6 +115,7 @@ const TopNav = () => {
                     key={item.to}
                     to={item.to}
                     label={item.label}
+                    currentPath={currentPath}
                     onClick={() => setOpen(false)}
                   />
                 ))}

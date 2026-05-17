@@ -2,9 +2,8 @@
 export default {
   darkMode: ["class"],
   content: [
-    "./index.html",
-    "./src/**/*.{ts,tsx,mdx}",
-    "./src/content/**/*.mdx",
+    "./src/**/*.{astro,ts,tsx,mdx,md}",
+    "./src/content/**/*.{mdx,md}",
   ],
   theme: {
     container: {

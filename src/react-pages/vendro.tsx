@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link as LinkIcon } from "lucide-react";
-import { Link } from "react-router-dom";
 import NewCard from "@/components/elements/newCard";
 import TitleWithDot from "@/components/elements/titleWithDot";
 import { Button } from "@/components/ui/button";
@@ -58,9 +57,9 @@ const Vendro = () => {
           <div className="flex items-center justify-between border-b pb-3">
             <TitleWithDot title="Store front - demo" />
             <Button asChild variant="outline" size="icon" title="Demo store front">
-              <Link to="https://vendro-store.vercel.app/" target="_blank">
+              <a href="https://vendro-store.vercel.app/" target="_blank" rel="noreferrer">
                 <LinkIcon className="h-4 w-4" />
-              </Link>
+              </a>
             </Button>
           </div>
           <div className="mt-4 flex flex-col gap-4">
@@ -77,9 +76,9 @@ const Vendro = () => {
               their brand identity.
             </p>
             <Button asChild variant="outline">
-              <Link to="https://vendro-store.vercel.app/" target="_blank">
+              <a href="https://vendro-store.vercel.app/" target="_blank" rel="noreferrer">
                 visit demo store
-              </Link>
+              </a>
             </Button>
           </div>
         </Card>
@@ -102,9 +101,9 @@ const Vendro = () => {
               reporting tools.
             </p>
             <Button asChild variant="outline">
-              <Link to="https://cal.com/anmolnoor" target="_blank">
+              <a href="https://cal.com/anmolnoor" target="_blank" rel="noreferrer">
                 Book Admin Panel Demo
-              </Link>
+              </a>
             </Button>
           </div>
         </Card>

@@ -1,0 +1,26 @@
+---
+interface Props {
+  title: string;
+  linkLabel?: string;
+  linkTo?: string;
+}
+
+const { title, linkLabel, linkTo } = Astro.props;
+---
+
+<div class="mb-3 flex items-center justify-between">
+  <span class="font-mono text-xs font-bold uppercase tracking-widest text-primary">
+    {title}
+  </span>
+  {
+    linkLabel && linkTo && (
+      <a
+        href={linkTo}
+        class="inline-flex items-center gap-1 font-mono text-sm font-medium text-primary hover:underline"
+      >
+        {linkLabel}
+        <span aria-hidden="true">→</span>
+      </a>
+    )
+  }
+</div>

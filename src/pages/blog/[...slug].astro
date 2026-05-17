@@ -1,0 +1,90 @@
+---
+import { getCollection, render } from "astro:content";
+import { ArrowLeft } from "lucide-react";
+import Main from "@/layouts/Main.astro";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog");
+  return posts.map((post) => ({
+    params: { slug: post.data.slug ?? post.id.replace(/\.mdx$/, "") },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+const formatDate = (d: Date) =>
+  d.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+
+const summary = post.data.excerpt ?? post.data.description ?? "";
+---
+
+<Main
+  title={`${post.data.title} — Anmol Noor`}
+  description={summary}
+  image={post.data.cover}
+  canonical={post.data.canonical}
+>
+  <Card className="p-6">
+    <div class="flex flex-col gap-6">
+      <div class="flex items-center justify-between">
+        <a
+          href="/blog"
+          class="inline-flex h-9 w-9 items-center justify-center rounded-md border border-input bg-background transition-colors hover:bg-accent"
+          title="Back to Blog"
+          aria-label="Back to Blog"
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </a>
+        <div class="flex items-center gap-2 font-mono text-xs text-muted-foreground">
+          <span>{formatDate(post.data.date)}</span>
+          <span>·</span>
+          <span>{post.data.readingMinutes} min read</span>
+        </div>
+      </div>
+
+      {
+        post.data.cover && (
+          <img
+            src={post.data.cover}
+            alt={post.data.title}
+            class="w-full rounded-md"
+          />
+        )
+      }
+
+      <div class="flex flex-col gap-2">
+        <h1
+          class="font-mono text-3xl font-bold tracking-tight md:text-4xl"
+        >
+          {post.data.title}
+        </h1>
+        {
+          post.data.tags.length > 0 && (
+            <div class="flex flex-wrap gap-1.5">
+              {post.data.tags.map((tag) => (
+                <Badge
+                  variant="neon"
+                  className="rounded-sm font-mono font-medium"
+                >
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+          )
+        }
+      </div>
+
+      <div class="prose prose-zinc max-w-none dark:prose-invert">
+        <Content />
+      </div>
+    </div>
+  </Card>
+</Main>

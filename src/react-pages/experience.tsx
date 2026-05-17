@@ -1,9 +1,7 @@
 import { Link as LinkIcon } from "lucide-react";
-import { Link } from "react-router-dom";
 import NewCard from "@/components/elements/newCard";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { GetTitle } from "@/utils/title";
 
 const internshipsAndExperience = [
   {
@@ -58,17 +56,17 @@ const internshipsAndExperience = [
 
 const Experience = () => {
   return (
-    <NewCard title="Experience" viewAll link="/experience">
+    <NewCard title="Experience" viewAll>
       <div className="flex flex-col gap-4">
         {internshipsAndExperience.map((item, idx) => (
           <Card key={`${item.company}-${idx}`} className="p-6">
             <div className="flex items-center justify-between gap-4">
-              {GetTitle(item.company)}
+              <h4 className="text-xl font-semibold">{item.company}</h4>
               {item.link !== "#" && (
                 <Button asChild variant="outline" size="icon">
-                  <Link to={item.link} target="_blank" title={item.link}>
+                  <a href={item.link} target="_blank" rel="noreferrer" title={item.link}>
                     <LinkIcon className="h-4 w-4" />
-                  </Link>
+                  </a>
                 </Button>
               )}
             </div>

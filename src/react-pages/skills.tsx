@@ -21,7 +21,7 @@ interface SkillsProps {
 
 const Skills = ({ items }: SkillsProps) => {
   return (
-    <NewCard title="Skills" viewAll link="/skills">
+    <NewCard title="Skills" viewAll>
       <div className="flex flex-col gap-2">
         {skills.slice(0, items).map((skill) => (
           <Card key={skill} className="p-4">
