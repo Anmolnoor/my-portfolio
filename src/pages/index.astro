@@ -32,21 +32,19 @@ const formatDate = (d: Date) =>
 
 <Main>
   <div class="flex flex-col gap-12">
-    <section class="py-6">
-      <div class="mb-4 flex justify-end">
-        <span
-          class="inline-flex items-center gap-2 rounded-md border border-primary/30 bg-primary/10 px-3 py-1 font-mono text-sm font-medium text-primary"
-        >
-          <span class="relative flex h-2 w-2">
-            <span
-              class="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"
-            ></span>
-            <span class="relative inline-flex h-2 w-2 rounded-full bg-primary">
-            </span>
+    <section class="relative py-6">
+      <span
+        class="absolute right-0 top-2 inline-flex items-center gap-2 rounded-md border border-primary/30 bg-primary/10 px-3 py-1 font-mono text-sm font-medium text-primary"
+      >
+        <span class="relative flex h-2 w-2">
+          <span
+            class="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"
+          ></span>
+          <span class="relative inline-flex h-2 w-2 rounded-full bg-primary">
           </span>
-          available
         </span>
-      </div>
+        available
+      </span>
       <div class="grid grid-cols-1 gap-10 lg:grid-cols-2">
         <div class="flex flex-col justify-center gap-6">
           <div class="flex items-center gap-2">

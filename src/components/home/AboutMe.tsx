@@ -5,7 +5,6 @@ import {
   Target,
   Lightning as Zap,
 } from "@phosphor-icons/react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import SectionHeader from "./SectionHeader";
 
@@ -18,7 +17,7 @@ const MetaRow = ({
   label: string;
   value: string;
 }) => (
-  <div className="flex items-start gap-3">
+  <div className="flex items-start gap-2">
     <span className="mt-0.5 shrink-0 text-muted-foreground">{icon}</span>
     <div>
       <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
@@ -34,14 +33,13 @@ const AboutMe = () => {
     <section>
       <SectionHeader title="About Me" />
       <Card className="p-6">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div className="flex items-start gap-4">
-            <Avatar className="h-[72px] w-[72px]">
-              <AvatarImage src="/anmol.jpg" alt="Anmol Noor" />
-              <AvatarFallback className="bg-primary/10 text-primary">
-                AN
-              </AvatarFallback>
-            </Avatar>
+            <img
+              src="/anmol.jpg"
+              alt="Anmol Noor"
+              className="h-[72px] w-[72px] shrink-0 rounded-full object-cover"
+            />
             <div className="min-w-0 flex-1 space-y-1">
               <p className="font-mono text-lg font-bold">Anmol Noor</p>
               <p className="text-sm text-muted-foreground">
@@ -53,7 +51,7 @@ const AboutMe = () => {
               </p>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-3">
             <MetaRow
               icon={<MapPin className="h-4 w-4" />}
               label="Location"
