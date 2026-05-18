@@ -1,0 +1,62 @@
+---
+import {
+  GithubLogo as Github,
+  LinkedinLogo as Linkedin,
+  EnvelopeSimple as Mail,
+  TwitterLogo as Twitter,
+} from "@phosphor-icons/react";
+
+const socials = [
+  {
+    label: "GitHub",
+    href: "https://github.com/anmolnoor",
+    Icon: Github,
+    external: true,
+  },
+  {
+    label: "LinkedIn",
+    href: "https://www.linkedin.com/in/anmolnoor/",
+    Icon: Linkedin,
+    external: true,
+  },
+  {
+    label: "X (Twitter)",
+    href: "https://twitter.com/noor_anmol",
+    Icon: Twitter,
+    external: true,
+  },
+  {
+    label: "Email",
+    href: "mailto:anmolnoor59@gmail.com",
+    Icon: Mail,
+    external: false,
+  },
+];
+
+const year = new Date().getFullYear();
+---
+
+<footer class="mt-12 border-t">
+  <div
+    class="container mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-8"
+  >
+    <p class="font-mono text-sm text-muted-foreground">
+      © {year} Anmol Noor. All rights reserved.
+    </p>
+    <div class="grid w-full grid-cols-2 gap-x-6 gap-y-3 sm:flex sm:w-auto sm:items-center">
+      {
+        socials.map(({ label, href, Icon, external }) => (
+          <a
+            href={href}
+            target={external ? "_blank" : undefined}
+            rel={external ? "noreferrer" : undefined}
+            class="inline-flex items-center gap-2 whitespace-nowrap font-mono text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <Icon className="h-4 w-4 shrink-0" />
+            {label}
+          </a>
+        ))
+      }
+    </div>
+  </div>
+</footer>

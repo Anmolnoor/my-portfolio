@@ -58,7 +58,7 @@ export const projects: Project[] = [
     featured: true,
   },
   {
-    title: "NFT Droper",
+    title: "NFT Dropper",
     tagline: "Solana NFT mint",
     description:
       "A Solana Chain NFT dropper with candy-machine integration and a minimal mint UI.",

@@ -1,0 +1,80 @@
+---
+import "@/index.css";
+import "highlight.js/styles/github-dark.css";
+import TopNav from "@/components/header/TopNav";
+import SiteFooter from "@/components/footer/SiteFooter.astro";
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  canonical?: string;
+}
+
+const {
+  title = "Anmol Noor — Software Engineer",
+  description = "I build full-stack applications, real-time systems, and developer tools. I care about clean architecture, performance, and great developer experience.",
+  image = "/anmol.jpg",
+  canonical,
+} = Astro.props;
+
+const canonicalUrl =
+  canonical ?? new URL(Astro.url.pathname, Astro.site).toString();
+const ogImage = new URL(image, Astro.site).toString();
+---
+
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:type" content="website" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <script is:inline>
+      (() => {
+        try {
+          const stored = localStorage.getItem("portfolio-theme");
+          const theme = stored === "light" ? "light" : "dark";
+          const root = document.documentElement;
+          root.classList.remove("light", "dark");
+          root.classList.add(theme);
+        } catch {
+          /* ignore */
+        }
+      })();
+    </script>
+  </head>
+  <body class="min-h-screen bg-background font-sans text-foreground antialiased">
+    <div class="flex min-h-screen flex-col">
+      <TopNav client:load />
+      <main class="container mx-auto w-full max-w-6xl flex-1 px-4 py-10">
+        <slot />
+      </main>
+      <SiteFooter />
+    </div>
+  </body>
+</html>

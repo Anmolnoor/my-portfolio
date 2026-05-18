@@ -2,9 +2,8 @@
 export default {
   darkMode: ["class"],
   content: [
-    "./index.html",
-    "./src/**/*.{ts,tsx,mdx}",
-    "./src/content/**/*.mdx",
+    "./src/**/*.{astro,ts,tsx,mdx,md}",
+    "./src/content/**/*.{mdx,md}",
   ],
   theme: {
     container: {
@@ -17,11 +16,11 @@ export default {
     extend: {
       fontFamily: {
         sans: [
-          "Inter",
-          "-apple-system",
-          "BlinkMacSystemFont",
-          "Segoe UI",
-          "sans-serif",
+          "JetBrains Mono",
+          "ui-monospace",
+          "SFMono-Regular",
+          "Menlo",
+          "monospace",
         ],
         mono: [
           "JetBrains Mono",

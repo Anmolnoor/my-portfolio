@@ -1,64 +1,33 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-type Theme = "dark" | "light" | "system";
+const STORAGE_KEY = "portfolio-theme";
 
-interface ThemeProviderProps {
-  children: React.ReactNode;
-  defaultTheme?: Theme;
-  storageKey?: string;
-}
+type Theme = "dark" | "light";
 
-interface ThemeProviderState {
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
-  toggleTheme: () => void;
-  resolvedTheme: "dark" | "light";
-}
+const getInitialTheme = (): Theme => {
+  if (typeof document === "undefined") return "dark";
+  return document.documentElement.classList.contains("dark") ? "dark" : "light";
+};
 
-const ThemeProviderContext = createContext<ThemeProviderState | undefined>(
-  undefined
-);
-
-const getSystemTheme = (): "dark" | "light" =>
-  window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-
-export function ThemeProvider({
-  children,
-  defaultTheme = "dark",
-  storageKey = "portfolio-theme",
-}: ThemeProviderProps) {
-  const [theme, setThemeState] = useState<Theme>(
-    () => (localStorage.getItem(storageKey) as Theme | null) ?? defaultTheme
-  );
-
-  const resolvedTheme: "dark" | "light" =
-    theme === "system" ? getSystemTheme() : theme;
+export function useTheme() {
+  const [resolvedTheme, setResolvedTheme] = useState<Theme>(getInitialTheme);
 
   useEffect(() => {
+    setResolvedTheme(getInitialTheme());
+  }, []);
+
+  const toggleTheme = () => {
+    const next: Theme = resolvedTheme === "dark" ? "light" : "dark";
     const root = document.documentElement;
     root.classList.remove("light", "dark");
-    root.classList.add(resolvedTheme);
-  }, [resolvedTheme]);
-
-  const setTheme = (next: Theme) => {
-    localStorage.setItem(storageKey, next);
-    setThemeState(next);
+    root.classList.add(next);
+    try {
+      localStorage.setItem(STORAGE_KEY, next);
+    } catch {
+      /* ignore */
+    }
+    setResolvedTheme(next);
   };
 
-  const toggleTheme = () => setTheme(resolvedTheme === "dark" ? "light" : "dark");
-
-  return (
-    <ThemeProviderContext.Provider
-      value={{ theme, setTheme, toggleTheme, resolvedTheme }}
-    >
-      {children}
-    </ThemeProviderContext.Provider>
-  );
-}
-
-// eslint-disable-next-line react-refresh/only-export-components
-export function useTheme() {
-  const ctx = useContext(ThemeProviderContext);
-  if (!ctx) throw new Error("useTheme must be used within ThemeProvider");
-  return ctx;
+  return { resolvedTheme, toggleTheme };
 }

@@ -1,0 +1,88 @@
+---
+import { getCollection } from "astro:content";
+import Main from "@/layouts/Main.astro";
+import PageHeader from "@/components/elements/PageHeader";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+
+const posts = (await getCollection("blog")).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+
+const formatDate = (d: Date) =>
+  d.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+---
+
+<Main
+  title="Blog — Anmol Noor"
+  description="Notes on shipping software — frontend, distributed systems, infra, and developer tooling."
+>
+  <div class="flex flex-col gap-6">
+    <PageHeader
+      eyebrow="Writing / Blog"
+      title="Notes on shipping software"
+      description="Frontend, distributed systems, Web3, real-time media, and developer tooling — written as I learn."
+    />
+
+    {
+      posts.length === 0 ? (
+        <div class="rounded-lg border bg-card p-12 text-center">
+          <p class="font-mono text-lg font-semibold">Coming soon</p>
+        </div>
+      ) : (
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {posts.map((post) => {
+            const slug = post.data.slug ?? post.id.replace(/\.mdx$/, "");
+            const summary =
+              post.data.excerpt ?? post.data.description ?? "";
+            return (
+              <a
+                href={`/blog/${slug}`}
+                class="group h-full text-inherit no-underline"
+              >
+                <Card className="h-full overflow-hidden transition-colors group-hover:bg-muted/40">
+                  {post.data.cover && (
+                    <img
+                      src={post.data.cover}
+                      alt={post.data.title}
+                      class="h-40 w-full object-cover"
+                    />
+                  )}
+                  <div class="space-y-2 p-4">
+                    <div class="flex items-center gap-2 font-mono text-xs text-muted-foreground">
+                      <span>{formatDate(post.data.date)}</span>
+                      <span>·</span>
+                      <span>{post.data.readingMinutes} min read</span>
+                    </div>
+                    <h4 class="font-mono text-lg font-semibold tracking-tight">
+                      {post.data.title}
+                    </h4>
+                    <p class="line-clamp-3 text-sm text-muted-foreground">
+                      {summary}
+                    </p>
+                    {post.data.tags.length > 0 && (
+                      <div class="flex flex-wrap gap-1.5 pt-1">
+                        {post.data.tags.map((tag) => (
+                          <Badge
+                            variant="neon"
+                            className="rounded-sm font-mono font-medium"
+                          >
+                            {tag}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </Card>
+              </a>
+            );
+          })}
+        </div>
+      )
+    }
+  </div>
+</Main>

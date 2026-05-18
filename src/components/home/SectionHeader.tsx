@@ -1,5 +1,4 @@
-import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight } from "@phosphor-icons/react";
 
 interface SectionHeaderProps {
   title: string;
@@ -14,13 +13,13 @@ const SectionHeader = ({ title, linkLabel, linkTo }: SectionHeaderProps) => {
         {title}
       </span>
       {linkLabel && linkTo && (
-        <Link
-          to={linkTo}
+        <a
+          href={linkTo}
           className="inline-flex items-center gap-1 font-mono text-sm font-medium text-primary hover:underline"
         >
           {linkLabel}
           <ArrowRight className="h-3.5 w-3.5" />
-        </Link>
+        </a>
       )}
     </div>
   );

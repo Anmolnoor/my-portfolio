@@ -1,0 +1,141 @@
+---
+import Main from "@/layouts/Main.astro";
+import {
+  CalendarDots as CalendarClock,
+  PaperPlaneTilt as Send,
+  FileText,
+  Stack as Layers,
+  Broadcast as Radio,
+} from "@phosphor-icons/react";
+import { getCollection } from "astro:content";
+import CurrentlyBuilding from "@/components/home/CurrentlyBuilding";
+import SelectedProjects from "@/components/home/SelectedProjects";
+import AboutMe from "@/components/home/AboutMe";
+import TerminalVisual from "@/components/home/TerminalVisual";
+import SectionHeader from "@/components/home/SectionHeader.astro";
+import { Card } from "@/components/ui/card";
+import IconTile from "@/components/home/IconTile";
+
+const allPosts = (await getCollection("blog")).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+const posts = allPosts.slice(0, 3);
+const blogIconsByIndex = [FileText, Layers, Radio];
+
+const formatDate = (d: Date) =>
+  d.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+---
+
+<Main>
+  <div class="flex flex-col gap-12">
+    <section class="relative py-6">
+      <span
+        class="absolute right-0 top-2 inline-flex items-center gap-2 rounded-md border border-primary/30 bg-primary/10 px-3 py-1 font-mono text-sm font-medium text-primary"
+      >
+        <span class="relative flex h-2 w-2">
+          <span
+            class="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"
+          ></span>
+          <span class="relative inline-flex h-2 w-2 rounded-full bg-primary">
+          </span>
+        </span>
+        available
+      </span>
+      <div class="grid grid-cols-1 gap-10 lg:grid-cols-2">
+        <div class="flex flex-col justify-center gap-6">
+          <div class="flex items-center gap-2">
+            <span class="h-1.5 w-1.5 rounded-full bg-primary"></span>
+            <span
+              class="font-mono text-xs font-bold uppercase tracking-widest text-primary"
+            >
+              Software Engineer
+            </span>
+          </div>
+          <h1
+            class="font-mono text-3xl font-bold leading-[1.1] tracking-tight md:text-5xl lg:text-[clamp(2.25rem,4vw,3.25rem)]"
+          >
+            In the world of 0s and 1s,
+            <br />
+             I'm the one who{" "}
+            <span class="whitespace-nowrap text-primary">bridges the gap</span>.
+          </h1>
+          <p class="max-w-xl text-base text-muted-foreground">
+            I build full-stack applications, real-time systems, and developer
+            tools. I care about clean architecture, performance, and great
+            developer experience — and I love to experiment.
+          </p>
+          <div class="flex flex-wrap items-center gap-3">
+            <a
+              href="https://cal.com/anmolnoor"
+              target="_blank"
+              rel="noreferrer"
+              class="inline-flex h-10 items-center gap-2 rounded-full bg-primary px-5 font-mono text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+            >
+              <CalendarClock className="h-4 w-4" />
+              Book a call
+            </a>
+            <a
+              href="mailto:anmolnoor59@gmail.com"
+              class="inline-flex h-10 items-center gap-2 rounded-full border border-input bg-background px-5 font-mono text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
+            >
+              <Send className="h-4 w-4" />
+              E-Mail
+            </a>
+          </div>
+        </div>
+        <div class="hidden items-center justify-center lg:flex">
+          <TerminalVisual client:load />
+        </div>
+      </div>
+    </section>
+
+    <CurrentlyBuilding />
+
+    <SelectedProjects />
+
+    <section>
+      <SectionHeader
+        title="Writing / Blog"
+        linkLabel="View all posts"
+        linkTo="/blog"
+      />
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {
+          posts.map((post, i) => {
+            const slug = post.data.slug ?? post.id.replace(/\.mdx$/, "");
+            const Icon = blogIconsByIndex[i % blogIconsByIndex.length];
+            const summary = post.data.excerpt ?? post.data.description ?? "";
+            return (
+              <a href={`/blog/${slug}`} class="group text-inherit no-underline">
+                <Card className="h-full p-4 transition-colors group-hover:bg-muted/40">
+                  <div class="mb-3 flex items-start gap-3">
+                    <IconTile variant="blue">
+                      <Icon className="h-5 w-5" />
+                    </IconTile>
+                    <p class="line-clamp-2 font-mono font-bold">
+                      {post.data.title}
+                    </p>
+                  </div>
+                  <p class="mb-4 line-clamp-2 text-sm text-muted-foreground">
+                    {summary}
+                  </p>
+                  <div class="flex items-center gap-2 font-mono text-xs text-muted-foreground">
+                    <span>{formatDate(post.data.date)}</span>
+                    <span>·</span>
+                    <span>{post.data.readingMinutes} min read</span>
+                  </div>
+                </Card>
+              </a>
+            );
+          })
+        }
+      </div>
+    </section>
+
+    <AboutMe />
+  </div>
+</Main>

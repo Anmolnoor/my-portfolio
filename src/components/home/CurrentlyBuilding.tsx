@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { currentlyBuilding } from "@/assets/currentlyBuilding";
 import IconTile from "./IconTile";
@@ -31,13 +30,13 @@ const CurrentlyBuilding = () => {
           </Card>
         );
         return item.link ? (
-          <Link
+          <a
             key={item.title}
-            to={item.link}
+            href={item.link}
             className="text-inherit no-underline"
           >
             {inner}
-          </Link>
+          </a>
         ) : (
           <div key={item.title}>{inner}</div>
         );
