@@ -1,8 +1,171 @@
 ---
 import Main from "@/layouts/Main.astro";
-import Resume from "@/react-pages/resume";
+import { getCollection } from "astro:content";
+import { stack, now } from "@/components/about/aboutData";
+import { projects, type Project } from "@/assets/projects";
+
+const summary =
+  "Software engineer building full-stack applications, real-time systems, developer tools, and self-hosted infrastructure. I care about clean architecture, performance, practical automation, and developer experience. My current work centers on coding agents, governed tool execution, CLI workflows, and homelab infrastructure.";
+
+const resumeTitles = [
+  "Foundation CLI",
+  "Beekeeper",
+  "agent-policy-gate",
+  "scripts",
+  "claude-dotfiles",
+  "Amend Notes",
+  "Vendro",
+];
+const resumeProjects = resumeTitles
+  .map((t) => projects.find((p) => p.title === t))
+  .filter((p): p is Project => Boolean(p));
+
+const posts = (await getCollection("blog"))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 5);
+
+const formatDate = (d: Date) =>
+  d.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+
+const slugFor = (post: (typeof posts)[number]) =>
+  post.data.slug ?? post.id.replace(/\.mdx$/, "");
 ---
 
 <Main title="Resume — Anmol Noor">
-  <Resume />
+  <article
+    class="mx-auto w-[210mm] max-w-full rounded-xl border border-border bg-card p-6 sm:p-8 md:p-10"
+  >
+    <!-- header -->
+    <header class="pb-2">
+      <h1 class="font-mono text-4xl font-bold tracking-tight">Anmol Noor</h1>
+      <p class="mt-1 font-mono text-sm uppercase tracking-widest text-primary">
+        Software Engineer
+      </p>
+      <p class="mt-4 text-sm leading-relaxed text-muted-foreground">
+        {summary}
+      </p>
+    </header>
+
+    <div class="flex flex-col gap-9 pt-8">
+      <!-- focus -->
+      <section>
+        <h2
+          class="mb-4 border-b border-border pb-2 font-mono text-xs font-bold uppercase tracking-widest text-primary"
+        >
+          Focus
+        </h2>
+        <ul class="space-y-2">
+          {
+            now.map((item) => (
+              <li class="text-sm">
+                <span class="font-semibold text-foreground">{item.title}</span>
+                <span class="text-muted-foreground"> — {item.note}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <!-- skills -->
+      <section>
+        <h2
+          class="mb-4 border-b border-border pb-2 font-mono text-xs font-bold uppercase tracking-widest text-primary"
+        >
+          Technical Skills
+        </h2>
+        <div class="space-y-3">
+          {
+            stack.map((group) => (
+              <div class="flex flex-col gap-1 sm:flex-row sm:gap-4">
+                <p class="w-36 shrink-0 font-mono text-xs uppercase tracking-wider text-muted-foreground sm:pt-0.5">
+                  {group.group}
+                </p>
+                <div class="flex flex-wrap gap-x-2 gap-y-1.5">
+                  {group.items.map((i) => (
+                    <span class="rounded border border-lime-500/25 bg-lime-500/5 px-2 py-0.5 font-mono text-xs text-foreground">
+                      {i.name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </section>
+
+      <!-- projects -->
+      <section>
+        <h2
+          class="mb-4 border-b border-border pb-2 font-mono text-xs font-bold uppercase tracking-widest text-primary"
+        >
+          Selected Projects
+        </h2>
+        <div class="space-y-5">
+          {
+            resumeProjects.map((p) => {
+              const external = p.link.startsWith("http");
+              return (
+                <div>
+                  <div class="flex flex-wrap items-baseline justify-between gap-x-3">
+                    <h3 class="font-mono text-sm font-bold">
+                      {p.title}
+                      {p.tagline && (
+                        <span class="font-normal text-primary">
+                          {" "}
+                          · {p.tagline}
+                        </span>
+                      )}
+                    </h3>
+                    <a
+                      href={p.link}
+                      target={external ? "_blank" : undefined}
+                      rel={external ? "noreferrer" : undefined}
+                      class="font-mono text-xs text-muted-foreground transition-colors hover:text-primary"
+                    >
+                      {external ? "View ↗" : "View →"}
+                    </a>
+                  </div>
+                  <p class="mt-1 text-sm text-muted-foreground">
+                    {p.description}
+                  </p>
+                  {p.techTags && p.techTags.length > 0 && (
+                    <p class="mt-1.5 font-mono text-xs text-muted-foreground/70">
+                      {p.techTags.join(" · ")}
+                    </p>
+                  )}
+                </div>
+              );
+            })
+          }
+        </div>
+      </section>
+
+      <!-- writing -->
+      <section>
+        <h2
+          class="mb-4 border-b border-border pb-2 font-mono text-xs font-bold uppercase tracking-widest text-primary"
+        >
+          Writing
+        </h2>
+        <div class="space-y-2.5">
+          {
+            posts.map((post) => (
+              <div class="flex items-baseline justify-between gap-x-4">
+                <a
+                  href={`/blog/${slugFor(post)}`}
+                  title={post.data.title}
+                  class="min-w-0 truncate text-sm text-foreground transition-colors hover:text-primary"
+                >
+                  {post.data.title}
+                </a>
+                <span class="shrink-0 font-mono text-xs text-muted-foreground">
+                  {formatDate(post.data.date)}
+                </span>
+              </div>
+            ))
+          }
+        </div>
+      </section>
+    </div>
+  </article>
 </Main>

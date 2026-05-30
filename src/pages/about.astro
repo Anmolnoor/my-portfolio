@@ -1,8 +1,13 @@
 ---
 import Main from "@/layouts/Main.astro";
-import AboutMe from "@/components/home/AboutMe";
+import TerminalAbout from "@/components/about/TerminalAbout";
 ---
 
 <Main title="About — Anmol Noor">
-  <AboutMe />
+  <section>
+    <p class="mb-3 font-mono text-xs font-bold uppercase tracking-widest text-primary">
+      About Me
+    </p>
+    <TerminalAbout client:load />
+  </section>
 </Main>
