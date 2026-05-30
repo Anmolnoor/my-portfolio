@@ -60,7 +60,7 @@ const contactFile = (
           rel="noreferrer"
           className="text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
         >
-          {s.href.replace("mailto:", "")}
+          {s.href.startsWith("mailto:") ? "drop me a line" : s.href}
         </a>
       </p>
     ))}

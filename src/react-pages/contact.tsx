@@ -40,7 +40,7 @@ const channels: Channel[] = [
   },
   {
     label: "Email",
-    handle: "anmolnoor59@gmail.com",
+    handle: "Drop me a line",
     href: "mailto:anmolnoor59@gmail.com",
     icon: EnvelopeSimple,
   },
@@ -91,7 +91,7 @@ const Contact = () => {
             <Button asChild variant="outline">
               <a href="mailto:anmolnoor59@gmail.com">
                 <Send />
-                anmolnoor59@gmail.com
+                Email me
               </a>
             </Button>
           </div>
