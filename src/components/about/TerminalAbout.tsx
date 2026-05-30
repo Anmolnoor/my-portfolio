@@ -454,7 +454,7 @@ const TerminalAbout = () => {
   };
 
   return (
-    <div className="overflow-hidden rounded-xl border border-border bg-[#0c0f0a] shadow-2xl shadow-black/40">
+    <div className="dark overflow-hidden rounded-xl border border-border bg-[#0c0f0a] text-foreground shadow-2xl shadow-black/40">
       {/* title bar */}
       <div className="flex items-center gap-2 border-b border-border bg-black/40 px-4 py-3">
         <span className="h-3 w-3 rounded-full bg-red-500/80" />
