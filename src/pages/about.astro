@@ -1,14 +1,13 @@
 ---
 import Main from "@/layouts/Main.astro";
-import AboutMe from "@/components/home/AboutMe";
-import TechStack from "@/components/about/TechStack";
-import BeyondKeyboard from "@/components/about/BeyondKeyboard";
+import TerminalAbout from "@/components/about/TerminalAbout";
 ---
 
 <Main title="About — Anmol Noor">
-  <div class="flex flex-col gap-12">
-    <AboutMe />
-    <TechStack />
-    <BeyondKeyboard />
-  </div>
+  <section>
+    <p class="mb-3 font-mono text-xs font-bold uppercase tracking-widest text-primary">
+      About Me
+    </p>
+    <TerminalAbout client:load />
+  </section>
 </Main>
