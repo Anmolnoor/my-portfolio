@@ -8,6 +8,7 @@ import {
   Dog,
   FileCode,
   GameController as Gamepad2,
+  Gear,
   ImageSquare as ImageIcon,
   Stack as Layers,
   Leaf,
@@ -19,8 +20,10 @@ import {
   Mountains as Mountain,
   MusicNotes as Music,
   Broadcast as Radio,
+  Robot,
   Path as Route,
   HardDrives as Server,
+  ShieldCheck,
   ShoppingCart,
   Note as StickyNote,
   Terminal as TerminalSquare,
@@ -63,6 +66,9 @@ const iconMap: Record<string, ReactNode> = {
   code: <Code className={iconClass} />,
   server: <Server className={iconClass} />,
   layers: <Layers className={iconClass} />,
+  robot: <Robot className={iconClass} />,
+  shield: <ShieldCheck className={iconClass} />,
+  gear: <Gear className={iconClass} />,
 };
 
 export const getIcon = (key?: string): ReactNode =>
