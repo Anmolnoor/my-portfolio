@@ -11,26 +11,65 @@ export const profile = {
   currently: "Building, learning, shipping",
 };
 
-export const stack: { group: string; items: string[] }[] = [
+export const stack: { group: string; items: { name: string; note: string }[] }[] = [
   {
     group: "Languages",
-    items: ["Python", "TypeScript", "JavaScript", "Shell", "Swift", "Java", "C++"],
+    items: [
+      { name: "Python", note: "Daily driver for agents, tooling & scripts." },
+      { name: "TypeScript", note: "Typed JavaScript for apps and the web." },
+      { name: "JavaScript", note: "Where it all started." },
+      { name: "Shell", note: "Glue for automation and dotfiles." },
+      { name: "Swift", note: "Native iOS experiments (HoldIt)." },
+      { name: "Java", note: "Android and coursework roots." },
+      { name: "C++", note: "Data structures & algorithms." },
+    ],
   },
   {
     group: "Frontend",
-    items: ["React", "Next.js", "Vue", "Astro", "Tailwind CSS", "React Native", "Redux"],
+    items: [
+      { name: "React", note: "My default for building UI." },
+      { name: "Next.js", note: "Full-stack React apps." },
+      { name: "Vue", note: "Powered a few earlier builds." },
+      { name: "Astro", note: "Runs this portfolio." },
+      { name: "Tailwind CSS", note: "Utility-first styling everywhere." },
+      { name: "React Native", note: "Cross-platform mobile." },
+      { name: "Redux", note: "Predictable state when it's needed." },
+    ],
   },
   {
     group: "Backend",
-    items: ["Node.js", "Express", "PostgreSQL", "MongoDB", "Prisma", "EJS", "REST APIs"],
+    items: [
+      { name: "Node.js", note: "JavaScript on the server." },
+      { name: "Express", note: "Quick REST APIs." },
+      { name: "PostgreSQL", note: "Relational workhorse." },
+      { name: "MongoDB", note: "Document store for MERN apps." },
+      { name: "Prisma", note: "Type-safe database access." },
+      { name: "EJS", note: "Server-rendered templates." },
+      { name: "REST APIs", note: "The contracts between services." },
+    ],
   },
   {
     group: "Infra / DevOps",
-    items: ["Linux", "Proxmox", "Pi-hole", "Docker", "Prometheus", "Grafana", "Tailscale"],
+    items: [
+      { name: "Linux", note: "Every box I run." },
+      { name: "Proxmox", note: "The homelab hypervisor." },
+      { name: "Pi-hole", note: "Network-wide DNS & ad-blocking." },
+      { name: "Docker", note: "Containers for self-hosted apps." },
+      { name: "Prometheus", note: "Metrics collection." },
+      { name: "Grafana", note: "Dashboards for everything." },
+      { name: "Tailscale", note: "Private mesh VPN for remote access." },
+    ],
   },
   {
     group: "Tools / Other",
-    items: ["Git", "Claude Code", "CLI", "Vim", "Solana / Web3", "WebRTC"],
+    items: [
+      { name: "Git", note: "Version control, always." },
+      { name: "Claude Code", note: "My AI pair in the terminal." },
+      { name: "CLI", note: "I live on the command line." },
+      { name: "Vim", note: "Fast, keyboard-first editing." },
+      { name: "Solana / Web3", note: "On-chain experiments." },
+      { name: "WebRTC", note: "Real-time audio and video." },
+    ],
   },
 ];
 

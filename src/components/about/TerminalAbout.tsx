@@ -78,7 +78,14 @@ const STACK_FILENAMES: Record<string, string> = {
 const stackFiles: Record<string, ReactNode> = {};
 stack.forEach(({ group, items }) => {
   stackFiles[STACK_FILENAMES[group]] = (
-    <p className="text-sm text-lime-400">{items.join("  ")}</p>
+    <div className="grid grid-cols-[8.5rem_1fr] gap-x-4 gap-y-1 text-sm">
+      {items.map(({ name, note }) => (
+        <div key={name} className="contents">
+          <span className="text-lime-400">{name}</span>
+          <span className="text-muted-foreground">{note}</span>
+        </div>
+      ))}
+    </div>
   );
 });
 const stackFileNames = Object.keys(stackFiles);
