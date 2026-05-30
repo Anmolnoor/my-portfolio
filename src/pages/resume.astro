@@ -33,10 +33,10 @@ const slugFor = (post: (typeof posts)[number]) =>
 
 <Main title="Resume — Anmol Noor">
   <article
-    class="mx-auto max-w-3xl rounded-xl border border-border bg-card p-7 md:p-10"
+    class="mx-auto w-[210mm] max-w-full rounded-xl border border-border bg-card p-6 sm:p-8 md:p-10"
   >
     <!-- header -->
-    <header class="border-b border-border pb-6">
+    <header class="pb-2">
       <h1 class="font-mono text-4xl font-bold tracking-tight">Anmol Noor</h1>
       <p class="mt-1 font-mono text-sm uppercase tracking-widest text-primary">
         Software Engineer
@@ -73,16 +73,20 @@ const slugFor = (post: (typeof posts)[number]) =>
         >
           Technical Skills
         </h2>
-        <div class="grid gap-x-6 gap-y-3 sm:grid-cols-2">
+        <div class="space-y-3">
           {
             stack.map((group) => (
-              <div class="flex flex-col gap-1 sm:flex-row sm:gap-3">
-                <p class="w-32 shrink-0 font-mono text-xs uppercase tracking-wider text-muted-foreground">
+              <div class="flex flex-col gap-1 sm:flex-row sm:gap-4">
+                <p class="w-36 shrink-0 font-mono text-xs uppercase tracking-wider text-muted-foreground sm:pt-0.5">
                   {group.group}
                 </p>
-                <p class="text-sm text-foreground">
-                  {group.items.map((i) => i.name).join(" · ")}
-                </p>
+                <div class="flex flex-wrap gap-x-2 gap-y-1.5">
+                  {group.items.map((i) => (
+                    <span class="rounded border border-lime-500/25 bg-lime-500/5 px-2 py-0.5 font-mono text-xs text-foreground">
+                      {i.name}
+                    </span>
+                  ))}
+                </div>
               </div>
             ))
           }
@@ -146,14 +150,15 @@ const slugFor = (post: (typeof posts)[number]) =>
         <div class="space-y-2.5">
           {
             posts.map((post) => (
-              <div class="flex flex-wrap items-baseline justify-between gap-x-3">
+              <div class="flex items-baseline justify-between gap-x-4">
                 <a
                   href={`/blog/${slugFor(post)}`}
-                  class="text-sm text-foreground transition-colors hover:text-primary"
+                  title={post.data.title}
+                  class="min-w-0 truncate text-sm text-foreground transition-colors hover:text-primary"
                 >
                   {post.data.title}
                 </a>
-                <span class="font-mono text-xs text-muted-foreground">
+                <span class="shrink-0 font-mono text-xs text-muted-foreground">
                   {formatDate(post.data.date)}
                 </span>
               </div>
