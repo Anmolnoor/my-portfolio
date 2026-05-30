@@ -12,14 +12,26 @@ export const profile = {
 };
 
 export const stack: { group: string; items: string[] }[] = [
-  { group: "Languages", items: ["TypeScript", "JavaScript", "Python"] },
-  { group: "Frontend", items: ["React", "Next.js", "Tailwind CSS"] },
-  { group: "Backend", items: ["Node.js", "PostgreSQL", "MongoDB", "Prisma"] },
+  {
+    group: "Languages",
+    items: ["Python", "TypeScript", "JavaScript", "Shell", "Swift", "Java", "C++"],
+  },
+  {
+    group: "Frontend",
+    items: ["React", "Next.js", "Vue", "Astro", "Tailwind CSS", "React Native", "Redux"],
+  },
+  {
+    group: "Backend",
+    items: ["Node.js", "Express", "PostgreSQL", "MongoDB", "Prisma", "EJS", "REST APIs"],
+  },
   {
     group: "Infra / DevOps",
-    items: ["Linux", "Proxmox", "Prometheus", "Grafana"],
+    items: ["Linux", "Proxmox", "Pi-hole", "Docker", "Prometheus", "Grafana", "Tailscale"],
   },
-  { group: "Tools / Other", items: ["CLI", "Claude Code", "Solana", "WebRTC"] },
+  {
+    group: "Tools / Other",
+    items: ["Git", "Claude Code", "CLI", "Vim", "Solana / Web3", "WebRTC"],
+  },
 ];
 
 export const interests = [
