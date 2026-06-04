@@ -64,20 +64,15 @@ export default function BlogReadCounter({ slug }: BlogReadCounterProps) {
     };
   }, [slug]);
 
-  const label =
-    state.status === "ready" ? formatCount(state.count) : "-- reads";
+  if (state.status === "unavailable") {
+    return null;
+  }
 
   return (
-    <span
-      aria-live="polite"
-      className="inline-flex items-center gap-1"
-      title={
-        state.status === "unavailable"
-          ? "Set KV_REST_API_URL and KV_REST_API_TOKEN to enable read counts"
-          : undefined
-      }
-    >
-      <span>{state.status === "loading" ? "reads" : label}</span>
+    <span aria-live="polite" className="inline-flex items-center gap-1">
+      <span>
+        {state.status === "loading" ? "reads" : formatCount(state.count)}
+      </span>
     </span>
   );
 }

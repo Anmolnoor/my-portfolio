@@ -11,6 +11,14 @@ test("blog posts render a persistent read counter", async () => {
   assert.match(postPage, /BlogReadCounter/);
   assert.match(postPage, /client:load/);
 
+  const counterWidget = await readFile(
+    new URL("../src/components/blog/BlogReadCounter.tsx", import.meta.url),
+    "utf8"
+  );
+
+  assert.match(counterWidget, /return null/);
+  assert.doesNotMatch(counterWidget, /-- reads/);
+
   const apiRoute = await readFile(
     new URL("../src/pages/api/blog-reads/[slug].json.ts", import.meta.url),
     "utf8"
@@ -32,6 +40,11 @@ test("blog posts render a persistent read counter", async () => {
       KV_REST_API_TOKEN: "token",
     },
     fakeFetch
+  );
+
+  await assert.rejects(
+    () => createBlogReadCounter({}, fakeFetch).increment("hello-world"),
+    { name: "ReadCounterStoreNotConfigured" }
   );
 
   assert.equal(getReadCountKey("hello-world"), "blog:reads:hello-world");
