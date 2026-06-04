@@ -1,0 +1,370 @@
+---
+title: "Testing FCLI as a Real Agent Kernel"
+description: "Pressure-testing FCLI as a local-first coding agent runtime with planning loops, typed capabilities, traces, recovery behavior, and deterministic verification."
+date: "2026-06-04"
+tags:
+  [
+    "AI Agents",
+    "Local First",
+    "Coding Agents",
+    "FCLI",
+    "Agent Runtime",
+    "Developer Tools",
+  ]
+published: true
+slug: "testing-fcli-as-a-real-agent-kernel"
+cover: /blog/testing-fcli.png
+---
+
+Today I pressure-tested **FCLI**, a local-first coding agent runtime I have been building.
+
+The goal was not to see whether a model can write a cute poem or generate a tiny Python script. That part is already easy.
+
+The real goal was to test the software underneath the model:
+
+- planner loop
+- typed capabilities
+- file writes
+- shell execution
+- verification
+- git inspection
+- execution traces
+- recovery behavior
+
+In other words:
+
+**Can this thing behave like the bones of a real worker?**
+
+Not a chatbot. Not a demo wrapper. A small agent kernel that can plan, act, observe, recover, and leave behind enough evidence to understand what happened.
+
+## What Changed in the Agent Loop
+
+The most important architectural direction in FCLI right now is the **replan loop**.
+
+Instead of treating every failure as terminal, FCLI now runs a bounded loop:
+
+```txt
+plan -> approve -> execute -> observe -> replan
+```
+
+That matters because real agent work is rarely one perfect plan followed by one perfect execution.
+
+A file might be missing.  
+A command might fail.  
+A tool might return output that changes the next step.  
+The agent might realize it needs more information.
+
+The runtime needs to observe what happened and then decide whether to continue, stop, ask a question, or report a real failure.
+
+One important improvement is the question path.
+
+If the agent does not have enough information, it can produce a `QuestionAction`.
+
+In interactive mode, that question can be answered and fed into the next planning iteration.
+
+In non-interactive mode, the run stops as:
+
+```txt
+AWAITING_USER_INPUT
+```
+
+instead of pretending it succeeded or crashing vaguely.
+
+That is a big difference between a brittle script runner and an actual agent runtime.
+
+## Test 1: Simple File Creation
+
+The first test was intentionally small.
+
+I asked FCLI to create a file named `oceasn` with three ocean-themed haikus.
+
+It succeeded.
+
+The agent:
+
+- created the requested file
+- changed only the requested file
+- did not stage anything
+- did not commit anything
+- saved a trace
+
+This proved the basic path:
+
+```txt
+natural language request -> plan -> typed file write -> final response
+```
+
+Small test, but important.
+
+Before testing harder behavior, the simple path has to work cleanly.
+
+## Test 2: Harder Constrained File Generation
+
+Then I made the prompt harder.
+
+I asked FCLI to create five ocean-themed haikus with strict constraints:
+
+- exactly five haikus
+- three non-empty lines each
+- one blank line between haikus
+- first lines spelling `OCEAN`
+- standalone word `tide` exactly twice
+- banned words excluded
+
+This run was more interesting.
+
+I had deleted the file before the test, so the agent first tried to read the existing file and failed.
+
+Instead of collapsing, it moved into a clarification path and asked whether it should create the file.
+
+After I answered, it recovered and produced a valid final file.
+
+The trace showed:
+
+```txt
+status: completed
+executed actions: 3
+failed actions: 1
+iterations: 5
+```
+
+That is not “perfect.”
+
+But honestly, this is exactly the kind of behavior I want an agent runtime to expose.
+
+The failure did not disappear.  
+The failed read was preserved in the trace.  
+The agent recovered.  
+The final artifact passed validation.
+
+That is much more useful than a system that silently hides its mistakes.
+
+## Test 3: Capability-Level Python Execution
+
+Next, I wanted to separate model quality from software capability.
+
+So I tested FCLI’s direct command capability with `foundation run`.
+
+The run created a small Python script, executed it, wrote an output file, and produced the expected SHA value.
+
+That confirmed the lower-level capability layer was working.
+
+The test proved:
+
+- shell execution worked
+- file outputs were created
+- history was recorded
+- rerunning the generated script worked
+
+This was an important distinction.
+
+The capability layer was not the weak point.
+
+## Test 4: Weak Provider Failure
+
+Then I tried a harder natural-language task through the previous provider setup.
+
+That failed twice before any tool action ran.
+
+The failure was:
+
+```txt
+Provider returned an empty chat response
+```
+
+This was useful signal.
+
+It showed that the underlying file and shell capability layer could work, but the planner/provider path was brittle.
+
+The model did not reliably produce a usable structured plan for the harder task.
+
+This is one of the most important distinctions when evaluating an agent system:
+
+```txt
+Did the tool fail?
+Did the planner fail?
+Did the model fail?
+Did the runtime recover?
+```
+
+In this case, the planner path failed before tools were even invoked.
+
+That means the problem was not file writing.  
+It was not shell execution.  
+It was not git inspection.
+
+The failure happened earlier, at the provider/planner boundary.
+
+## Test 5: Stronger Provider With GPT-5.5
+
+After adding the Codex provider path, I tested with:
+
+```bash
+--provider codex --model gpt-5.5
+```
+
+This was the cleanest run of the day.
+
+The hard smoke test asked FCLI to:
+
+- create a new scoped directory
+- write a CSV file
+- write a Python analyzer
+- write an expected JSON file
+- run the analyzer
+- verify `result.json` against `expected.json`
+- verify a Markdown report line exactly
+- inspect git status
+- avoid staging or committing anything
+
+The result:
+
+```txt
+HARD_SMOKE_OK
+```
+
+The trace summary was also clean:
+
+```txt
+status: completed
+executed actions: 6
+failed actions: 0
+iterations: 2
+capabilities used:
+  - foundation.file.write
+  - foundation.shell.command
+  - foundation.git
+```
+
+I also reran local verification outside the agent and got:
+
+```txt
+LOCAL_VERIFY_OK
+```
+
+That was the clearest evidence from the day.
+
+The stronger model did not just produce better text. It improved the planner path.
+
+The capabilities were already there.  
+The stronger model selected and sequenced them better.
+
+## What Performed Better
+
+With GPT-5.5, FCLI did not just “sound smarter.”
+
+It behaved better as an agent planner.
+
+The improvement was visible in the trace:
+
+- valid structured plan on the first planning pass
+- correct capability selection
+- no empty provider response
+- no failed actions
+- deterministic verification passed
+- final git status inspection was scoped correctly
+- nothing was staged or committed
+
+This moved the system from:
+
+```txt
+interesting but brittle
+```
+
+to:
+
+```txt
+usable for scoped local coding-agent tasks
+```
+
+That is a meaningful step.
+
+## What Still Needs Work
+
+The tests also exposed real gaps.
+
+### Provider Configuration Needs Cleaner Boundaries
+
+Switching provider/model can leave provider-specific settings behind, such as base URL or credential source.
+
+That can accidentally mix an OpenAI provider name with Ollama credentials or endpoint config.
+
+Provider configuration needs sharper isolation so each provider has a clean and predictable boundary.
+
+### FCLI Needs Repeated Evals
+
+One clean hard smoke test is encouraging, but reliability does not come from one good run.
+
+Reliability comes from repeated deterministic tasks and measured success rates.
+
+The next stage should include a proper eval suite with many scoped tasks and clear expected outputs.
+
+### Failure Modes Should Become More Structured
+
+The agent should keep making failure states more machine-readable.
+
+Examples:
+
+- provider empty responses
+- unsupported model errors
+- missing files
+- policy blocks
+- awaiting-user-input states
+- verification failures
+
+These should not just be strings in logs.
+
+They should become structured outcomes that a supervisor, UI, or future worker runtime can consume.
+
+### The Result Contract Should Be Smaller
+
+The trace is rich, but if FCLI becomes a worker kernel, another system should not need to parse the entire trace to understand what happened.
+
+A cleaner result contract should include:
+
+- status
+- changed files
+- commands executed
+- verification result
+- artifacts created
+- failed actions
+- risk flags
+- final git state
+
+The trace can remain detailed, but the summary should be small and predictable.
+
+## The Main Takeaway
+
+The most important observation from today is that FCLI is no longer just a command wrapper.
+
+It now has the core shape of an agent kernel:
+
+- bounded planning loop
+- typed capabilities
+- approval and policy checks
+- execution traces
+- replan behavior
+- question/awaiting-input path
+- deterministic verification
+- structured history
+
+The weaker model exposed brittleness in planning.
+
+The stronger model showed that the runtime can do real work when the planner produces good actions.
+
+That is a useful place to be.
+
+FCLI is not production-ready.  
+It is not fully reliable yet.  
+But it is definitely past the toy demo phase.
+
+The next step is not adding more magic.
+
+The next step is making the loop boring:
+
+- more evals
+- cleaner provider config
+- better structured failure results
+- repeatable worker-style task contracts
+
+That is how FCLI becomes a dependable local agent runtime.
