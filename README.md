@@ -19,7 +19,7 @@ technology.
 
 - **Website:** [anmolnoor.com](https://anmolnoor.com)
 - **GitHub:** [@anmolnoor](https://github.com/anmolnoor)
-- **LinkedIn:** [in/anmolnoor](https://www.linkedin.com/in/anmolnoor/)
+- **LinkedIn:** [in/anmol-noor](https://www.linkedin.com/in/anmol-noor/)
 - **X (Twitter):** [@noor_anmol](https://twitter.com/noor_anmol)
 - **Email:** [anmolnoor59@gmail.com](mailto:anmolnoor59@gmail.com)
 

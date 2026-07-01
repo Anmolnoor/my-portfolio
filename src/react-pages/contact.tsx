@@ -28,8 +28,8 @@ const channels: Channel[] = [
   },
   {
     label: "LinkedIn",
-    handle: "in/anmolnoor",
-    href: "https://www.linkedin.com/in/anmolnoor/",
+    handle: "in/anmol-noor",
+    href: "https://www.linkedin.com/in/anmol-noor/",
     icon: LinkedinLogo,
   },
   {
