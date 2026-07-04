@@ -108,7 +108,7 @@ export const now = [
 
 export const socials = [
   { label: "GitHub", href: "https://github.com/Anmolnoor" },
-  { label: "LinkedIn", href: "https://www.linkedin.com/in/anmolnoor/" },
+  { label: "LinkedIn", href: "https://www.linkedin.com/in/anmol-noor/" },
   { label: "X", href: "https://twitter.com/noor_anmol" },
   { label: "Email", href: "mailto:anmolnoor59@gmail.com" },
   { label: "Cal.com", href: "https://cal.com/anmolnoor" },
