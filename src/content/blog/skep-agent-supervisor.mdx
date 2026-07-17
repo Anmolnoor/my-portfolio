@@ -1,0 +1,152 @@
+---
+title: "Meet skep — the agent supervisor running my portfolio"
+date: 2026-07-16
+slug: skep-agent-supervisor
+tags: ["AI Agents", "Coding Agents", "Agent Supervisor", "skep", "Developer Tools", "Local First"]
+description: "I built an AI agent supervisor that dispatches sandboxed coding workers, gates risky work behind human approvals, and learns reusable skills. Here's how it works and why one agent isn't enough."
+cover: /blog/skep.png
+published: true
+---
+
+I'm writing this post with skep. Not *about* skep — I'm literally talking to the skep assistant right now, and behind it a supervisor is dispatching a sandboxed worker to draft this file, verify it, and land the patch. This is the first time I've used it to publish something on my own site, and it feels like a milestone.
+
+For the past few months I've been building a system that sits one layer above the coding agent I shipped earlier this year. That agent — [fcli](/blog/fcli) — is a local-first runtime that takes a plan, executes it in a sandbox, and verifies the result. It's a kernel. What I needed next was something that could manage multiple agents, remember what worked, gate the dangerous stuff, and run without me babysitting it. That's skep.
+
+## What skep is
+
+skep is a personal agent supervisor. It's the chat face I talk to — the "skep assistant" — but behind that chat is a supervisor process that manages a fleet of sandboxed coding workers. Each worker gets a disposable worktree, a deny-all egress policy, and a bounded budget of time and tokens. The supervisor decides which worker to dispatch, what policy to apply, and whether the result needs human approval before it lands.
+
+Think of it like this: fcli is the agent kernel — it knows how to execute a single plan. skep is the operating system that schedules work across many plans, enforces security boundaries, and learns from every confirmed run.
+
+## How it relates to fcli
+
+I built fcli first because I wanted a coding agent that I could trust. It runs locally, uses typed capabilities (read, write, shell, network), and follows a strict plan→approve→execute→observe loop. Every action is verified. It's deterministic enough that I can run it on my homelab without worrying it'll `rm -rf` something important.
+
+But after using fcli for a few weeks, I hit a wall. I was still the one deciding what to work on, writing the plans, approving every step, and manually stringing together multi-step tasks. One agent isn't enough when you have a dozen repos, recurring maintenance work, and research tasks that need governed web access. I needed a layer that could:
+
+- Dispatch workers on demand or on a schedule
+- Apply different policies per project (some repos are more sensitive)
+- Remember what worked and reuse it
+- Gate destructive operations behind human approval
+- Let me talk to it like an assistant, not a CLI
+
+skep is that layer.
+
+## Architecture
+
+Here's the high-level picture:
+
+```
+┌─────────────────────────────────────────┐
+│              skep assistant              │
+│         (chat interface, CLI)           │
+└─────────────────┬───────────────────────┘
+                  │
+┌─────────────────▼───────────────────────┐
+│              supervisor                  │
+│  ┌─────────────────────────────────────┐│
+│  │  policy engine  │  approval gates   ││
+│  │  scheduling     │  skill registry   ││
+│  │  worktree mgr   │  run history      ││
+│  └─────────────────────────────────────┘│
+└─────────────────┬───────────────────────┘
+                  │
+     ┌────────────┼────────────┐
+     ▼            ▼            ▼
+┌─────────┐ ┌─────────┐ ┌─────────┐
+│ worker  │ │ worker  │ │ worker  │
+│ (fcli)  │ │ (fcli)  │ │ (fcli)  │
+│ sandbox │ │ sandbox │ │ sandbox │
+└─────────┘ └─────────┘ └─────────┘
+```
+
+### Supervisor
+
+The supervisor is the brain. It holds the policy engine (which decides what a worker is allowed to do on a given repo), the approval gates (which pause runs that touch sensitive paths or need a human sign-off), a scheduling ticker for recurring work, and a skill registry that stores reusable templates learned from confirmed runs.
+
+When I say "skep, update the Tailscale post with the new subnet config," the supervisor looks up the repo, checks the policy (this blog is low-risk, so auto-approve read/write but gate any shell commands that touch `.git`), dispatches a worker with a plan, and streams the result back to me. If the worker wants to push a commit, the supervisor pauses and asks me to confirm.
+
+### Sandboxed workers
+
+Every worker run gets its own git worktree. Egress is deny-all by default — if a worker needs network access, it has to be explicitly granted in the policy. Each run has a budget: max tokens, max wall-clock time, max shell commands. If a worker exceeds its budget, the supervisor kills it and cleans up.
+
+This is the part I'm most proud of. I've been burned by agents that run arbitrary code on my machine, and I refuse to let that happen again. The sandbox isn't perfect yet — I'm still using worktrees + filesystem permissions rather than full container isolation — but it's enough that I can sleep at night.
+
+### Skill system
+
+After a run is confirmed (I approve the result), the supervisor extracts a skill template: the plan structure, the policy that was applied, the verification steps, and any reusable context. Next time I ask for something similar, the supervisor can instantiate that skill instead of starting from scratch.
+
+For example, the first time I asked skep to write a blog post, it took a few iterations to get the frontmatter right. Now there's a `blog-post` skill that pre-fills the template, knows to use my voice, and runs the same verification steps. This post was generated from that skill.
+
+### Human-in-the-loop approval
+
+Nothing lands without confirmation. That's a hard rule. The supervisor can auto-approve read-only operations and low-risk writes (like drafting a file in a worktree), but anything that touches the main branch, pushes to a remote, or runs a shell command with side effects gets gated. I get a notification with a diff, and I approve or reject.
+
+This is the design decision I'm most confident about. Agents will get smarter, but I don't want to wake up to a force-pushed main branch because an LLM hallucinated a `git push --force`.
+
+## How I built it
+
+I iterated from fcli's single-agent loop to a multi-agent supervisor over about three months. The key insight was that one agent isn't enough — you need a system that can dispatch, govern, verify, and remember across many runs.
+
+### The first version was just a loop
+
+I started by wrapping fcli in a simple while-loop: take a task, generate a plan, execute, observe, repeat. It worked for linear tasks but fell apart on anything that required context across runs. I'd ask it to "fix the lint errors in all my repos" and it would forget which repos it had already touched.
+
+### Then I added a run database
+
+I gave the supervisor a SQLite database to track every run: the plan, the policy, the result, the diff, and whether I approved it. This let me query history and resume interrupted work. It also became the foundation for the skill system — if a run pattern appeared multiple times with high approval rates, the supervisor could suggest turning it into a skill.
+
+### The approval model took the most iteration
+
+At first I tried to auto-approve everything and just show me a summary. That was a mistake. I woke up to a PR that looked fine on the surface but had subtly broken a CI pipeline because the agent had "fixed" a config file it shouldn't have touched. Now I gate by default and only auto-approve when I've explicitly configured a policy that says "this path is safe."
+
+### Separating the assistant from the workers
+
+This was the architectural decision that made everything click. The skep assistant is the interface I talk to — it's conversational, it asks clarifying questions, it remembers context across sessions. The workers are stateless, sandboxed, and disposable. The supervisor sits between them, translating my intent into plans and enforcing policy.
+
+This separation means I can swap out the assistant's LLM without touching the worker runtime, and I can upgrade the worker sandbox without changing how I interact with skep.
+
+## What it can do today
+
+Here's what's working right now, as I write this:
+
+- **Dispatch coding tasks on registered repos.** I can say "skep, add a dark mode toggle to my portfolio" and it'll plan, execute, and show me a diff.
+- **Run research with governed web access.** I can ask it to research a topic and summarize findings, with network access scoped to specific domains.
+- **Schedule recurring work.** Every Monday morning, skep checks for outdated dependencies across my repos and opens PRs if there are updates.
+- **Learn skills from successful runs.** The blog-post skill I mentioned is real — it learned from the fcli and testing-fcli posts.
+- **Manage policy per project.** My homelab configs repo has a strict policy (no auto-approve, no network egress). My blog repo is more relaxed.
+- **Land patches via PRs.** When I approve a run, skep can open a PR on GitHub with the diff and a summary.
+
+I'm writing this blog post right now using skep. I described what I wanted, the supervisor dispatched a worker with the blog-post skill, and I'm reviewing the draft in real time. When I approve, it'll commit and open a PR.
+
+## What's next
+
+There's a lot I'm still figuring out.
+
+### Smarter auto-approval
+
+Right now the approval model is binary: either a path is safe or it isn't. I want the supervisor to learn from my approval patterns — if I always approve changes to `*.mdx` files in the blog repo, it should eventually auto-approve those and only gate on unusual diffs. But this is a hard problem; "unusual" is subjective, and I don't want to train a model that learns my bad habits.
+
+### Skill composition
+
+Skills are currently standalone templates. I want them to compose — a `blog-post` skill that uses a `research` skill for fact-checking, or a `refactor` skill that chains `lint` and `test` skills. This requires the supervisor to understand dependencies between skills and manage partial failures.
+
+### Long-running projects
+
+skep is great for single-session tasks, but it doesn't handle multi-day projects well. If I ask it to "migrate my entire homelab to NixOS," that's not a single plan — it's a project with milestones, rollback points, and interleaved human decisions. I'm thinking about a project layer that sits above the supervisor, but I haven't started building it yet.
+
+### Better sandboxing
+
+Worktree isolation is good, but I want full container isolation. I'm looking at Firecracker microVMs for a future version, but that adds complexity I'm not ready for yet.
+
+## Why I'm building this in public
+
+I believe the future of developer tools is agents that work alongside us, not black-box services that we hand our code to. skep runs on my machine, under my control, with my policies. It's not a SaaS product — it's a tool I built for myself, and I'm sharing it because I think other developers want the same thing.
+
+If you're interested in trying it out, the code is on [GitHub](https://github.com/Anmolnoor/skep) (still rough, still evolving). I'd love feedback, especially on the approval model and the skill system.
+
+This is the beginning of something I've been thinking about for years. An agent that I can trust, that learns from me, and that actually makes me faster without making me anxious. skep isn't there yet, but it's getting closer every week.
+
+---
+
+*This post was drafted by skep, reviewed and edited by me. The supervisor dispatched a worker with the `blog-post` skill, and I approved the final diff. The future is weird and I'm here for it.*
