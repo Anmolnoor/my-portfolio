@@ -10,7 +10,7 @@ import rehypeHighlight from "rehype-highlight";
 export default defineConfig({
   site: "https://anmolnoor.com",
   output: "static",
-  adapter: vercel({ skip: true }),
+  adapter: vercel(),
   integrations: [react(), mdx(), sitemap()],
   markdown: {
     remarkPlugins: [remarkGfm],
