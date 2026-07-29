@@ -14,11 +14,11 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/check": "^0.9.4",
-    "@astrojs/mdx": "^5.0.6",
-    "@astrojs/react": "^5.0.5",
-    "@astrojs/sitemap": "^3.7.2",
-    "@astrojs/vercel": "^10.0.7",
+    "@astrojs/check": "^0.9.4 || ^1.0.0",
+    "@astrojs/mdx": "^5.0.6 || ^6.0.0",
+    "@astrojs/react": "^5.0.5 || ^6.0.0",
+    "@astrojs/sitemap": "^3.7.2 || ^4.0.0",
+    "@astrojs/vercel": "^10.0.7 || ^11.0.0",
     "@mdx-js/react": "^3.1.1",
     "@phosphor-icons/react": "2.1.9",
     "@radix-ui/react-avatar": "^1.1.11",
