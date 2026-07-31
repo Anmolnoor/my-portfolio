@@ -1,0 +1,88 @@
+---
+title: "The Queen, the Workers, and the Group Policy Object"
+description: "How I went from Beekeeper to fcli to skep — and why the answer to agent chaos turned out to be something I learned in a networking classroom."
+date: 2026-07-31
+tags: ["skep", "agents", "journey", "launch"]
+slug: beekeeper-fcli-skep-journey
+readingMinutes: 6
+---
+
+A **skep** is an old-fashioned beehive — the woven straw dome you see in medieval drawings. Before modern hives, that's where the colony lived: the queen at the center, workers coming and going, everything happening inside one structure the beekeeper could see and lift.
+
+That's the software I've been trying to build for two years. It just took me three attempts to realize what I was actually building.
+
+The name stuck because I wanted my agents to live inside something I could govern, inspect, and ultimately trust.
+
+## It started with a chore
+
+The first version of this idea wasn't a framework. It was a chore I didn't want to do anymore: keeping my GitHub repositories alive. Dependency updates, security patches, the small maintenance work that piles up when you have side projects and a day job. I wanted an agent that would just... handle it. Check my repositories, propose fixes, let me approve them, then move on.
+
+That small itch turned out to be a trapdoor. Because the moment you let an agent touch your repositories, you hit the real question — not *can it do the work* (it can), but *how do I stay in control while it does?*
+
+## Beekeeper: the metaphor arrives, the codebase collapses
+
+My first serious attempt was called **Beekeeper**. The metaphor was there from day one: a queen that decides, workers that execute, different worker castes for different kinds of work. I still think the metaphor is right — bees are the best mental model for agent systems I've found. The queen doesn't do the foraging. She doesn't need to. The colony has roles, and the roles have rules.
+
+The problem was me. I tried to build the whole colony at once — every caste, every capability, every integration — and the codebase grew faster than my understanding of it. Beekeeper became the thing every ambitious side project becomes: large, unwieldy, and impossible to trust. I wrote a formal decision record admitting it and walked away.
+
+**Lesson one: the metaphor can be right while the codebase is wrong.** Killing Beekeeper was the best architectural decision I've made, and it didn't feel like one at the time.
+
+## fcli: prove one worker first
+
+So I shrank the problem to its smallest unit: one worker, one terminal, local-first. **fcli** was a coding agent CLI — no hive, no queen, just a single bee that could take a task, work a repository, and show me exactly what it changed before anything landed.
+
+fcli never tried to be a product. It was a proof: that the *worker pattern* works. That an agent can operate on real code, on my machine, under my eyes, and produce diffs I was comfortable merging. Once that became boringly reliable, I stopped adding to it. It's feature-complete, and it earned its retirement.
+
+**Lesson two: prove the smallest unit until it's boring.** Everything I trust in skep today traces back to patterns fcli made boring first.
+
+## skep: the day the bees met Active Directory
+
+Here's where my background did something unexpected for me.
+
+Before all this, I trained in network administration and security. Anyone who has run a Windows domain knows the real magic there isn't any single feature — it's **Group Policy**. A single place where the administrator defines the rules, and every machine and every user in the domain inherits them. You don't chase individual computers around asking them to behave. You define policy once, and the domain enforces it.
+
+One day it clicked: *that's* what agents are missing.
+
+Everyone is trying to make agents more capable. Almost nobody is making them **governed**. We keep writing prompts that say "please be careful" when what we really need is a domain controller that makes carelessness impossible.
+
+So skep became my third attempt, built around a simple inversion: **policy before capability.**
+
+The queen doesn't just dispatch workers. Every action a worker wants to take passes through a policy layer before it touches the outside world. What commands are allowed. What networks can be reached. What requires my explicit approval, delivered as an approval card I can review from anywhere. What gets verified after the work claims to be done. Per-project rules, the way an administrator scopes a Group Policy Object to an Organizational Unit.
+
+Eventually I realized my role wasn't to press every button, and it wasn't to blindly trust the AI either.
+
+**I'm the domain admin of my own hive.**
+
+The colony works. I define the rules it works under.
+
+## What the hive does today
+
+I won't map the internals here — partly because this is a launch post, not documentation, and partly on purpose. But at the level that matters:
+
+* It runs as my daily driver, across several machines, and has for weeks. Not a demo — the thing I actually use.
+* It dispatches coding workers against real repositories, and nothing lands without passing the approval flow. The diff *is* the approval.
+* It does governed research on the web, runs my schedules, and carries skills it has learned from working with me.
+* It has extended itself, building some of its own tooling under the same rules everything else follows.
+* It can run entirely on local models. My hive doesn't need to leave my network to think.
+* And in my favorite moment of the whole project: skep drafted, revised, and published a blog post about itself — through its own worker, its own approval gate, and its own pull request. The bees announced the hive.
+
+## What three attempts taught me
+
+* **Governance is the product.** Capabilities are everywhere now; control is scarce. The boring parts — allowlists, approval gates, verification, and fail-closed defaults — are the parts that let you sleep.
+* **Let the field drive everything.** Every improvement round in skep is seeded by its own field record — what actually broke while I actually used it. Roadmaps lie; usage doesn't.
+* **"It passed" is a claim, not a fact.** I once audited work that landed green and still found real bugs hiding behind skipped tests. Now honesty is enforced: verification is a step, not a vibe.
+* **Old knowledge compounds in strange ways.** A networking classroom gave me the mental model that two years of agent-building couldn't. Whatever field you came from, it's probably hiding your best idea.
+
+## The hive is open
+
+skep v1 is out today — MIT licensed, a one-line install, and runs locally.
+
+The straw dome is on the table.
+
+If the idea of being the domain admin of your own agents sounds like the right relationship to have with this technology, come take a look:
+
+**GitHub:** https://github.com/Anmolnoor/skep
+
+**Website:** https://skep.anmolnoor.com
+
+The queen is waiting for her first instructions.
