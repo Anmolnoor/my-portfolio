@@ -43,6 +43,26 @@ export interface Project {
 
 export const projects: Project[] = [
   {
+    title: "skep",
+    tagline: "Governed AI coding agents",
+    description:
+      "A local-first supervisor for AI coding agents — sandboxed workers, independent re-verification, and human approval before anything lands. MIT, on PyPI.",
+    link: "https://skep.anmolnoor.com",
+    iconKey: "server",
+    techTags: ["Python", "Agents", "Security"],
+    featured: true,
+  },
+  {
+    title: "AuthWAPI",
+    tagline: "Auth-as-a-service API",
+    description:
+      "A drop-in authentication API — registration, login, email password resets, and S3 profile-image uploads — built with TypeScript, Express, and MongoDB.",
+    link: "https://github.com/Anmolnoor/authwapi",
+    iconKey: "lock",
+    techTags: ["TypeScript", "Express", "MongoDB"],
+    featured: true,
+  },
+  {
     title: "Foundation CLI",
     tagline: "Coding agent, built in public",
     description:
