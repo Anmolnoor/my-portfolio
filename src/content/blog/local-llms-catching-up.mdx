@@ -1,0 +1,249 @@
+---
+title: "Local LLMs Are Catching Up Fast, If Your Hardware Can Keep Up"
+description: "I tested two local models on my own machines against GLM-5.3 Flash in the cloud, on 18 coding problems with hidden bugs. A 3B-active model on a mini PC matched the cloud model on correctness. It just took five times as long."
+date: 2026-10-14
+slug: local-llms-catching-up
+author: "Anmol"
+tags: ["local-llm", "ollama", "benchmarks", "homelab", "coding-agents"]
+cover: /blog/local-llms-catching-up.png
+readingMinutes: 15
+---
+
+I run my agents on my own hardware wherever I can. That raises a fair question: am I wasting my time? Cloud models are bigger, faster and cheap. So I stopped going on impressions and measured it.
+
+I tested two local models on two machines I own, and one cloud model, on the same 18 Python coding problems. Each problem has hidden bugs and blanks to fill in, and is scored by hidden tests. Here is the short version.
+
+- **On correctness, a 3B-active model on a mini PC matched a 320B cloud model.** Ornith 1.5 35B-A3B on my K8 Plus and GLM-5.3 Flash on Ollama Cloud both solved 10 of 10 basic problems and 7 of 8 hard ones on the first try.
+- **The gap is speed, and speed is hardware.** The cloud model finished seven hard problems in 11 minutes. My mini PC needed 55.
+- **This is not a fair fight, and that's the point.** GLM-5.3 Flash has about 9 times the total parameters and 6 times the active parameters of Ornith. Even at 1-bit it needs about 100 GB of memory, which doesn't fit my biggest machine.
+
+## The hardware
+
+| | MacBook Pro | GMKtec K8 Plus (mini PC) | Ollama Cloud |
+|---|---|---|---|
+| Chip | Apple M4 Pro | AMD Ryzen 7 8845HS (8 cores, 16 threads, Zen 4) | Not disclosed ("datacenter-grade hardware") |
+| GPU | Integrated M4 Pro GPU | Radeon 780M iGPU, 16 GB carved out of system RAM | Not disclosed |
+| Memory | 48 GB unified | 96 GB DDR5-5600 (Crucial, 2 × 48 GB SO-DIMM), dual channel; about 78 GB visible to the OS | n/a |
+| Memory bandwidth | 273 GB/s | 89.6 GB/s theoretical (2 channels × 5,600 MT/s × 8 bytes) | n/a |
+| Software | macOS, Ollama with MLX models | Fedora, Ollama 0.40.3 with the Vulkan backend | Ollama API, same client |
+| Model I ran on it | Qwen3.8 27B | Ornith 1.5 35B-A3B | GLM-5.3 Flash |
+| Measured speed | about 31 tokens/s | about 26 tokens/s | about 165 tokens/s |
+
+Ollama Cloud runs models on Ollama's own infrastructure through the same `ollama` client and API. Ollama doesn't say which GPUs it uses. It states that its cloud does not retain your data. Third-party write-ups describe a free tier and paid plans of around $20 and $100 a month. The billing details have changed over time, so check the current terms before you rely on them.
+
+## The models
+
+| | Qwen3.8 27B | Ornith 1.5 35B-A3B | GLM-5.3 Flash |
+|---|---|---|---|
+| Made by | Alibaba (Qwen team) | Ornith AI | Z.ai |
+| Released | August 2026 (open weights) | 2026 | August 26, 2026 |
+| Architecture | Dense | Mixture of experts | Mixture of experts (8 of 288 experts per token) |
+| Total parameters | 27.8B | about 35B | 320B |
+| Active per token | 27.8B (all of them) | about 3B | 18B |
+| Context (vendor) | up to about 1M | 262K (about 1M with YaRN) | 1M |
+| License | Apache 2.0 | not stated on the model card | MIT |
+| Vendor coding numbers | SWE-bench Pro 61.7 | SWE-bench Pro 59.6, SWE-bench Verified 79 | Terminal-Bench 2.1 84.3, DeepSWE 63.4 |
+| Memory to run | about 16 to 19 GB at 4-bit | 21 GB download in Ollama | about 100 GB at 1-bit, about 200 GB at 4-bit, about 306 GiB at FP8 |
+| How I ran it | `qwen3.8:27b-mlx` on the Mac | `ornith-1.5:35b` on the K8 Plus | `glm-5.3-flash` on Ollama Cloud |
+
+The vendor numbers come from different benchmarks run in different ways, so don't compare them across columns. They're here to show what each model claims.
+
+GLM-5.3 Flash is a serious model. Z.ai reports it close to frontier models on agentic coding, and its API price is $0.15 per million input tokens and $0.50 per million output tokens. Serving it yourself takes a multi-GPU server node.
+
+## How I tested
+
+I built a test suite instead of chatting with the models, because chatting misleads you. Early on, one model claimed its 350-word story was "(298 words)". Another explained algebra beautifully and quietly set up a word problem that has no whole-number answer. Fluent output is easy to trust and hard to check.
+
+The suite has two tiers.
+
+- **Basic, 10 problems:** small, everyday functions, each 10 to 20 lines.
+- **Hard, 8 problems:** longer files with several bugs that interact, where fixing one can break another.
+
+Each problem gives the model a spec and a starter file with **unmarked bugs** and TODO blanks. The model is only told that bugs exist, not where. It returns the whole fixed file, and hidden pytest tests score it. The tests are split into "core" (normal behaviour) and "edge" (the traps), so a function that rejects everything can't look half right.
+
+Here's what a starter looks like. This is the basic `chunk` problem, with my annotations added. The model sees it without the comments:
+
+```python
+def chunk(items, size):
+    """Split items into consecutive lists of length `size`."""
+    # TODO: validate size
+    ...
+
+    result = []
+    for start in range(0, len(items) - size, size):   # bug: drops the last piece
+        result.append(items[start:start + size])      # bug: a tuple gives tuples, not lists
+    return result
+```
+
+### The problems
+
+The traps aren't trick questions. They're the mistakes that make it into real code: off-by-one bounds, Python behaviour people misremember, and rules that only bite on unusual input.
+
+**Basic tier**
+
+| Problem | What it does | The trap |
+|---|---|---|
+| `chunk` | Split a list into fixed-size pieces | The last, shorter piece gets dropped. `True` and `2.0` must be rejected as sizes. |
+| `merge_intervals` | Merge overlapping ranges | Unsorted input, ranges that only touch (`(1, 2)` and `(2, 3)`), and a range inside another |
+| `LRUCache` | A cache that evicts the least recently used key | Both reading and updating a key count as a use. Stored values can be `None`. |
+| `slugify` | Turn a title into a URL slug | Accents and characters like `ﬃ` and `Ⅻ` need Unicode normalization |
+| `parse_csv_line` | Split one CSV line, without the `csv` module | Quoted commas, `""` escapes and a trailing empty field |
+| `bisect_left` | Binary search for an insertion point | Finding the first of several duplicates, and off-by-one bounds |
+| `top_words` | Count the most common words | Ties sorted alphabetically, and apostrophes in words like `don't` |
+| `retry` | A decorator that retries a failing function | The exact number of attempts, retrying only listed errors, and keeping the function's name |
+| `flatten` | Flatten nested lists | Strings must not be split into letters, and 10,000 levels of nesting breaks recursion |
+| `split_bill` | Split a bill into near-equal cents | No floating point: it must be exact for `10**20` cents |
+
+**Hard tier**
+
+| Problem | What it does | The trap |
+|---|---|---|
+| `TokenBucket` | A rate limiter that refills over time | It must start full, never exceed capacity, and survive the clock going backwards |
+| SemVer `compare` | Order version numbers by the SemVer 2.0 rules | `1.0.0-alpha` ranks below `1.0.0`. Numeric and text labels compare differently. `"1.0.0\n"` and fullwidth digits like `１.0.0` must be rejected. |
+| `wrap` | Word wrap that keeps paragraphs apart | Blank lines that contain spaces, Windows line endings, and words longer than the line |
+| Legacy refactor | Rewrite messy pricing code cleanly | It must match the old code exactly, rounding quirks included, on 3,000 random orders |
+| `topo_sort` | Put dependencies in order | Alphabetical tie-breaks, reporting a real cycle, and a 5,000-node cycle that breaks recursion |
+| `glob_match` | Match file patterns like `src/**.py` | `*` must stop at `/` but `**` must not, plus character classes, escapes, and a pattern that makes naive backtracking run practically forever |
+| Undo/redo `Editor` | A text buffer with history | Undoing a delete needs the deleted text, plus a history limit and the redo order |
+| JSON Pointer `resolve` | Look up a value by path (RFC 6901) | `~01` decodes to `~1`, not `/`. `-1` and `01` aren't valid list indexes, even though Python accepts them. |
+
+The Unicode cases show up on purpose. In Python, `\d` in a regex and `str.isdigit()` both accept digits like `١` (Arabic-Indic) and `１` (fullwidth), and `int("1０")` quietly returns `10`. A spec that says "ASCII digits only" needs code that actually enforces it.
+
+I checked the suite itself before trusting it.
+
+1. Every reference solution passes and every starter fails.
+2. I put each of 71 planted bugs back into a correct solution, one at a time, and confirmed the tests catch it.
+3. After the runs, I compared every passing hard-tier solution against my reference solutions on more than 300,000 random inputs. Passing the tests and being correct are not the same thing.
+
+All models ran with thinking on and one attempt per problem unless I say otherwise. The local models had a 32K-token context.
+
+## Results
+
+![Problems solved on the first try](/blog/local-llms-solved-first-try.png)
+
+| | Basic, first try | Hard, first try | Hard, after one repair round |
+|---|---|---|---|
+| Qwen3.8 27B (Mac) | 9/10 | 4/8 | 7/8 |
+| Ornith 1.5 35B-A3B (K8 Plus) | 10/10 | 7/8 | 7/8 |
+| GLM-5.3 Flash (Ollama Cloud) | 10/10 | 7/8 | not needed |
+
+Every passing hard-tier solution from all three models agreed with my reference on the random inputs. When these models passed, they were right.
+
+### The hard tier, problem by problem
+
+| Problem | Qwen3.8 27B | Ornith 1.5 35B-A3B | GLM-5.3 Flash |
+|---|---|---|---|
+| Token bucket | ✅ 67 s | ✅ 119 s | ✅ 59 s |
+| SemVer | ❌ 153 s | ✅ 762 s | ✅ 127 s |
+| Word wrap | ✅ 205 s | ✅ 452 s | ✅ 69 s |
+| Legacy refactor | ❌ 86 s | ✅ 490 s | ✅ 34 s |
+| Topological sort | ✅ 270 s | ✅ 634 s | ✅ 165 s |
+| Glob matching | ❌ 881 s | ⛔ ran out of tokens | ⛔ no reply within an hour |
+| Undo/redo editor | ✅ 101 s | ✅ 415 s | ✅ 133 s |
+| JSON Pointer | ❌ 67 s | ✅ 406 s | ✅ 92 s |
+
+![Total time to finish each tier](/blog/local-llms-time-per-tier.png)
+
+| | Basic: time | Basic: tokens | Hard (7, no glob): time | Hard (7, no glob): tokens |
+|---|---|---|---|---|
+| Qwen3.8 27B | 9.5 min | 17,668 | 15.8 min | 30,428 |
+| Ornith 1.5 35B-A3B | 16.2 min | 25,512 | 54.6 min | 83,594 |
+| GLM-5.3 Flash | 2.2 min | 27,370 | 11.3 min | 112,198 |
+
+At Z.ai's API list price, GLM's tokens for both tiers come to well under 10 cents.
+
+## What I learned
+
+### 1. Small active parameters went a long way
+
+Ornith activates about 3B parameters per token. GLM-5.3 Flash activates 18B, out of 320B. On these 18 problems they tied on correctness, and both solved three of the four hard problems Qwen missed on its first try.
+
+That fits what the model cards show. Ornith 1.5 reports SWE-bench Verified 79 and SWE-bench Pro 59.6, against 73.4 and 49.5 for Qwen3.6-35B-A3B, a model of the same size from about five months earlier. Those are vendor numbers, but the direction matches what I measured.
+
+What my tests don't measure is breadth of knowledge. A 35B model holds less of the world than a 320B one, and self-contained coding problems hide that. If your work needs that knowledge, the bigger model still matters.
+
+### 2. The gap that's left is speed, and that's hardware
+
+![Generation speed by model and hardware](/blog/local-llms-generation-speed.png)
+
+GLM didn't win by thinking less. It generated the **most** tokens of the three on the hard tier. It just generated them five to six times faster.
+
+Generation speed on local hardware is mostly memory bandwidth. Every generated token reads every active weight from memory. That's why the same dense Qwen3.8 27B runs at about 6 tokens/s on the mini PC (about 90 GB/s) and about 31 on the M4 Pro (273 GB/s). It's also why a mixture-of-experts model fits the mini PC so well: Ornith reads only about 3B parameters per token, so it runs at about 26 tokens/s on the slower memory, and the 96 GB of RAM holds the full model easily.
+
+### 3. Hardware setup mattered more than I expected
+
+Out of the box, Ollama on the K8 Plus ran entirely on the CPU. The fix was two environment variables, because Ollama skips integrated GPUs unless you opt in:
+
+```ini
+[Service]
+Environment="OLLAMA_VULKAN=1"
+Environment="OLLAMA_IGPU_ENABLE=1"
+Environment="OLLAMA_CONTEXT_LENGTH=32768"
+```
+
+With the Radeon 780M enabled through Vulkan, generation went from 19.6 to 26.7 tokens/s on Qwen3.6 35B-A3B (+36%), and from 17.2 to 24.3 on Gemma 4 26B (+41%). The third line matters just as much: Ollama loaded models with a **4,096-token** context by default, which silently cuts off long agent prompts.
+
+On the Mac, switching from the default Ollama build of Qwen3.8 27B to its MLX build took it from single digits to about 31 tokens/s.
+
+### 4. Thinking helps, but don't trust what it says
+
+On an earlier parser test, Qwen3.8 27B scored 45/47 with thinking off and 47/47 with it on, three runs out of three. The thinking is where it noticed that Python's `\d` and `isdigit()` accept non-ASCII digits like `١`.
+
+But a thinking trace isn't proof. Qwen3.6 35B wrote a 7.5-minute trace that "traced" its code step by step and ended "All constraints met ✅". Its code couldn't parse `"1h"`. It had traced the code it meant to write, not the code it wrote. Only running the tests catches that.
+
+### 5. The ways they failed were consistent
+
+- **Confident wrong knowledge.** Qwen reasoned that assigning to an existing key in an `OrderedDict` moves it to the end. It doesn't. More thinking can't fix a fact the model believes. Ornith never relied on the fact at all and wrote an explicit `move_to_end`.
+- **The same blind spot, repeatedly.** Two of Qwen's four hard-tier misses were the same trap: `\d`, `isdigit()` or `$` quietly accepting Unicode digits or a trailing newline. It had caught that exact trap on my earlier parser test, then missed it here.
+- **A repair fixes the symptom.** Given only the failing test name, Qwen fixed SemVer, the refactor and JSON Pointer. On glob, it patched the exact case the test named and left the cause in place, which random-input testing caught.
+- **No answer at all.** Ornith spent all its tokens on glob three times and never wrote code. A wrong answer plus tests plus one retry is recoverable. An hour with no output isn't.
+
+### 6. I made mistakes too
+
+The suite caught the models, and checking the suite caught me. Three specs required rejecting booleans without saying so. One test missed a Unicode case. The glob spec never said invalid patterns must be rejected before matching, and Ornith spent its whole budget debating exactly that question. My runner also once took a model's example block instead of its solution, which turned a correct answer into "code did not run". All of these are fixed. If you build your own evaluations, test the tests.
+
+## Caveats
+
+- **One run per model per tier.** Qwen failed JSON Pointer in one run and passed it in the next with the same prompt. A second run could move any score by a problem or two.
+- **Glob doesn't count yet.** Its spec was ambiguous until the end, so I'm leaving it out until I rerun all three models on the clarified version.
+- **Different hardware for each model.** Time compares setups, not models. Tokens are the fairer measure of effort.
+- **Narrow tests.** Eighteen single-file Python problems. No large codebases, long contexts, tool use or general knowledge.
+- **Settings I can't see.** GLM ran through Ollama Cloud with thinking on. I don't know exactly which reasoning effort that maps to.
+
+## So, am I wasting my time?
+
+No, but the answer is more specific than "local is good now."
+
+**Local models really are catching up.** A 21 GB model on a mini PC solved the same problems as a 320B model in a datacenter. That would have sounded unlikely a short while ago.
+
+**But you pay in time, and only the right hardware makes it bearable.** On a mixture-of-experts model with the GPU working, the mini PC is usable for jobs nobody is waiting on. A dense model on the same machine is too slow for agent work.
+
+Here's how I'm setting things up now:
+
+- **Interactive work and agent loops:** a hosted model like GLM-5.3 Flash. It's faster and costs cents.
+- **Private code, offline work and overnight jobs:** Ornith on the K8 Plus. It's right as often, and it's the machine that stays on.
+- **Everything:** tests as the referee, a thinking budget per step, and a fallback to the cloud model when the local one fails its tests or runs out of budget.
+
+## Reproduce it
+
+The suite runs any Ollama or OpenAI-compatible model:
+
+```bash
+pip3 install pytest
+python3 run_suite.py --self-check --tier hard
+python3 run_suite.py --model ornith-1.5:35b --think on --tier hard
+python3 run_suite.py --model glm-5.3-flash --think on --tier hard --repair 1
+```
+
+Results go to `results/summary.md` and `results/summary_hard.md`, with every reply, thinking trace and code file saved.
+
+## Sources
+
+- [Z.ai releases GLM-5.3-Flash: 320B-A18B MoE with a 1M-token context (MarkTechPost)](https://www.marktechpost.com/2026/08/26/z-ai-releases-glm-5-3-flash-a-320b-a18b-natively-multimodal-moe-with-a-1m-token-context/)
+- [zai-org/GLM-5.3-Flash model card (Hugging Face)](https://huggingface.co/zai-org/GLM-5.3-Flash)
+- [GLM-5.3-Flash memory requirements by quantization (Unsloth)](https://unsloth.ai/docs/models/glm-5.3-flash.md)
+- [GLM-5.3-Flash pricing (AnotherWrapper, citing Z.ai)](https://anotherwrapper.com/llm-pricing/glm-5.3-flash)
+- [Ornith 1.5 35B model card (Hugging Face)](https://huggingface.co/ornith-ai/Ornith-1.5-35B)
+- [How to run Qwen3.8-27B locally with Ollama (Tech Insider)](https://tech-insider.org/how-to-run-qwen3-8-27b-locally-ollama-2026/)
+- [Cloud models (Ollama blog)](https://ollama.com/blog/cloud-models)
+- [Ollama Cloud: pricing, models and how it works (Serverman)](https://www.serverman.co.uk/ai/ollama/ollama-cloud/)
