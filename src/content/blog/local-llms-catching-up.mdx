@@ -1,20 +1,20 @@
 ---
 title: "Local LLMs Are Catching Up Fast, If Your Hardware Can Keep Up"
-description: "I tested two local models on my own machines against GLM-5.3 Flash in the cloud, on 18 coding problems with hidden bugs. A 3B-active model on a mini PC matched the cloud model on correctness. It just took five times as long."
+description: "I tested two local models on my own machines against GLM-5.3 Flash in the cloud, on 18 coding problems with hidden bugs. A 3B-active model matched the cloud model on correctness. On a mini PC it took five times as long; on a MacBook, about twice."
 date: 2026-10-14
 slug: local-llms-catching-up
 author: "Anmol"
 tags: ["local-llm", "ollama", "benchmarks", "homelab", "coding-agents"]
 cover: /blog/local-llms-catching-up.png
-readingMinutes: 15
+readingMinutes: 17
 ---
 
 I run my agents on my own hardware wherever I can. That raises a fair question: am I wasting my time? Cloud models are bigger, faster and cheap. So I stopped going on impressions and measured it.
 
-I tested two local models on two machines I own, and one cloud model, on the same 18 Python coding problems. Each problem has hidden bugs and blanks to fill in, and is scored by hidden tests. Here is the short version.
+I tested two local models on the two machines I own, ran one of them on both machines, and compared everything with one cloud model, on the same 18 Python coding problems. Each problem has hidden bugs and blanks to fill in, and is scored by hidden tests. Here is the short version.
 
-- **On correctness, a 3B-active model on a mini PC matched a 320B cloud model.** Ornith 1.5 35B-A3B on my K8 Plus and GLM-5.3 Flash on Ollama Cloud both solved 10 of 10 basic problems and 7 of 8 hard ones on the first try.
-- **The gap is speed, and speed is hardware.** The cloud model finished seven hard problems in 11 minutes. My mini PC needed 55.
+- **On correctness, a 3B-active model matched a 320B cloud model.** Ornith 1.5 35B-A3B on my K8 Plus and GLM-5.3 Flash on Ollama Cloud both solved 10 of 10 basic problems and 7 of 8 hard ones on the first try. A second Ornith run, on my MacBook, scored 10 of 10 and 6 of 8.
+- **The gap is speed, and speed is hardware.** The cloud model finished seven hard problems in 11 minutes. The same small model needed 55 on my mini PC and 26 on my MacBook.
 - **This is not a fair fight, and that's the point.** GLM-5.3 Flash has about 9 times the total parameters and 6 times the active parameters of Ornith. Even at 1-bit it needs about 100 GB of memory, which doesn't fit my biggest machine.
 
 ## The hardware
@@ -25,9 +25,9 @@ I tested two local models on two machines I own, and one cloud model, on the sam
 | GPU | Integrated M4 Pro GPU | Radeon 780M iGPU, 16 GB carved out of system RAM | Not disclosed |
 | Memory | 48 GB unified | 96 GB DDR5-5600 (Crucial, 2 × 48 GB SO-DIMM), dual channel; about 78 GB visible to the OS | n/a |
 | Memory bandwidth | 273 GB/s | 89.6 GB/s theoretical (2 channels × 5,600 MT/s × 8 bytes) | n/a |
-| Software | macOS, Ollama with MLX models | Fedora, Ollama 0.40.3 with the Vulkan backend | Ollama API, same client |
-| Model I ran on it | Qwen3.8 27B | Ornith 1.5 35B-A3B | GLM-5.3 Flash |
-| Measured speed | about 31 tokens/s | about 26 tokens/s | about 165 tokens/s |
+| Software | macOS, Ollama (MLX build for Qwen) | Fedora, Ollama 0.40.3 with the Vulkan backend | Ollama API, same client |
+| Models I ran on it | Qwen3.8 27B, Ornith 1.5 35B-A3B | Ornith 1.5 35B-A3B | GLM-5.3 Flash |
+| Measured speed | about 31 tokens/s (Qwen), about 61 (Ornith) | about 26 tokens/s | about 165 tokens/s |
 
 Ollama Cloud runs models on Ollama's own infrastructure through the same `ollama` client and API. Ollama doesn't say which GPUs it uses. It states that its cloud does not retain your data. Third-party write-ups describe a free tier and paid plans of around $20 and $100 a month. The billing details have changed over time, so check the current terms before you rely on them.
 
@@ -44,7 +44,7 @@ Ollama Cloud runs models on Ollama's own infrastructure through the same `ollama
 | License | Apache 2.0 | not stated on the model card | MIT |
 | Vendor coding numbers | SWE-bench Pro 61.7 | SWE-bench Pro 59.6, SWE-bench Verified 79 | Terminal-Bench 2.1 84.3, DeepSWE 63.4 |
 | Memory to run | about 16 to 19 GB at 4-bit | 21 GB download in Ollama | about 100 GB at 1-bit, about 200 GB at 4-bit, about 306 GiB at FP8 |
-| How I ran it | `qwen3.8:27b-mlx` on the Mac | `ornith-1.5:35b` on the K8 Plus | `glm-5.3-flash` on Ollama Cloud |
+| How I ran it | `qwen3.8:27b-mlx` on the Mac | `ornith-1.5:35b` on the K8 Plus and the Mac (identical file) | `glm-5.3-flash` on Ollama Cloud |
 
 The vendor numbers come from different benchmarks run in different ways, so don't compare them across columns. They're here to show what each model claims.
 
@@ -125,38 +125,60 @@ All models ran with thinking on and one attempt per problem unless I say otherwi
 |---|---|---|---|
 | Qwen3.8 27B (Mac) | 9/10 | 4/8 | 7/8 |
 | Ornith 1.5 35B-A3B (K8 Plus) | 10/10 | 7/8 | 7/8 |
+| Ornith 1.5 35B-A3B (Mac) | 10/10 | 6/8 | not run |
 | GLM-5.3 Flash (Ollama Cloud) | 10/10 | 7/8 | not needed |
 
-Every passing hard-tier solution from all three models agreed with my reference on the random inputs. When these models passed, they were right.
+Every passing hard-tier solution, from every run, agreed with my reference on the random inputs. When these models passed, they were right.
 
 ### The hard tier, problem by problem
 
-| Problem | Qwen3.8 27B | Ornith 1.5 35B-A3B | GLM-5.3 Flash |
-|---|---|---|---|
-| Token bucket | ✅ 67 s | ✅ 119 s | ✅ 59 s |
-| SemVer | ❌ 153 s | ✅ 762 s | ✅ 127 s |
-| Word wrap | ✅ 205 s | ✅ 452 s | ✅ 69 s |
-| Legacy refactor | ❌ 86 s | ✅ 490 s | ✅ 34 s |
-| Topological sort | ✅ 270 s | ✅ 634 s | ✅ 165 s |
-| Glob matching | ❌ 881 s | ⛔ ran out of tokens | ⛔ no reply within an hour |
-| Undo/redo editor | ✅ 101 s | ✅ 415 s | ✅ 133 s |
-| JSON Pointer | ❌ 67 s | ✅ 406 s | ✅ 92 s |
+| Problem | Qwen3.8 27B (Mac) | Ornith (K8 Plus) | Ornith (Mac) | GLM-5.3 Flash |
+|---|---|---|---|---|
+| Token bucket | ✅ 67 s | ✅ 119 s | ✅ 53 s | ✅ 59 s |
+| SemVer | ❌ 153 s | ✅ 762 s | ✅ 387 s | ✅ 127 s |
+| Word wrap | ✅ 205 s | ✅ 452 s | ✅ 283 s | ✅ 69 s |
+| Legacy refactor | ❌ 86 s | ✅ 490 s | ❌ 110 s | ✅ 34 s |
+| Topological sort | ✅ 270 s | ✅ 634 s | ✅ 288 s | ✅ 165 s |
+| Glob matching | ❌ 881 s | ⛔ ran out of tokens | ⛔ ran out of tokens | ⛔ no reply within an hour |
+| Undo/redo editor | ✅ 101 s | ✅ 415 s | ✅ 259 s | ✅ 133 s |
+| JSON Pointer | ❌ 67 s | ✅ 406 s | ✅ 165 s | ✅ 92 s |
 
 ![Total time to finish each tier](/blog/local-llms-time-per-tier.png)
 
 | | Basic: time | Basic: tokens | Hard (7, no glob): time | Hard (7, no glob): tokens |
 |---|---|---|---|---|
-| Qwen3.8 27B | 9.5 min | 17,668 | 15.8 min | 30,428 |
-| Ornith 1.5 35B-A3B | 16.2 min | 25,512 | 54.6 min | 83,594 |
+| Qwen3.8 27B (Mac) | 9.5 min | 17,668 | 15.8 min | 30,428 |
+| Ornith 1.5 35B-A3B (K8 Plus) | 16.2 min | 25,512 | 54.6 min | 83,594 |
+| Ornith 1.5 35B-A3B (Mac) | 7.6 min | 28,493 | 25.8 min | 93,527 |
 | GLM-5.3 Flash | 2.2 min | 27,370 | 11.3 min | 112,198 |
 
 At Z.ai's API list price, GLM's tokens for both tiers come to well under 10 cents.
+
+### Same model, two machines
+
+To separate the hardware from the model, I ran Ornith on both machines. Ollama pulled the identical file on each (the file hashes match), and the suite was unchanged.
+
+| Ornith 1.5 35B-A3B | K8 Plus | MacBook Pro M4 Pro |
+|---|---|---|
+| Memory bandwidth | 89.6 GB/s | 273 GB/s |
+| Generation speed | about 26 tokens/s | about 61 tokens/s |
+| Basic tier | 10/10 in 16.2 min | 10/10 in 7.6 min |
+| Hard tier (7, no glob) | 7/7 in 54.6 min | 6/7 in 25.8 min |
+| Glob | ran out of tokens after 22 min | ran out of tokens after 9 min |
+
+About 3 times the memory bandwidth gave about 2.3 times the speed, with the same weights.
+
+The one score that changed wasn't the hardware's doing. On the Mac, Ornith kept a line from the starter that reads `item["price"]` before checking the quantity, the same bug Qwen made. On the K8 Plus it had rewritten that loop. Same weights, same prompt, different run. Thinking length varies too: Ornith spent 7,323 tokens on the CSV parser in one run and 11,778 in the other.
+
+Glob shows the limit of faster hardware. The budget is measured in tokens, not minutes, so the faster machine just ran out sooner.
+
+This also gives a fair head-to-head on one machine. On the Mac, Ornith finished the basic tier faster than Qwen (7.6 vs 9.5 minutes) with a better score (10/10 vs 9/10). On the hard tier, Qwen finished sooner (15.8 vs 25.8 minutes), but Ornith solved 6 problems to Qwen's 4.
 
 ## What I learned
 
 ### 1. Small active parameters went a long way
 
-Ornith activates about 3B parameters per token. GLM-5.3 Flash activates 18B, out of 320B. On these 18 problems they tied on correctness, and both solved three of the four hard problems Qwen missed on its first try.
+Ornith activates about 3B parameters per token. GLM-5.3 Flash activates 18B, out of 320B. On these 18 problems they were neck and neck: GLM scored 7/8 on the hard tier, and Ornith scored 7/8 and 6/8 in two runs. Both solved SemVer and JSON Pointer every time, two problems Qwen missed on its first try.
 
 That fits what the model cards show. Ornith 1.5 reports SWE-bench Verified 79 and SWE-bench Pro 59.6, against 73.4 and 49.5 for Qwen3.6-35B-A3B, a model of the same size from about five months earlier. Those are vendor numbers, but the direction matches what I measured.
 
@@ -166,9 +188,9 @@ What my tests don't measure is breadth of knowledge. A 35B model holds less of t
 
 ![Generation speed by model and hardware](/blog/local-llms-generation-speed.png)
 
-GLM didn't win by thinking less. It generated the **most** tokens of the three on the hard tier. It just generated them five to six times faster.
+GLM didn't win by thinking less. It generated the **most** tokens on the hard tier. It just generated them faster: about 6 times faster than Ornith on the mini PC, and about 2.7 times faster than the same model on my MacBook.
 
-Generation speed on local hardware is mostly memory bandwidth. Every generated token reads every active weight from memory. That's why the same dense Qwen3.8 27B runs at about 6 tokens/s on the mini PC (about 90 GB/s) and about 31 on the M4 Pro (273 GB/s). It's also why a mixture-of-experts model fits the mini PC so well: Ornith reads only about 3B parameters per token, so it runs at about 26 tokens/s on the slower memory, and the 96 GB of RAM holds the full model easily.
+Generation speed on local hardware is mostly memory bandwidth. Every generated token reads every active weight from memory. That's why the same dense Qwen3.8 27B runs at about 6 tokens/s on the mini PC (about 90 GB/s) and about 31 on the M4 Pro (273 GB/s). It's also why a mixture-of-experts model fits the mini PC so well: Ornith reads only about 3B parameters per token, so it runs at about 26 tokens/s on the slower memory, and the 96 GB of RAM holds the full model easily. Move the same file to the M4 Pro and it runs at about 61.
 
 ### 3. Hardware setup mattered more than I expected
 
@@ -196,7 +218,7 @@ But a thinking trace isn't proof. Qwen3.6 35B wrote a 7.5-minute trace that "tra
 - **Confident wrong knowledge.** Qwen reasoned that assigning to an existing key in an `OrderedDict` moves it to the end. It doesn't. More thinking can't fix a fact the model believes. Ornith never relied on the fact at all and wrote an explicit `move_to_end`.
 - **The same blind spot, repeatedly.** Two of Qwen's four hard-tier misses were the same trap: `\d`, `isdigit()` or `$` quietly accepting Unicode digits or a trailing newline. It had caught that exact trap on my earlier parser test, then missed it here.
 - **A repair fixes the symptom.** Given only the failing test name, Qwen fixed SemVer, the refactor and JSON Pointer. On glob, it patched the exact case the test named and left the cause in place, which random-input testing caught.
-- **No answer at all.** Ornith spent all its tokens on glob three times and never wrote code. A wrong answer plus tests plus one retry is recoverable. An hour with no output isn't.
+- **No answer at all.** Ornith spent all its tokens on glob four times, on both machines, and never wrote code. A wrong answer plus tests plus one retry is recoverable. An hour with no output isn't.
 
 ### 6. I made mistakes too
 
@@ -204,9 +226,9 @@ The suite caught the models, and checking the suite caught me. Three specs requi
 
 ## Caveats
 
-- **One run per model per tier.** Qwen failed JSON Pointer in one run and passed it in the next with the same prompt. A second run could move any score by a problem or two.
+- **One or two runs per model.** Ornith scored 7/8 on the hard tier in one run and 6/8 in the next, with identical weights. Qwen failed JSON Pointer in one run and passed it in the next. Any score here could move by a problem or two.
 - **Glob doesn't count yet.** Its spec was ambiguous until the end, so I'm leaving it out until I rerun all three models on the clarified version.
-- **Different hardware for each model.** Time compares setups, not models. Tokens are the fairer measure of effort.
+- **Mixed hardware.** Qwen and Ornith meet head-to-head on the Mac, but the cloud comparison crosses hardware. Time compares setups, not models; tokens are the fairer measure of effort.
 - **Narrow tests.** Eighteen single-file Python problems. No large codebases, long contexts, tool use or general knowledge.
 - **Settings I can't see.** GLM ran through Ollama Cloud with thinking on. I don't know exactly which reasoning effort that maps to.
 
@@ -214,14 +236,15 @@ The suite caught the models, and checking the suite caught me. Three specs requi
 
 No, but the answer is more specific than "local is good now."
 
-**Local models really are catching up.** A 21 GB model on a mini PC solved the same problems as a 320B model in a datacenter. That would have sounded unlikely a short while ago.
+**Local models really are catching up.** A 21 GB model on a mini PC solved the same problems as a 320B model in a datacenter. On a laptop with faster memory, the same file finished the hard problems in 26 minutes against the cloud's 11. That would have sounded unlikely a short while ago.
 
 **But you pay in time, and only the right hardware makes it bearable.** On a mixture-of-experts model with the GPU working, the mini PC is usable for jobs nobody is waiting on. A dense model on the same machine is too slow for agent work.
 
 Here's how I'm setting things up now:
 
 - **Interactive work and agent loops:** a hosted model like GLM-5.3 Flash. It's faster and costs cents.
-- **Private code, offline work and overnight jobs:** Ornith on the K8 Plus. It's right as often, and it's the machine that stays on.
+- **Private code, offline work and overnight jobs:** Ornith on the K8 Plus. It's right about as often, and it's the machine that stays on.
+- **Local work at my desk:** the same Ornith file on the MacBook, at more than twice the speed.
 - **Everything:** tests as the referee, a thinking budget per step, and a fallback to the cloud model when the local one fails its tests or runs out of budget.
 
 ## Reproduce it
