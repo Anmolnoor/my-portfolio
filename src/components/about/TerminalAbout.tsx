@@ -477,7 +477,7 @@ const TerminalAbout = () => {
               onClick={takeOver}
               className="rounded-md border border-primary/40 bg-primary/10 px-3 py-1 font-mono text-xs font-medium text-primary transition-colors hover:bg-primary/20"
             >
-              login as guest →
+              Explore profile →
             </button>
           ) : (
             <span className="flex items-center gap-1.5 font-mono text-xs text-muted-foreground">
@@ -522,9 +522,9 @@ const TerminalAbout = () => {
             onClick={takeOver}
             className="mt-2 self-start text-left text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
-            <span className="text-primary">»</span> Want to explore? Click{" "}
+            <span className="text-primary">»</span> Want to try commands? Click{" "}
             <span className="rounded border border-primary/40 bg-primary/10 px-1.5 py-0.5 text-primary">
-              login as guest
+              Explore profile
             </span>{" "}
             to type your own commands.
           </button>

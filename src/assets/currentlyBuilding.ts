@@ -9,11 +9,11 @@ export interface CurrentlyBuildingItem {
 export const currentlyBuilding: CurrentlyBuildingItem[] = [
   {
     iconKey: "code",
-    label: "JUST LAUNCHED",
+    label: "CURRENT FOCUS",
     title: "skep",
     description:
-      "A local-first supervisor for AI coding agents — sandboxed, verified, approval-gated. Open source as of this week.",
-    link: "/blog/beekeeper-fcli-skep-journey",
+      "A local-first supervisor for AI coding agents — sandboxed workers, independent re-verification, and human approval before changes land.",
+    link: "https://skep.anmolnoor.com",
   },
   {
     iconKey: "server",

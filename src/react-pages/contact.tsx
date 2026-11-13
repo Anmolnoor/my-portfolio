@@ -67,9 +67,9 @@ const Contact = () => {
           </span>
 
           <div className="space-y-2">
-            <h2 className="font-mono text-3xl font-bold tracking-tight">
+            <h1 className="font-mono text-3xl font-bold tracking-tight">
               Let's talk
-            </h2>
+            </h1>
             <p className="max-w-xl text-muted-foreground">
               Got a project, a role, or an idea worth building? The fastest way
               to reach me is email or by booking a call — I read everything and

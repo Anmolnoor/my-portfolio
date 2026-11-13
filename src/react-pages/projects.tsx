@@ -30,7 +30,7 @@ const Projects = () => {
       {rest.length > 0 && (
         <section className="flex flex-col gap-3">
           <span className="font-mono text-xs font-bold uppercase tracking-widest text-muted-foreground">
-            Everything else
+            More projects & experiments
           </span>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {rest.map((project) => (

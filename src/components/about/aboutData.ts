@@ -93,6 +93,10 @@ export const funFacts = [
 
 export const now = [
   {
+    title: "skep",
+    note: "Building a local-first coding agent supervisor with sandboxed workers, independent verification, and approval gates.",
+  },
+  {
     title: "Foundation CLI",
     note: "Building a local-first, shell-native coding agent in public.",
   },
