@@ -5,7 +5,7 @@ date: 2026-11-19
 tags: ["skep", "agents", "governance", "policy", "security", "claude-code", "acp"]
 slug: skep-one-policy-engine
 cover: /blog/skep-one-policy-engine.png
-readingMinutes: 12
+readingMinutes: 15
 ---
 
 In July I wrote on this blog that [governance is the product](/blog/beekeeper-fcli-skep-journey). I believed it. I had allowlists, approval cards, a sandbox, and a supervisor that re-ran the tests itself.
@@ -14,7 +14,7 @@ In November I went looking for the place in the code where a tool call gets deci
 
 This post is the update on skep since launch, and it is mostly about that one finding: what my own records said, what I built instead, how it works, and where it stops. That July post said "I won't map the internals here." This one does.
 
-*Version note: this describes skep 1.4.2 and 1.5.0, which was tagged the day I wrote it. Two things below exist only from 1.5.0 on, and I mark them. The numbers come from the run store and decision log on one machine, read on 19 November 2026; the queries are at the end.*
+*Version note: this describes skep 1.4.2 and 1.5.0, which was tagged the day I wrote it. Two things below exist only from 1.5.0 on, and I mark them. The numbers come from the run store and decision log on one machine, read on 19 November 2026; the queries and a sanitized copy of the data are at the end.*
 
 ## The record that embarrassed me
 
@@ -73,6 +73,31 @@ So the REST API, the CLI, the Claude Code hook, the ACP proxy, and the chat assi
     VERDICT      allow · ask · deny, plus the layer that decided
         └──►  decision log
 ```
+
+Here is that example run for real, on skep 1.5.0 with the stock `builder` baseline and a freshly set-up project:
+
+```sh
+skep policy why <repo> shell run "uv run pytest; rm -rf build"
+```
+
+```json
+{
+  "run": {
+    "considered": [
+      {
+        "layer": "template:builder",
+        "pattern": "uv run pytest",
+        "rule_id": "shell:uv run pytest",
+        "verdict": "allow"
+      }
+    ],
+    "decided_by": "default/unmatched",
+    "verdict": "require_approval"
+  }
+}
+```
+
+Read it against the diagram. Step 1: the floor has nothing to say about either command. Step 2: a baseline is approved and intact. Step 3: the line is split in two, and `uv run pytest` matches an allow in the builder template while `rm -rf build` matches nothing. Step 4: the part nothing matched asks, and the strictest part decides the whole line. So the verdict is "ask", credited to `default/unmatched` and not to the allow that was considered. Swap the second command for `git push` and step 1 ends it: deny, by the floor, with nothing considered.
 
 A few of these deserve a sentence.
 
@@ -190,7 +215,7 @@ If you run coding agents and want to see what yours are doing, the governor and 
 
 ## How I counted
 
-You cannot check my numbers, because they come from my own store. You can run the same queries on yours. The store is `~/.skep/supervisor/supervisor.sqlite3` and the decision log is `~/.skep/supervisor/audit/policy/decisions.jsonl`.
+These numbers come from my own store, so you cannot re-derive them from the repository. You can do two things instead: run the same queries on your own store, or recount mine from the sanitized copy below. The store is `~/.skep/supervisor/supervisor.sqlite3` and the decision log is `~/.skep/supervisor/audit/policy/decisions.jsonl`.
 
 ```sql
 -- runs by kind and mode (46 of 57 coding runs; 121 of 198 overall)
@@ -206,5 +231,25 @@ FROM approvals WHERE action = 'apply_patch' GROUP BY 1, 2;
 ```
 
 The decision-log figures are counts of rows grouped by `verdict`, `rule_id`, `source` and the first part of `actor`. Eight rows written by a tamper test are in the totals; none of them is among the hook's 316 denials.
+
+**The data.** Four CSV files, one row per record, cut at the last row I read for this post:
+
+- [runs.csv](/data/skep-one-policy-engine/runs.csv) — 198 rows: day, worker kind, engine, execution mode
+- [reverifications.csv](/data/skep-one-policy-engine/reverifications.csv) — 112 rows: day, what the worker reported, what the replay found
+- [approvals.csv](/data/skep-one-policy-engine/approvals.csv) — 46 patch approvals: day, status, human or automatic, seconds to resolve, why a denial was a denial, whether the replay had passed
+- [decisions.csv](/data/skep-one-policy-engine/decisions.csv) — 565 rows: day, kind of actor, scope, action, source, verdict, rule, layer
+
+They are sanitized, which means reduced to categories. There are no command lines, paths, hosts, URLs, repo or project names, ids or notes in them, and times are cut to the day. A rule that named a command or a host appears only as its class (`shell:*`, `net:*`), and the test rows are labelled `test`. Every figure in this post reproduces from those four files; [the script that wrote them](/data/skep-one-policy-engine/snapshot.py) checks each one before it finishes.
+
+**The mechanism.** The numbers are mine, but the behaviour is checkable by anyone. On skep 1.5.0, against a throwaway home with the `builder` baseline:
+
+```sh
+skep policy decide shell run "git push" --repo <repo>              # deny, by the floor
+skep policy decide shell run "ls -la; rm -rf build" --repo <repo>  # ask, unmatched
+skep policy decide shell run "uv run pytest" --repo <repo>         # allow, template:builder
+skep policy why <repo> shell run "git push"                        # which layer decided
+```
+
+Those are the answers I got. Note that `decide` writes a row to your decision log each time and `why` does not. The four test files that cover this — the policy engine, the hook, the governor and the sandbox default — pass at the 1.5.0 tag.
 
 Holes poked in any of the above are the most useful thing you can send me.

@@ -1,0 +1,113 @@
+day,worker_outcome,outcome,confirmed,unavailable_reason
+2026-07-17,passed,unavailable,0,no patch artifact
+2026-07-17,passed,unavailable,0,no patch artifact
+2026-07-17,passed,unavailable,0,no patch artifact
+2026-07-17,passed,unavailable,0,no patch artifact
+2026-07-17,passed,unavailable,0,no patch artifact
+2026-07-17,passed,unavailable,0,no patch artifact
+2026-07-17,passed,unavailable,0,no patch artifact
+2026-07-17,passed,unavailable,0,no patch artifact
+2026-07-17,passed,unavailable,0,no patch artifact
+2026-07-17,passed,unavailable,0,no patch artifact
+2026-07-17,passed,passed,1,
+2026-07-17,passed,unavailable,0,no patch artifact
+2026-07-17,passed,unavailable,0,no patch artifact
+2026-07-17,passed,unavailable,0,no patch artifact
+2026-07-17,passed,unavailable,0,no patch artifact
+2026-07-17,passed,unavailable,0,no patch artifact
+2026-07-17,passed,unavailable,0,no patch artifact
+2026-07-17,passed,unavailable,0,no patch artifact
+2026-07-17,passed,unavailable,0,no patch artifact
+2026-07-17,passed,unavailable,0,no patch artifact
+2026-07-17,passed,unavailable,0,no patch artifact
+2026-07-17,passed,unavailable,0,no patch artifact
+2026-07-17,passed,unavailable,0,no patch artifact
+2026-07-17,passed,unavailable,0,no patch artifact
+2026-07-17,passed,unavailable,0,no patch artifact
+2026-07-17,passed,unavailable,0,no patch artifact
+2026-07-17,passed,unavailable,0,no patch artifact
+2026-07-17,passed,unavailable,0,no patch artifact
+2026-07-21,passed,passed,1,
+2026-07-21,passed,passed,1,
+2026-07-21,passed,passed,1,
+2026-07-21,passed,passed,1,
+2026-07-21,passed,passed,1,
+2026-07-21,passed,passed,1,
+2026-07-21,passed,passed,1,
+2026-07-21,passed,not_applicable,0,
+2026-07-21,passed,not_applicable,0,
+2026-07-21,passed,not_applicable,0,
+2026-07-21,passed,not_applicable,0,
+2026-07-21,passed,passed,1,
+2026-07-21,passed,passed,1,
+2026-07-21,passed,passed,1,
+2026-07-21,passed,passed,1,
+2026-07-21,passed,passed,1,
+2026-07-21,passed,passed,1,
+2026-07-21,passed,passed,1,
+2026-07-21,passed,passed,1,
+2026-07-21,passed,passed,1,
+2026-07-21,passed,not_applicable,0,
+2026-07-21,passed,passed,1,
+2026-07-21,passed,not_applicable,0,
+2026-07-21,passed,not_applicable,0,
+2026-07-21,passed,passed,1,
+2026-07-21,passed,passed,1,
+2026-07-21,passed,not_applicable,0,
+2026-07-21,passed,passed,1,
+2026-07-21,passed,passed,1,
+2026-07-21,passed,not_applicable,0,
+2026-07-21,passed,not_applicable,0,
+2026-07-21,passed,not_applicable,0,
+2026-07-22,passed,passed,1,
+2026-07-22,passed,not_applicable,0,
+2026-07-22,passed,not_applicable,0,
+2026-07-22,passed,passed,1,
+2026-07-22,passed,not_applicable,0,
+2026-07-22,passed,passed,1,
+2026-07-22,passed,passed,1,
+2026-07-22,passed,not_applicable,0,
+2026-07-22,passed,passed,1,
+2026-07-22,passed,passed,1,
+2026-07-25,passed,not_applicable,0,
+2026-07-25,passed,not_applicable,0,
+2026-07-25,passed,passed,1,
+2026-07-25,passed,passed,1,
+2026-07-26,passed,passed,1,
+2026-07-26,passed,not_applicable,0,
+2026-07-26,passed,not_applicable,0,
+2026-07-26,passed,failed,0,
+2026-07-26,passed,passed,1,
+2026-08-03,passed,not_applicable,0,
+2026-08-03,passed,not_applicable,0,
+2026-08-03,passed,not_applicable,0,
+2026-08-03,passed,passed,1,
+2026-09-02,passed,passed,1,
+2026-09-02,passed,not_applicable,0,
+2026-09-02,passed,not_applicable,0,
+2026-09-02,passed,not_applicable,0,
+2026-10-21,passed,passed,1,
+2026-10-22,passed,failed,0,
+2026-10-22,passed,passed,1,
+2026-10-22,passed,passed,1,
+2026-10-22,passed,not_applicable,0,
+2026-10-22,passed,passed,1,
+2026-10-22,passed,passed,1,
+2026-10-23,passed,not_applicable,0,
+2026-10-23,passed,not_applicable,0,
+2026-10-23,passed,not_applicable,0,
+2026-10-23,passed,not_applicable,0,
+2026-11-05,passed,not_applicable,0,
+2026-11-05,passed,not_applicable,0,
+2026-11-05,passed,passed,1,
+2026-11-05,passed,passed,1,
+2026-11-05,passed,passed,1,
+2026-11-06,passed,passed,1,
+2026-11-16,passed,passed,1,
+2026-11-18,passed,not_applicable,0,
+2026-11-18,passed,not_applicable,0,
+2026-11-18,passed,not_applicable,0,
+2026-11-18,passed,passed,1,
+2026-11-19,passed,passed,1,
+2026-11-19,passed,passed,1,
+2026-11-19,passed,passed,1,
