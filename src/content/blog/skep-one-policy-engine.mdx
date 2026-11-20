@@ -20,7 +20,7 @@ Three things from skep's own store, on my own machine.
 
 **There was no single policy.** An audit against the real model showed five decision paths, each reading a different subset of the policy layers, each with its own private answer for "no rule matched." Asked the same question, they disagreed on 6 of 19 kinds of probe. The three most dangerous actions in that test session — a money transfer through an MCP tool, a private file passed to web search, and a fetch grant for a whole host — produced no approval card at all. Meanwhile about 9 of the 23 cards that did appear were noise. It is all written down in [ADR 0059](https://github.com/Anmolnoor/skep/blob/main/docs/adr/0059-policy-v3.md).
 
-**Most of my coding runs had no sandbox.** Of the 57 coding runs in my store, 46 ran in `workspace` mode: skep's built-in worker, checked on every tool call but with no OS wall around it. Count every run in the store, early experiments and script runs included, and it is 121 of 198. I did not choose that on purpose. The project setup defaults said `workspace`, projects inherited it, and my own quickstart told people to type it. The fix ([ADR 0066](https://github.com/Anmolnoor/skep/blob/main/docs/adr/0066-sandbox-by-default.md)) makes new projects sandboxed whenever the host can sandbox, and leaves existing projects as they are. It is on main and not in a release yet.
+**Most of my coding runs had no sandbox.** Of the 57 coding runs in my store, 46 ran in `workspace` mode: skep's built-in worker, checked on every tool call but with no OS wall around it. Count every run in the store, early experiments and script runs included, and it is 121 of 198. The setup defaults said `workspace`, projects inherited it, and my own quickstart told people to type it. The fix ([ADR 0066](https://github.com/Anmolnoor/skep/blob/main/docs/adr/0066-sandbox-by-default.md)) makes new projects sandboxed whenever the host can sandbox, and leaves existing projects as they are. It is on main and not in a release yet.
 
 **The worker reported "passed" 112 times. skep confirmed 48.** skep re-runs a project's check on a clean copy after the worker finishes. My store has 112 of these records, and the worker reported a pass in every one. In 35 there was no patch, so nothing to check. In 27 the worker said it had changed files but left no patch to check. Of the 50 that skep could replay, 48 passed and 2 failed.
 
@@ -107,7 +107,7 @@ This is the part that is new in kind, not just in quality. As of this autumn the
 
 That is an agent in an asking mode. Where skep can answer, it answers before the client ever shows a card, and the rest reach you. It never answers "always allow" on your behalf; a standing grant is a policy change, and you make those yourself. A call the agent runs without asking shows up only if the agent reports it.
 
-I wired my Claude sessions this way in my editor and field-tested it on two days.
+The decision log shows governor sessions from my editor on two days.
 
 Here is the part I have to be exact about. These paths do not enforce the same thing:
 
@@ -144,7 +144,7 @@ skep policy why <repo> shell run "git push"
 
 The log is also how I found out my first policy was bad. Its first three weeks hold 319 denials from one rule, `default-deny`. 316 of them came from the Claude Code hook, nearly all on two days. They were not attacks. They were mostly an agent doing ordinary work — `cd` somewhere, `grep` something, pipe it to `head` — and being refused, because at the time "no rule matched" meant deny.
 
-A policy that refuses ordinary work teaches you to turn it off. The hook is not in my Claude Code settings today.
+A policy that refuses ordinary work teaches you to turn it off. The hook is not installed on this machine today.
 
 That is why unmatched now means ask. Since the change, the log on this machine holds 104 asks, 84 allows and 3 denials — all from skep's own assistant and its dispatches. The hook and the governor have logged nothing since 9 November, so I cannot yet show you the new default working on them.
 
