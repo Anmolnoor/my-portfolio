@@ -106,7 +106,7 @@ The traps aren't trick questions. They're the mistakes that make it into real co
 | `topo_sort` | Put dependencies in order | Alphabetical tie-breaks, reporting a real cycle, and a 5,000-node cycle that breaks recursion |
 | `glob_match` | Match file patterns like `src/**.py` | `*` must stop at `/` but `**` must not, plus character classes, escapes, and a pattern that makes naive backtracking run practically forever |
 | Undo/redo `Editor` | A text buffer with history | Undoing a delete needs the deleted text, plus a history limit and the redo order |
-| JSON Pointer `resolve` | Look up a value by path (RFC 6901) | `~01` decodes to `~1`, not `/`. `-1` and `01` aren't valid list indexes, even though Python accepts them. |
+| JSON Pointer `resolve` | Look up a value by path (RFC 6901) | `~01` decodes to `~1`, not `/`. `-1` and `01` aren't valid list indexes, even though Python's `int()` accepts both. |
 
 The Unicode cases show up on purpose. In Python, `\d` in a regex and `str.isdigit()` both accept digits like `١` (Arabic-Indic) and `１` (fullwidth), and `int("1０")` quietly returns `10`. A spec that says "ASCII digits only" needs code that actually enforces it.
 
@@ -153,7 +153,7 @@ Every hard-tier solution that passed on the first try, from every run, agreed wi
 | Ornith 1.5 35B-A3B (Mac) | 7.6 min | 28,493 | 25.8 min | 93,527 |
 | GLM-5.3 Flash | 2.2 min | 27,370 | 11.3 min | 112,198 |
 
-At Z.ai's API list price, GLM's output tokens for both tiers come to about 7 cents, plus a little for input.
+At Z.ai's API list price, GLM's output tokens for both tiers come to about 7 cents with glob left out, plus input charges.
 
 ### Same model, two machines
 
@@ -191,7 +191,7 @@ What my tests don't measure is breadth of knowledge. A 35B model holds less of t
 
 GLM didn't win by thinking less. It generated the **most** tokens on the hard tier. It just generated them faster: about 6 times faster than Ornith on the mini PC, and about 2.7 times faster than the same model on my MacBook.
 
-Generation speed on local hardware is mostly memory bandwidth. Every generated token reads every active weight from memory. That's why the same dense Qwen3.8 27B runs at about 6 tokens/s on the mini PC (about 90 GB/s) and about 31 on the M4 Pro (273 GB/s). It's also why a mixture-of-experts model fits the mini PC so well: Ornith reads only about 3B parameters per token, so it runs at about 26 tokens/s on the slower memory, and the 96 GB of RAM holds the full model easily. Move the same file to the M4 Pro and it runs at about 61.
+Generation speed on local hardware is mostly memory bandwidth. Every generated token reads every active weight from memory. That's why the same dense Qwen3.8 27B runs at only about 6 tokens/s on the mini PC (about 90 GB/s). It's also why a mixture-of-experts model fits the mini PC so well: Ornith reads only about 3B parameters per token, so it runs at about 26 tokens/s on the slower memory, and the 96 GB of RAM holds the full model easily. Move the same file to the M4 Pro and it runs at about 61.
 
 ### 3. Hardware setup mattered more than I expected
 
@@ -219,7 +219,7 @@ But a thinking trace isn't proof. Qwen3.6 35B wrote a 7.5-minute trace that "tra
 - **Confident wrong knowledge.** Qwen reasoned that assigning to an existing key in an `OrderedDict` moves it to the end. It doesn't. More thinking can't fix a fact the model believes. Ornith never relied on the fact at all and wrote an explicit `move_to_end`.
 - **The same blind spot, repeatedly.** Two of Qwen's four hard-tier misses were the same trap: `\d`, `isdigit()` or `$` quietly accepting Unicode digits or a trailing newline. It had caught that exact trap on my earlier parser test, then missed it here.
 - **A repair fixes the symptom.** Given only the failing test name, Qwen fixed SemVer, the refactor and JSON Pointer. On glob, it patched the exact case the test named and left the cause in place, which random-input testing caught.
-- **No answer at all.** Ornith spent all its tokens on glob four times, on both machines, and never wrote code. A wrong answer plus tests plus one retry is recoverable. An hour with no output isn't.
+- **No answer at all.** Ornith spent all its tokens on glob four times, on both machines, and never wrote code. A wrong answer plus tests plus one retry is recoverable. A run that ends with no code isn't.
 
 ### 6. I made mistakes too
 
