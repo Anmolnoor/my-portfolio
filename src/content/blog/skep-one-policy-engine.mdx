@@ -46,7 +46,7 @@ An agent asking permission is only governed if something other than the agent de
 
 ## One function decides
 
-So the REST API, the CLI, the Claude Code hook, the ACP proxy, and the chat assistant's file, shell, web and MCP checks now share one `decide()`. That is one function for those entry points. A dispatched worker's own tool calls are checked against permissions compiled at dispatch, and some agent actions cannot be intercepted at all; the table further down says which. It takes a scope, an action and a value, and it checks in a fixed order:
+So the REST API, the CLI, the Claude Code hook, the ACP proxy, and the chat assistant's file, shell, web and MCP checks now share one `decide()`. That is one function for those entry points. skep's built-in worker checks its own tool calls against permissions compiled at dispatch instead, and some agent actions are never seen at all; the table further down says which. It takes a scope, an action and a value, and it checks in a fixed order:
 
 ```
  tool call  →  (scope, action, value)
@@ -74,7 +74,7 @@ So the REST API, the CLI, the Claude Code hook, the ACP proxy, and the chat assi
         └──►  decision log
 ```
 
-Here is that example run for real, on skep 1.5.0 with the stock `builder` baseline and a freshly set-up project, trimmed to the `run` block:
+Here is that example run for real, on skep 1.5.0 with the stock `builder` baseline and a freshly set-up project, trimmed to the fields that matter:
 
 ```sh
 skep policy why <repo> shell run "uv run pytest; rm -rf build"
@@ -107,9 +107,9 @@ A few of these deserve a sentence.
 
 **"No rule matched" now means ask a human.** That holds for the hook, the governor and the chat assistant, with three named exceptions: a shell command the chat assistant wants to run inside a registered repo is still denied, a tool call classified as read-only runs, and a project you have explicitly unlocked lets its sandboxed worker's default shell asks through. If skep itself cannot decide — a broken store, a missing file — the hook asks too. Where there is no human to ask, anything short of an allow is refused.
 
-**The baseline is locked.** When you run `skep onboard` you approve a policy template. skep writes it read-only and stores its hash beside it. If its contents change afterwards, the guard asks on every call until you approve it again, and new runs are refused. A fresh install with no baseline asks about everything the floor does not refuse and you have not already approved.
+**The baseline is locked.** When you run `skep onboard` you approve a policy template. skep writes it read-only and stores its hash beside it. If its contents change afterwards, the guard asks on every call until you approve it again (and refuses outright on the governor's hard path, where there is nobody to ask), and new runs are refused. A fresh install with no baseline asks about everything the floor does not refuse and you have not already approved.
 
-**Step 5 only tightens.** A role is a named set of limits for a chat or a worker, and it can narrow a verdict but never widen it. A worker's permissions are held to what its dispatcher may do, and where the dispatcher would have had to ask, the worker does not get it on its own: the question goes to a human, or with nobody to ask the permission is dropped. There is one known gap: the worker matches command prefixes, so a dispatcher rule narrower than the prefix — allow `npm`, deny `npm publish` — is invisible to it. And a chat that has both read private data and taken in outside content has to ask before it sends anything out, even where a rule allows it.
+**Step 5 only tightens.** A role is a named set of limits for a chat or a worker, and it can narrow a verdict but never widen it. A worker's permissions are held to what its dispatcher may do, and where the dispatcher would have had to ask, the worker does not get it on its own: the question goes to a human, or the permission is dropped. There is one known gap: the worker matches command prefixes, so a dispatcher rule narrower than the prefix — allow `npm`, deny `npm publish` — is invisible to it. And a chat that has both read private data and taken in outside content has to ask before it sends anything out, even where a rule allows it.
 
 ## Governing agents I did not launch
 
@@ -173,7 +173,7 @@ The log is also how I found out my first policy was bad. Its first three weeks h
 
 A policy that refuses ordinary work teaches you to turn it off. My Claude Code user settings do not list the hook today.
 
-That is why unmatched now means ask. Since the change, the log on this machine holds 104 approval-required verdicts, 84 allows and 3 denials — all from skep's own assistant and its dispatches. For 25 of the 104 there was nobody to ask, and the permission was dropped from a dispatched worker instead. The hook and the governor have logged nothing since 9 November, so I cannot yet show you the new default working on them.
+That is why unmatched now means ask. Since the change, the log on this machine holds 104 approval-required verdicts, 84 allows and 3 denials — all from skep's own assistant and its dispatches. For 25 of the 104 the permission was dropped from a dispatched worker instead of being asked. The hook and the governor have logged nothing since 9 November, so I cannot yet show you the new default working on them.
 
 **I will not tell you the log shows disasters prevented. It doesn't.** The floor fired 11 times, mostly on remote git, and I cannot show that any of those was a real save and not a probe or a test. What the log shows is that every decision has a reason I can read. That is a smaller claim, and it is the one I can back.
 
@@ -191,7 +191,7 @@ Four earlier claims need correcting.
 - **Not everything goes through `decide()` yet.** The permissions compiled for a dispatched worker, and a few smaller checks, still read the policy on their own path. The ADR lists them as open.
 - **Reads are mostly open.** In sandbox mode, writes are confined to the run's worktree and a few designated folders. Reads outside it are not confined, apart from a list of credential paths. The Claude Code hook has no opinion on the `Read` tool at all, so `cat ~/.ssh/id_ed25519` is denied and a `Read` of the same file is never seen.
 - **The floor catches what it can read.** `python deploy.py` can run `git push` inside the script, and a word matcher never sees it. If `python deploy.py` is allowed, whatever is inside it runs. A sandboxed worker has a wall behind that. The hook has nothing.
-- **"Read-only" is partly the tool's own word.** An MCP tool call counts as read-only when its server marks it that way, its name starts with a read verb, and no mutation verb appears anywhere in the name. skep does not check what the tool actually does, so a wrong or dishonest server can get a call through without a card.
+- **"Read-only" is partly the tool's own word.** An ordinary MCP tool call counts as read-only when its server marks it that way, its name starts with a read verb, and no mutation verb appears anywhere in the name; browser tools go by a short list of name keywords instead. Either way, skep does not check what the tool actually does, so a wrong or dishonest server can get a call through without a card.
 - **The governor does not sandbox and does not verify.** It governs the wire.
 - **Verification is as strong as the command you pin.** A thin check confirms a bad patch. From 1.5.0 skep refuses to auto-land on the obviously empty ones, like `true`, but it cannot tell a weak test suite from a good one. And installing dependencies for the re-run can execute a patch's build code before you have approved anything.
 - **I approve my own baseline, and I approve fast.** Across 46 patch-approval records, 13 were approved automatically after a confirmed re-verify and 25 I approved by hand — 20 of those within ten seconds. Eight ended denied: three by me, the rest stale, redundant or failed to apply. All three of mine were patches whose re-verify had passed. That is the best argument I have for keeping a human in the loop, and the ten-second figure is the best argument that the human needs better evidence on the card.
