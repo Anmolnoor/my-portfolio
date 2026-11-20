@@ -7,7 +7,7 @@ from datetime import datetime
 home = os.path.expanduser("~/.skep/supervisor")
 out = sys.argv[1]
 os.makedirs(out, exist_ok=True)
-CUT = "2026-11-19T22:39:25Z"  # the last row read for the post
+CUT = "2026-11-20"  # exclusive: everything before midnight UTC, 20 November 2026
 db = sqlite3.connect(f"file:{home}/supervisor.sqlite3?immutable=1", uri=True)
 
 def write(name, header, rows):
@@ -25,12 +25,12 @@ def secs(a, b):
 
 runs = write("runs.csv", ["day", "worker_kind", "coding_engine", "execution_mode"], [
     (c[:10], k or "", e or "", m) for c, k, e, m in db.execute(
-        "select created_at, worker_kind, coding_engine, execution_mode from runs where created_at <= ? order by created_at", (CUT,))])
+        "select created_at, worker_kind, coding_engine, execution_mode from runs where created_at < ? order by created_at", (CUT,))])
 
 rev = write("reverifications.csv", ["day", "worker_outcome", "outcome", "confirmed", "unavailable_reason"], [
     (c[:10], w, o, conf, "no patch artifact" if o == "unavailable" and (d or "").startswith("no patch artifact") else "")
     for c, w, o, conf, d in db.execute(
-        "select created_at, worker_outcome, outcome, confirmed, detail from reverifications where created_at <= ? order by created_at", (CUT,))])
+        "select created_at, worker_outcome, outcome, confirmed, detail from reverifications where created_at < ? order by created_at", (CUT,))])
 
 confirmed = {t for (t,) in db.execute("select task_id from reverifications where confirmed = 1")}
 def denial(note):
@@ -39,7 +39,7 @@ def denial(note):
             else "apply failed" if n.startswith("apply failed") else "denied by operator")
 appr = []
 for task, action, status, req, res, by, note in db.execute(
-        "select task_id, action, status, requested_at, resolved_at, resolved_by, resolution_note from approvals where action = 'apply_patch' and requested_at <= ? order by requested_at", (CUT,)):
+        "select task_id, action, status, requested_at, resolved_at, resolved_by, resolution_note from approvals where action = 'apply_patch' and requested_at < ? order by requested_at", (CUT,)):
     appr.append((req[:10], action, status,
                  "" if not by else "auto" if by.startswith("auto:") else "human",
                  secs(req, res) if res else "",
@@ -64,10 +64,11 @@ dec = []
 for line in open(f"{home}/audit/policy/decisions.jsonl"):
     if not line.strip(): continue
     r = json.loads(line)
-    if r["at"] > CUT: continue
+    if r["at"] >= CUT: continue
     dec.append((r["at"][:10], actor(r["actor"]), r.get("scope") or "", r.get("action") or "", r.get("source") or "",
-                r.get("verdict") or "", rule(r.get("rule_id")), layer(r.get("layer")), floor_kind(r)))
-dec = write("decisions.csv", ["day", "actor", "scope", "action", "source", "verdict", "rule", "layer", "floor_kind"], dec)
+                r.get("verdict") or "", rule(r.get("rule_id")), layer(r.get("layer")), floor_kind(r),
+                r.get("delegated") if r.get("delegated") in ("ask", "dropped") else ""))
+dec = write("decisions.csv", ["day", "actor", "scope", "action", "source", "verdict", "rule", "layer", "floor_kind", "delegated"], dec)
 
 # the post's numbers, recounted from the files just written
 C = Counter
@@ -89,6 +90,7 @@ dd = [d for d in dec if d[6] == "default-deny"]
 assert len(dd) == 319 and sum(d[1] == "claude-code" for d in dd) == 316
 late = C(d[5] for d in dec if d[0] > "2026-11-09" and d[5])
 assert late == {"require_approval": 104, "allow": 84, "deny": 3}, late
+assert sum(d[0] > "2026-11-09" and d[5] == "require_approval" and d[9] == "dropped" for d in dec) == 25
 fl = [d for d in dec if d[4] == "floor"]
 assert len(fl) == 11 and sum(d[8] == "remote git" for d in fl) == 8, C(d[8] for d in fl)
 assert len({d[0] for d in dec}) == 9 and len({d[0] for d in dec if d[1] in ("acp", "human")}) == 2
