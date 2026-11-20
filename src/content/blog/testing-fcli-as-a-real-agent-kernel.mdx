@@ -1,6 +1,7 @@
 ---
 title: "Testing FCLI as a Real Agent Kernel"
 description: "Pressure-testing FCLI as a local-first coding agent runtime with planning loops, typed capabilities, traces, recovery behavior, and deterministic verification."
+tldr: "FCLI's file, shell and git capabilities were not the weak point; the planner/provider path was. A weaker provider failed before any tool ran, while GPT-5.5 via Codex passed a hard smoke test with zero failed actions. FCLI is past the toy demo phase but not production-ready; next come evals, cleaner provider config and structured failure results."
 date: "2026-06-04"
 tags:
   [
