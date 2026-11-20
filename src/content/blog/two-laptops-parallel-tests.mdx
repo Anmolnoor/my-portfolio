@@ -134,7 +134,7 @@ Then I ran the suite once more with `--durations=10` to find that serial part:
 | 13.9 s | the same grants test, `[builder]` |
 | 13.6 s | the same grants test, `[assistant]` |
 
-Eight of the top ten are two "matrix" tests. Each case checks around a thousand policy decisions for one kind of home against saved answers, all inside one test. xdist can't split a single test, so each runs on one worker.
+Eight of the top ten are two "matrix" tests. Each case checks one to two thousand policy decisions for one kind of home against saved answers, all inside one test. xdist can't split a single test, so each runs on one worker.
 
 That list didn't explain the scaling, though. The run took 2:30 end to end (pytest reports 2:21). Loading the test list takes 1.7 seconds and the longest test 18.5 seconds, so neither accounts for a 2:30 run on its own. I didn't measure the rest of the overhead, such as starting the workers. Together the ten slowest took 133 seconds, about 7% of the 14 workers' combined time. Spread evenly, that is about 10 seconds of wall time.
 
