@@ -8,6 +8,16 @@ cover: /blog/skep-one-policy-engine.png
 readingMinutes: 15
 ---
 
+**skep** is my open-source, local-first supervisor for AI coding agents: it runs Claude Code, Codex, Aider, pi or its own built-in worker in a sandbox, re-runs your tests itself, and lands a patch only when you approve it. You install it with `pipx install skep`.
+
+**The short version:**
+
+- skep's policy was decided in five places that disagreed on 6 of 19 test probes, and the three most dangerous actions in that test got no approval card.
+- One function, `decide()`, now answers for the API, the CLI, the Claude Code hook, the editor proxy and the chat assistant, and "no rule matched" means ask a human, not deny.
+- 46 of my 57 coding runs had no sandbox. From 1.5.0, new projects are sandboxed by default.
+- The worker reported "passed" 112 times. skep could replay 50 of those and confirmed 48.
+- The sharpest finding: 20 of my 25 manual patch approvals landed inside ten seconds. The human in the loop needs better evidence on the card.
+
 In July I wrote on this blog that [governance is the product](/blog/beekeeper-fcli-skep-journey). I believed it. I had allowlists, approval cards, a sandbox, and a supervisor that re-ran the tests itself.
 
 In November I went looking for the place in the code where a tool call gets decided. I found five places. They did not agree with each other.
@@ -20,7 +30,7 @@ This post is the update on skep since launch, and it is mostly about that one fi
 
 Three things from skep's own store, on my own machine.
 
-**There was no single policy.** An audit against the real model showed five decision paths, each reading a different subset of the policy layers, each with its own private answer for "no rule matched." Asked the same question, they disagreed on 6 of 19 kinds of probe. The three most dangerous actions in that test session — a money transfer through an MCP tool, a private file passed to web search, and a fetch grant for a whole host — produced no approval card at all. Meanwhile about 9 of the 23 cards that did appear were noise. It is all written down in [ADR 0059](https://github.com/Anmolnoor/skep/blob/main/docs/adr/0059-policy-v3.md).
+**There was no single policy.** An audit against the real model showed five decision paths, each reading a different subset of the policy layers, each with its own private answer for "no rule matched." Asked the same question, they disagreed on 6 of 19 kinds of probe. The three most dangerous actions in that test session — a money transfer through an MCP tool (a tool served over the Model Context Protocol), a private file passed to web search, and a fetch grant for a whole host — produced no approval card at all. Meanwhile about 9 of the 23 cards that did appear were noise. It is all written down in [ADR 0059](https://github.com/Anmolnoor/skep/blob/main/docs/adr/0059-policy-v3.md), one of the architecture decision records (ADRs) in the skep repo.
 
 **Most of my coding runs had no sandbox.** Of the 57 coding runs in my store, 46 ran in `workspace` mode: skep's built-in worker, checked on every tool call but with no OS wall around it. Count every run in the store, early experiments and script runs included, and it is 121 of 198. The setup defaults said `workspace`, projects inherited it, and my own quickstart told people to type it. The fix ([ADR 0066](https://github.com/Anmolnoor/skep/blob/main/docs/adr/0066-sandbox-by-default.md)) makes new projects sandboxed whenever the host can sandbox, and leaves existing projects as they are. The ADR counted 41 of 49 a day earlier; eight runs later it is 46 of 57. The fix is in 1.5.0 and not in 1.4.2 or earlier.
 
@@ -46,7 +56,7 @@ An agent asking permission is only governed if something other than the agent de
 
 ## One function decides
 
-So the REST API, the CLI, the Claude Code hook, the ACP proxy, and the chat assistant's file, shell, web and MCP checks now share one `decide()`. That is one function for those entry points. skep's built-in worker checks its own tool calls against permissions compiled at dispatch instead, and some agent actions are never seen at all; the table further down says which. It takes a scope, an action and a value, and it checks in a fixed order:
+So the REST API, the CLI, the Claude Code hook, the ACP proxy (the Agent Client Protocol, which editors use to drive agents), and the chat assistant's file, shell, web and MCP checks now share one `decide()`. That is one function for those entry points. skep's built-in worker checks its own tool calls against permissions compiled at dispatch instead, and some agent actions are never seen at all; the table further down says which. It takes a scope, an action and a value, and it checks in a fixed order:
 
 ```
  tool call  →  (scope, action, value)
@@ -146,7 +156,7 @@ Here is the part I have to be exact about. These paths do not enforce the same t
 | ACP governor, advisory | Only when the agent asks | Only what it was asked | Whatever the client provides |
 | ACP governor, hard | Yes, for file writes and terminals | Yes — only an allow passes | Whatever the client provides |
 
-The hard path only exists on version 1 of the protocol, and only when the client runs the agent's file writes or terminals itself, so there is a hop for skep to stand on. My editor does not, so there the governor is advisory only. In that setup an agent in its default mode asks nothing, so the governor only watches what the agent reports. What it gives me there is a record, not a wall. I think a record is worth having. I do not think it should be called enforcement.
+The hard path only exists on version 1 of the protocol, and only when the client runs the agent's file writes or terminals itself, so there is a hop for skep to stand on. T3 Code, the editor I use, does not, so there the governor is advisory only. In that setup an agent in its default mode asks nothing, so the governor only watches what the agent reports. What it gives me there is a record, not a wall. I think a record is worth having. I do not think it should be called enforcement.
 
 ## The log answers "why"
 
@@ -182,9 +192,17 @@ That is why unmatched now means ask. Since the change, the log on this machine h
 Four earlier claims need correcting.
 
 - **"Every shell command executed" is in the audit trail** ([launch post](/blog/skep-is-live)). True for the commands skep's built-in worker launches through its shell tool. For Claude Code, Codex, Aider and pi running as workers, skep keeps the evidence for each run — the command it launched, the sandbox profile, the patch, the re-verify — and not each tool call the agent made inside the sandbox.
+
+  **Today:** unchanged in 1.5.0, and the 1.5.0 README now says so plainly.
 - **"Every action a worker wants to take passes through a policy layer"**, and a domain controller that "makes carelessness impossible" ([journey post](/blog/beekeeper-fcli-skep-journey)). For those external engines there is no per-action check; the sandbox is the only wall. And "impossible" was wrong on its face: 46 of my 57 coding runs had no sandbox behind the checks.
+
+  **Today:** the correction still holds in 1.5.0. The external engines get no per-action check, the sandbox is their wall, and they always run in one. What changed is the default: from 1.5.0, new projects run sandboxed whenever the host can sandbox ([ADR 0066](https://github.com/Anmolnoor/skep/blob/main/docs/adr/0066-sandbox-by-default.md)). Existing projects keep the mode they had.
 - **"Every MCP call passes through the same governed policy layer"** ([launch post](/blog/skep-is-live)). It didn't. MCP calls read only part of the policy plus a risk guess based on the tool's name. That is how the transfer above got through without a card.
+
+  **Today:** fixed since 1.4.0, so fixed in 1.5.0. The chat assistant's MCP calls go through the same `decide()`, baseline included, and the name-based risk guess no longer decides anything. What is still open is under "Where it still stops": whether a call counts as read-only is partly the tool's own word.
 - **The launch quickstart used `--execution-mode workspace`.** That mode has no sandbox. I should not have led with it.
+
+  **Today:** the 1.5.0 README quickstart uses `--execution-mode sandbox`.
 
 ## Where it still stops
 
@@ -206,6 +224,8 @@ The threat model has not changed: the agent is competent and untrusted. A kernel
 I had the features in July. I got the rest in November, and I only found out it was missing because I asked the system to explain itself and got five different answers.
 
 If you run coding agents and want to see what yours are doing, the governor and the hook are the cheapest way in. You can try them without dispatching a single worker; run `skep onboard` first, so there is an approved baseline to answer from.
+
+Here is the setup I use. The client is T3 Code: add a Local ACP command provider and paste what `skep acp install-hint` prints, which wraps Claude's ACP adapter in `skep acp govern`. Then put Claude in its `default` mode. That is an asking mode, so the governor answers on the advisory path. T3 Code does not run the agent's file writes or terminals itself, so the hard path never applies there. Leave Claude in `auto` and the governor only watches.
 
 - [The ACP governor](https://github.com/Anmolnoor/skep/blob/main/docs/acp-governor.md)
 - [The Claude Code policy hook](https://github.com/Anmolnoor/skep/blob/main/docs/policy-hook.md)
