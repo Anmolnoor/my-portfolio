@@ -136,7 +136,7 @@ Three of its invariants map onto my incident with uncomfortable precision:
 - **One authorization boundary, no shadow permission systems.** The invariant says every side effect should pass through the policy engine, and a feature carrying its own private allow-logic is rejected on shape alone. My `Popen` with `setsid` is the shadow permission system this rule exists to forbid: a raw primitive, outside every policy that could have reviewed it.
 - **Approvals are a ledger, not a moment.** Actor, timestamp, resolution note, landing branch. My restart was auditable only because I chose to write the log. That is the difference worth paying for.
 
-The concrete version: `ops.service.restart` is a named capability. Invoking it dry-runs first and prints `would restart: <service>`, and executing it requires an explicit `--approve` from the operator. Same action I took, but modelled and previewed before it happens rather than explained afterwards.
+The concrete version: `ops.service.restart` is a named capability. Without `--approve`, the CLI previews the restart and prints `would restart: <service>`; executing it requires an explicit `--approve` from the operator. Same action I took, but modelled as a named capability and gated by the operator rather than explained afterwards.
 
 ## What I would still change in skep
 
