@@ -191,7 +191,7 @@ What my tests don't measure is breadth of knowledge. A 35B model holds less of t
 
 GLM didn't win by thinking less. It generated the **most** tokens on the hard tier. It just generated them faster: about 6 times faster than Ornith on the mini PC, and about 2.7 times faster than the same model on my MacBook.
 
-Generation speed on local hardware is mostly memory bandwidth. Every generated token reads every active weight from memory. That's why the same dense Qwen3.8 27B runs at only about 6 tokens/s on the mini PC (about 90 GB/s). It's also why a mixture-of-experts model fits the mini PC so well: Ornith reads only about 3B parameters per token, so it runs at about 26 tokens/s on the slower memory, and the 96 GB of RAM holds the full model easily. Move the same file to the M4 Pro and it runs at about 61.
+Generation speed on local hardware is mostly memory bandwidth. Every generated token reads every active weight from memory. That's why dense Qwen3.8 27B runs at only about 6 tokens/s on the mini PC (about 90 GB/s). It's also why a mixture-of-experts model fits the mini PC so well: Ornith reads only about 3B parameters per token, so it runs at about 26 tokens/s on the slower memory, and the 96 GB of RAM holds the full model easily. Move the same file to the M4 Pro and it runs at about 61.
 
 ### 3. Hardware setup mattered more than I expected
 
