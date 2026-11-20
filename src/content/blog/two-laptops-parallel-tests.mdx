@@ -64,7 +64,7 @@ My best explanation is the bottom half of the table. skep's tests start a lot of
 
 *An honest footnote: Fedora's run also had 69 failures. With the settings I come back to below it had one, a missing `node`. I don't know how much the failures changed its time, so treat this row as approximate. The tie was still close enough to need an explanation.*
 
-## Why Fedora starts programs 7× faster
+## Why `true` starts 7× faster on Fedora
 
 The agent timed three operations separately; both process timings include waiting for the child to exit:
 
@@ -118,7 +118,7 @@ The 20 minutes is real, just not where I first thought. My gates and CI already 
 
 `-n auto` started one worker per logical CPU here: 14 on the Mac, 16 on Fedora. (It counts physical cores instead only when the psutil package is installed, and it isn't in skep's setup.) Each worker loads the full list of tests. A coordinator hands tests to whichever worker is free and gathers the results into one normal pytest report. The tests themselves don't change.
 
-There's one catch: tests running side by side must not fight over the same resource. Two tests that both bind port 8765, or write to the same file, will fail at random when they run side by side. skep's notes record the suite as xdist-safe since the gates adopted xdist, so it works here.
+There's one catch: tests running side by side must not fight over the same resource. Two tests that both bind port 8765, or write to the same file, will fail at random when they run side by side. skep's notes call the suite xdist-safe (a few order-dependent tests have been fixed since), and it ran cleanly in parallel here.
 
 ## Why 8× and not 14×
 
@@ -136,7 +136,7 @@ Then I ran the suite once more with `--durations=10` to find that serial part:
 
 Eight of the top ten are two "matrix" tests. Each case checks one to two thousand policy decisions for one kind of home against saved answers, all inside one test. xdist can't split a single test, so each runs on one worker.
 
-That list didn't explain the scaling, though. The run took 2:30 end to end (pytest reports 2:21). Loading the test list takes 1.7 seconds and the longest test 18.5 seconds, so neither accounts for a 2:30 run on its own. I didn't measure the rest of the overhead, such as starting the workers. Together the ten slowest took 133 seconds, about 7% of the 14 workers' combined time. Spread evenly, that is about 10 seconds of wall time.
+That list didn't explain the scaling, though. The run took 2:30 end to end (pytest reports 2:21). Loading the test list takes 1.7 seconds and the longest test 18.5 seconds, so neither accounts for a 2:30 run on its own. I didn't measure the rest of the overhead, such as starting the workers. Together the ten slowest took 133 seconds, roughly 6 to 7% of the time 14 workers had available. Spread evenly, that is about 10 seconds of wall time.
 
 A likelier explanation was already in round one. In the synthetic benchmark the Mac's best multi-core result was 7.9× its single-core speed, and Fedora's was 6.5×. The test suite got 8.3× and 6.2× in the runs above; the Mac's second run, the one with `--durations`, came out at 9.2×. That is close to what the hardware itself managed, which suggests the CPUs set most of the limit: four of the Mac's cores are slower efficiency cores, all of them share one memory system and one disk, and Fedora's 16 threads are really 8 cores. I didn't measure the suite's balance directly, so this is the best fit, not proof.
 
@@ -153,6 +153,6 @@ Memory isn't what limits how many agents I run: the agent processes I sampled us
 - **Add one real workload to every benchmark.** The synthetic numbers said 2×, the suite said a tie, and both were true for different kinds of work.
 - **Measure process starts.** If your workload starts thousands of programs, the operating system matters as much as the CPU.
 - **Time the command your gates run.** My tie was measured with the serial command behind `make test`, not the one my gates use.
-- **Check your Amdahl's-law guess against `--durations`.** My estimate of the serial part didn't hold up: the slowest tests alone didn't explain the scaling.
+- **Check your Amdahl's-law guess against `--durations`.** The slowest tests alone didn't explain the scaling, so my estimate of the serial part is still untested.
 
 *How this was measured: the same Python 3.12 and the same stdlib-only scripts on both machines, run on 19 and 20 November 2026, skep at commit `2bf2644`. The Mac shares its CPU with my other agents; I waited for another agent's suite to finish before the synthetic run, and when one re-run overlapped another agent's suite I used the clean run. macOS can report a disk write as finished before it reaches the drive, so treat the Mac's disk-write figure as an upper bound.*
