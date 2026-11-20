@@ -156,7 +156,7 @@ Here is the part I have to be exact about. These paths do not enforce the same t
 | ACP governor, advisory | Only when the agent asks | Only what it was asked | Whatever the client provides |
 | ACP governor, hard | Yes, for file writes and terminals | Yes — only an allow passes | Whatever the client provides |
 
-The hard path only exists on version 1 of the protocol, and only when the client runs the agent's file writes or terminals itself, so there is a hop for skep to stand on. T3 Code, the editor I use, does not, so there the governor is advisory only. In that setup an agent in its default mode asks nothing, so the governor only watches what the agent reports. What it gives me there is a record, not a wall. I think a record is worth having. I do not think it should be called enforcement.
+The hard path only exists on version 1 of the protocol, and only when the client runs the agent's file writes or terminals itself, so there is a hop for skep to stand on. T3 Code, the editor I use, does not, so there the governor is advisory only. In that setup an agent left in its out-of-the-box mode (Claude's `auto`, Codex's `agent`) asks nothing, so the governor only watches what the agent reports. What it gives me there is a record, not a wall. I think a record is worth having. I do not think it should be called enforcement.
 
 ## The log answers "why"
 
