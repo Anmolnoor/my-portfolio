@@ -1,7 +1,7 @@
 ---
 title: "Local LLMs Are Catching Up Fast, If Your Hardware Can Keep Up"
-description: "I tested two local models on my own machines against GLM-5.3 Flash in the cloud, on 18 coding problems with hidden bugs. A 3B-active model matched the cloud model on correctness. On a mini PC it took five times as long; on a MacBook, about twice."
-tldr: "On 18 Python coding problems with hidden bugs, Ornith 1.5 35B-A3B, a local model with about 3B active parameters, matched the 320B GLM-5.3 Flash in the cloud on correctness. The gap is speed, set by memory bandwidth: seven hard problems took 11 minutes in the cloud, 26 on my MacBook and 55 on my mini PC."
+description: "I tested two local models on my own machines against GLM-5.3 Flash in the cloud, on 18 coding problems with hidden bugs. A 3B-active model matched the cloud model on correctness. On the hard problems it took about five times as long on a mini PC, and over twice as long on a MacBook."
+tldr: "On 18 Python coding problems with hidden bugs, Ornith 1.5 35B-A3B, a local model with about 3B active parameters, matched the 320B GLM-5.3 Flash in the cloud on correctness. The gap is speed, and speed is hardware: seven hard problems took 11 minutes in the cloud, 26 on my MacBook and 55 on my mini PC."
 date: 2026-10-14
 slug: local-llms-catching-up
 author: "Anmol"
@@ -27,10 +27,10 @@ I tested two local models on the two machines I own, ran one of them on both mac
 | Memory | 48 GB unified | 96 GB DDR5-5600 (Crucial, 2 × 48 GB SO-DIMM), dual channel; about 78 GB visible to the OS | n/a |
 | Memory bandwidth | 273 GB/s | 89.6 GB/s theoretical (2 channels × 5,600 MT/s × 8 bytes) | n/a |
 | Software | macOS, Ollama (MLX build for Qwen) | Fedora, Ollama 0.40.3 with the Vulkan backend | Ollama API, same client |
-| Models I ran on it | Qwen3.8 27B, Ornith 1.5 35B-A3B | Ornith 1.5 35B-A3B | GLM-5.3 Flash |
+| Models in the coding tests | Qwen3.8 27B, Ornith 1.5 35B-A3B | Ornith 1.5 35B-A3B | GLM-5.3 Flash |
 | Measured speed | about 31 tokens/s (Qwen), about 61 (Ornith) | about 26 tokens/s | about 165 tokens/s |
 
-Ollama Cloud runs models on Ollama's own infrastructure through the same `ollama` client and API. Ollama doesn't say which GPUs it uses. It states that its cloud does not retain your data. Third-party write-ups describe a free tier and paid plans of around $20 and $100 a month. The billing details have changed over time, so check the current terms before you rely on them.
+Ollama Cloud runs models on Ollama's own infrastructure through the same `ollama` client and API. Ollama doesn't say which GPUs it uses. It states that its cloud does not retain your data. Its pricing page lists a pay-as-you-go plan with no subscription, and paid plans at $20 and $100 a month. The billing details have changed over time, so check the current terms before you rely on them.
 
 ## The models
 
@@ -42,14 +42,14 @@ Ollama Cloud runs models on Ollama's own infrastructure through the same `ollama
 | Total parameters | 27.8B | about 35B | 320B |
 | Active per token | 27.8B (all of them) | about 3B | 18B |
 | Context (vendor) | up to about 1M | 262K (about 1M with YaRN) | 1M |
-| License | Apache 2.0 | not stated on the model card | MIT |
+| License | Apache 2.0 | MIT | MIT |
 | Vendor coding numbers | SWE-bench Pro 61.7 | SWE-bench Pro 59.6, SWE-bench Verified 79 | Terminal-Bench 2.1 84.3, DeepSWE 63.4 |
 | Memory to run | about 16 to 19 GB at 4-bit | 21 GB download in Ollama | about 100 GB at 1-bit, about 200 GB at 4-bit, about 306 GiB at FP8 |
 | How I ran it | `qwen3.8:27b-mlx` on the Mac | `ornith-1.5:35b` on the K8 Plus and the Mac (identical file) | `glm-5.3-flash` on Ollama Cloud |
 
 The vendor numbers come from different benchmarks run in different ways, so don't compare them across columns. They're here to show what each model claims.
 
-GLM-5.3 Flash is a serious model. Z.ai reports it close to frontier models on agentic coding, and its API price is $0.15 per million input tokens and $0.50 per million output tokens. Serving it yourself takes a multi-GPU server node.
+GLM-5.3 Flash is a serious model. Z.ai reports it close to frontier models on agentic coding, and its API price is $0.15 per million input tokens and $0.50 per million output tokens. Even its smallest 1-bit version needs about 100 GB of memory.
 
 ## How I tested
 
@@ -129,7 +129,7 @@ All models ran with thinking on and one attempt per problem unless I say otherwi
 | Ornith 1.5 35B-A3B (Mac) | 10/10 | 6/8 | not run |
 | GLM-5.3 Flash (Ollama Cloud) | 10/10 | 7/8 | not needed |
 
-Every passing hard-tier solution, from every run, agreed with my reference on the random inputs. When these models passed, they were right.
+Every hard-tier solution that passed on the first try, from every run, agreed with my reference on the random inputs. When these models passed, they were right.
 
 ### The hard tier, problem by problem
 
@@ -153,7 +153,7 @@ Every passing hard-tier solution, from every run, agreed with my reference on th
 | Ornith 1.5 35B-A3B (Mac) | 7.6 min | 28,493 | 25.8 min | 93,527 |
 | GLM-5.3 Flash | 2.2 min | 27,370 | 11.3 min | 112,198 |
 
-At Z.ai's API list price, GLM's tokens for both tiers come to well under 10 cents.
+At Z.ai's API list price, GLM's output tokens for both tiers come to about 7 cents, plus a little for input.
 
 ### Same model, two machines
 
@@ -228,7 +228,7 @@ The suite caught the models, and checking the suite caught me. Three specs requi
 ## Caveats
 
 - **One or two runs per model.** Ornith scored 7/8 on the hard tier in one run and 6/8 in the next, with identical weights. Qwen failed JSON Pointer in one run and passed it in the next. Any score here could move by a problem or two.
-- **Glob doesn't count yet.** Its spec was ambiguous until the end, so I'm leaving it out until I rerun all three models on the clarified version.
+- **Glob counts as unsolved for everyone.** Its spec was ambiguous until the end, so it's out of the time and token totals until I rerun all three models on the clarified version.
 - **Mixed hardware.** Qwen and Ornith meet head-to-head on the Mac, but the cloud comparison crosses hardware. Time compares setups, not models; tokens are the fairer measure of effort.
 - **Narrow tests.** Eighteen single-file Python problems. No large codebases, long contexts, tool use or general knowledge.
 - **Settings I can't see.** GLM ran through Ollama Cloud with thinking on. I don't know exactly which reasoning effort that maps to.
@@ -270,4 +270,4 @@ Results go to `results/summary.md` and `results/summary_hard.md`, with every rep
 - [Ornith 1.5 35B model card (Hugging Face)](https://huggingface.co/ornith-ai/Ornith-1.5-35B)
 - [How to run Qwen3.8-27B locally with Ollama (Tech Insider)](https://tech-insider.org/how-to-run-qwen3-8-27b-locally-ollama-2026/)
 - [Cloud models (Ollama blog)](https://ollama.com/blog/cloud-models)
-- [Ollama Cloud: pricing, models and how it works (Serverman)](https://www.serverman.co.uk/ai/ollama/ollama-cloud/)
+- [Ollama pricing](https://ollama.com/pricing)
