@@ -1,6 +1,7 @@
 ---
 title: "My Two Laptops Tied. Then I Ran the Tests in Parallel."
 description: "I asked an agent which of my two machines is faster. The synthetic benchmark said the Mac by 2×, the real test suite said a tie, and the tie only held when the tests ran one at a time. What macOS and Linux each do slowly, and what pytest-xdist actually buys."
+tldr: "Run one test at a time, skep's test suite roughly tied on my Mac and Fedora laptops, 23:05 against 22:35. Run the way my gates run it, with pytest-xdist on every logical CPU and without coverage, the Mac took 2:46 and Fedora 3:39. Time a suite with the exact command the project's gates use, never plain pytest."
 date: 2026-11-20
 tags: ["benchmarking", "pytest", "python", "macos", "linux", "agents", "claude-code", "skep"]
 slug: two-laptops-parallel-tests

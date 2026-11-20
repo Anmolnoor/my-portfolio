@@ -1,6 +1,7 @@
 ---
 title: "Building Secure Remote Access for My Home Lab with Tailscale"
 description: "How I added secure remote access to my Proxmox home lab using a dedicated Tailscale subnet router VM."
+tldr: "I set up a dedicated Ubuntu VM in Proxmox as a Tailscale subnet router advertising 192.168.0.0/24, so I can reach Proxmox, Pi-hole, Grafana and my other home.lan services from my phone on mobile data without opening any router ports. The first snag was a Netplan default route pointing at my Pi-hole instead of the router."
 date: "2026-05-27"
 tags: ["homelab", "proxmox", "tailscale", "networking", "self-hosting"]
 cover: /blog/tailscale.png

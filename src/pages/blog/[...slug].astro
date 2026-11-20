@@ -82,6 +82,19 @@ const summary = post.data.excerpt ?? post.data.description ?? "";
         }
       </div>
 
+      <aside
+        class="rounded-md border border-border bg-muted/40 p-4"
+        aria-labelledby="tldr-label"
+      >
+        <p
+          id="tldr-label"
+          class="font-mono text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+        >
+          TL;DR
+        </p>
+        <p class="mt-1 text-sm leading-relaxed">{post.data.tldr}</p>
+      </aside>
+
       <div class="prose prose-zinc max-w-none dark:prose-invert">
         <Content />
       </div>
