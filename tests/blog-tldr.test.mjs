@@ -10,7 +10,7 @@ test("every blog post has a non-empty tldr in its frontmatter", async () => {
   for (const file of files) {
     const src = await readFile(new URL(file, blogDir), "utf8");
     const frontmatter = src.match(/^---\n([\s\S]*?)\n---/)?.[1] ?? "";
-    assert.match(frontmatter, /^tldr: *\S/m, `${file} is missing a tldr`);
+    assert.match(frontmatter, /^tldr: *"?[^"\s]/m, `${file} is missing a tldr`);
   }
 });
 
