@@ -1,6 +1,6 @@
 ---
 title: "My Two Laptops Tied. Then I Ran the Tests in Parallel."
-description: "I asked an agent which of my two machines is faster. The synthetic benchmark said the Mac by 2×, the real test suite said a tie, and the tie came from how the benchmark ran the tests. What macOS and Linux each do slowly, and what pytest-xdist actually buys."
+description: "I asked an agent which of my two machines is faster. The synthetic benchmark said the Mac by 2×, the real test suite said a tie, and the tie only held when the tests ran one at a time. What macOS and Linux each do slowly, and what pytest-xdist actually buys."
 date: 2026-11-20
 tags: ["benchmarking", "pytest", "python", "macos", "linux", "agents", "claude-code", "skep"]
 slug: two-laptops-parallel-tests
@@ -15,7 +15,7 @@ I run my coding agents on two laptops: a MacBook Pro and a Fedora machine. My no
 - On the same code, the Mac is 1.65× faster on one core, 2× faster at its best multi-core throughput, and 3.3× faster at copying memory.
 - Fedora starts a tiny program (`/usr/bin/true`) about 7× faster, runs `git init` plus a commit about 7× faster, and creates small files about 3.5× faster.
 - Yet on skep's real test suite, run one test at a time, the two machines tied: 23:05 against 22:35.
-- That tie came from how the benchmark ran the suite. skep's own gates already run it with pytest-xdist on every logical CPU. Run that way (minus the gates' coverage step) it takes 2:46 on the Mac and 3:39 on Fedora: about 20 minutes less per run.
+- That tie only held for the serial run. skep's own gates already run it with pytest-xdist on every logical CPU. Run that way (minus the gates' coverage step) it takes 2:46 on the Mac and 3:39 on Fedora: about 20 minutes less per run.
 - xdist's speed-up on each machine was close to that machine's raw CPU scaling, which suggests the hardware sets most of the limit.
 
 ## The two machines
@@ -64,9 +64,9 @@ My best explanation is the bottom half of the table. skep's tests start a lot of
 
 *An honest footnote: Fedora's run also had 69 failures. With the settings I come back to below it had one, a missing `node`. I don't know how much the failures changed its time, so treat this row as approximate. The tie was still close enough to need an explanation.*
 
-## Why Linux starts processes 7× faster
+## Why Fedora starts programs 7× faster
 
-The agent timed each step on its own (each time includes waiting for the child to exit):
+The agent timed three operations separately; both process timings include waiting for the child to exit:
 
 | Step | Mac | Fedora |
 |---|---|---|
@@ -78,16 +78,16 @@ Two things stand out.
 
 **On Linux, starting a program is cheaper than copying a process.** Modern glibc's `posix_spawn` doesn't copy the parent's memory map. The child shares the parent's memory only until it calls `exec`, which gives it a fresh address space, so nothing is duplicated.
 
-**On macOS, starting a program is expensive even without the copy.** Apple's `posix_spawn` doesn't copy either, and it still takes 2.5 ms. The time goes into setting up the new program. These are known design differences, not things I measured one by one:
+**On macOS, starting a program is expensive even without the copy.** Apple's `posix_spawn` doesn't copy either, and it still takes 2.5 ms. `true` itself does almost nothing, so most of that is the cost of starting and ending a process. These are known design differences, not things I measured one by one:
 
 - Every macOS process is two kernel objects, a Mach task and a BSD process.
 - Code signatures are validated as a program's code loads, and native Apple Silicon code must be signed.
 
-Small files were slower on the Mac too, and I didn't measure why. Right after another agent's test suite finished, I saw `fseventsd`, the service that records file changes for Spotlight and file watchers, using 67% of a core. I checked for third-party antivirus too. There is none on that Mac, only Apple's own XProtect.
+Small files were slower on the Mac too, and I didn't measure why. Right after another agent's test suite finished, I saw `fseventsd`, the service that logs file changes for file watchers and backup tools such as Time Machine, using 67% of a core. I checked for third-party antivirus too. There is none on that Mac, only Apple's own XProtect.
 
-None of this makes macOS badly built; it does more work when a program starts. That only adds up when a workload starts a great many programs, and skep's suite probably does.
+None of this makes macOS badly built; starting a program just took longer here. That only adds up when a workload starts a great many programs, and skep's suite probably does.
 
-## Round three: the tie came from how I ran it
+## Round three: the tie only held one test at a time
 
 With the tie explained, I asked the agent to add pytest-xdist to skep so the suite would run faster.
 
@@ -108,7 +108,7 @@ So we ran it again with those settings (still without coverage, which adds some 
 
 With those settings, 68 of Fedora's 69 failures went away. The one left is a web UI test that needs `node`, which that machine doesn't have.
 
-Run the way my gates run it, the Mac is 1.3× faster. My reading: run one at a time, the suite spends much of its time on the things the Mac does slowly. In parallel there is enough work to keep every core busy, and the faster CPU shows again.
+Run the way my gates run it, the Mac is 1.3× faster. My reading: run one at a time, the suite spends much of its time on the things the Mac does slowly. In parallel, the Mac pulled ahead again.
 
 The part I like least: before we caught this, the agent had already written the wrong conclusion into my shared fleet notes. It said the suite takes 23 minutes and my one-suite-at-a-time lock could probably be relaxed. Both were wrong, and the lock is exactly what stops two parallel suites from fighting over the same cores. It corrected the notes within the hour. The lesson went into the notes too: **time a suite with the exact command the project's gates use, never plain `pytest`.**
 
@@ -118,7 +118,7 @@ The 20 minutes is real, just not where I first thought. My gates and CI already 
 
 `-n auto` started one worker per logical CPU here: 14 on the Mac, 16 on Fedora. (It counts physical cores instead only when the psutil package is installed, and it isn't in skep's setup.) Each worker loads the full list of tests. A coordinator hands tests to whichever worker is free and gathers the results into one normal pytest report. The tests themselves don't change.
 
-There's one catch: tests running side by side must not fight over the same resource. Two tests that both bind port 8765, or write to the same file, will fail at random when they run side by side. skep's notes record the suite being made safe for this when the gates adopted xdist, so it works here.
+There's one catch: tests running side by side must not fight over the same resource. Two tests that both bind port 8765, or write to the same file, will fail at random when they run side by side. skep's notes record the suite as xdist-safe since the gates adopted xdist, so it works here.
 
 ## Why 8× and not 14×
 
@@ -134,25 +134,25 @@ Then I ran the suite once more with `--durations=10` to find that serial part:
 | 13.9 s | the same grants test, `[builder]` |
 | 13.6 s | the same grants test, `[assistant]` |
 
-Eight of the top ten are two "matrix" tests. Each one checks thousands of policy decisions (every combination of home, role, chat, grant type and probe) against saved answers, all inside one test. xdist can't split a single test, so each runs on one worker.
+Eight of the top ten are two "matrix" tests. Each case checks around a thousand policy decisions for one kind of home against saved answers, all inside one test. xdist can't split a single test, so each runs on one worker.
 
-The numbers didn't support my guess, though. That run finished in 2:21. Loading the test list takes 1.7 seconds, and the longest test is 18.5 seconds. Neither is anywhere near the bottleneck. Together the ten slowest took 133 seconds, about 7% of the 14 workers' combined time. Spread evenly, that is about 10 seconds of wall time.
+That list didn't explain the scaling, though. The run took 2:30 end to end (pytest reports 2:21). Loading the test list takes 1.7 seconds and the longest test 18.5 seconds, so neither accounts for a 2:30 run on its own. I didn't measure the rest of the overhead, such as starting the workers. Together the ten slowest took 133 seconds, about 7% of the 14 workers' combined time. Spread evenly, that is about 10 seconds of wall time.
 
 A likelier explanation was already in round one. In the synthetic benchmark the Mac's best multi-core result was 7.9× its single-core speed, and Fedora's was 6.5×. The test suite got 8.3× and 6.2× in the runs above; the Mac's second run, the one with `--durations`, came out at 9.2×. That is close to what the hardware itself managed, which suggests the CPUs set most of the limit: four of the Mac's cores are slower efficiency cores, all of them share one memory system and one disk, and Fedora's 16 threads are really 8 cores. I didn't measure the suite's balance directly, so this is the best fit, not proof.
 
 ## What goes where now
 
-Memory isn't what limits how many agents I run: the agent processes I sampled used about 175 MB on average and 540 MB at most, and an agent that is thinking uses almost no CPU. The limit I've actually hit is the API: seven agents across both machines hit the Claude rate limit earlier this month. So: three or four agents on the Mac, one or two on Fedora, five at most in total, and one full test suite at a time per machine.
+Memory isn't what limits how many agents I run: the agent processes I sampled used about 175 MB on average and 540 MB at most, and an agent that is thinking uses almost no CPU. The limit I've actually hit is the API: seven agents across both machines hit the Claude rate limit earlier this month. So: three or four agents on the Mac, one or two on Fedora (three at most), five at most in total, and one full test suite at a time per machine.
 
 **On the Mac:** coding and review agents, because compiling, type checking, linting and parallel test runs are CPU-bound. Also local models and anything memory-heavy, where its 3.3× faster memory helps most.
 
-**On Fedora:** merges, the final gate run (about a minute slower there), pushes and pull requests. Also anything that starts lots of processes or touches lots of files: npm installs, heavy git work, containers (no virtual machine needed on Linux), and the Linux-only sandbox tests. And long-running jobs that want 78 GB of memory or a lot of disk.
+**On Fedora:** merges, the final gate run, pushes and pull requests; the coverage-free suite run was about a minute slower there. Also anything that starts lots of processes or touches lots of files: npm installs, heavy git work, containers (no virtual machine needed on Linux), and the Linux-only sandbox tests. And long-running jobs that want 78 GB of memory or a lot of disk.
 
 ## What I'd keep from this
 
 - **Add one real workload to every benchmark.** The synthetic numbers said 2×, the suite said a tie, and both were true for different kinds of work.
 - **Measure process starts.** If your workload starts thousands of programs, the operating system matters as much as the CPU.
-- **Time the command your gates run.** My tie came from the serial command behind `make test`, not the one my gates use.
-- **Check your Amdahl's-law guess against `--durations`.** My estimate of the serial part was wrong: measuring the slowest tests showed they weren't the limit.
+- **Time the command your gates run.** My tie was measured with the serial command behind `make test`, not the one my gates use.
+- **Check your Amdahl's-law guess against `--durations`.** My estimate of the serial part didn't hold up: the slowest tests alone didn't explain the scaling.
 
 *How this was measured: the same Python 3.12 and the same stdlib-only scripts on both machines, run on 19 and 20 November 2026, skep at commit `2bf2644`. The Mac shares its CPU with my other agents; I waited for another agent's suite to finish before the synthetic run, and when one re-run overlapped another agent's suite I used the clean run. macOS can report a disk write as finished before it reaches the drive, so treat the Mac's disk-write figure as an upper bound.*
