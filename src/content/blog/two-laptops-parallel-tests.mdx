@@ -118,7 +118,7 @@ The 20 minutes is real, just not where I first thought. My gates and CI already 
 
 `-n auto` started one worker per logical CPU here: 14 on the Mac, 16 on Fedora. (It counts physical cores instead only when the psutil package is installed, and it isn't in skep's setup.) Each worker loads the full list of tests. A coordinator hands tests to whichever worker is free and gathers the results into one normal pytest report. The tests themselves don't change.
 
-There's one catch: tests running side by side must not fight over the same resource. Two tests that both bind port 8765, or write to the same file, will fail at random when they run side by side. skep's notes call the suite xdist-safe (a few order-dependent tests have been fixed since), and it ran cleanly in parallel here.
+There's one catch: tests running side by side must not fight over the same resource. Two tests that both bind port 8765, or write to the same file, will fail at random when they run side by side. skep's notes call the suite xdist-safe (a few order-dependent tests have been fixed since), and both parallel runs on the Mac passed.
 
 ## Why 8× and not 14×
 
