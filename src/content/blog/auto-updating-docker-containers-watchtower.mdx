@@ -1,6 +1,7 @@
 ---
 title: "Auto-Updating Docker Containers in My Homelab with Watchtower"
 description: "How I used Watchtower to auto-update low-risk Docker containers in my homelab while keeping critical services under manual control."
+tldr: "Watchtower now keeps my Homepage container updated on a 4 AM schedule, after setting DOCKER_API_VERSION=1.40 fixed an API version error and a --run-once test confirmed it worked. It checks every container on the host by default, so my rule is: auto-update low-risk services, keep Pi-hole and databases manual, and switch to label-only mode as the setup grows."
 date: "2026-06-13"
 tags:
   - homelab
