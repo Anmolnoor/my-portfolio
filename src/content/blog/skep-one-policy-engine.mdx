@@ -8,15 +8,15 @@ cover: /blog/skep-one-policy-engine.png
 readingMinutes: 15
 ---
 
-**skep** is my open-source, local-first supervisor for AI coding agents: it runs Claude Code, Codex, Aider, pi or its own built-in worker in a sandbox, re-runs your tests itself, and lands a patch only when you approve it. You install it with `pipx install skep`.
+**skep** is my open-source, local-first supervisor for AI coding agents: it can run Claude Code, Codex, Aider, pi or its own built-in worker in a sandbox, re-runs your tests itself, and by default holds the patch until you approve it. You install it with `pipx install skep`.
 
 **The short version:**
 
 - skep's policy was decided in five places that disagreed on 6 of 19 test probes, and the three most dangerous actions in that test got no approval card.
-- One function, `decide()`, now answers for the API, the CLI, the Claude Code hook, the editor proxy and the chat assistant, and "no rule matched" means ask a human, not deny.
-- 46 of my 57 coding runs had no sandbox. From 1.5.0, new projects are sandboxed by default.
+- One function, `decide()`, now answers for the API, the CLI, the Claude Code hook, the editor proxy and the chat assistant, and "no rule matched" now usually means ask a human, not deny.
+- 46 of my 57 coding runs had no sandbox. From 1.5.0, new projects are sandboxed by default when the host supports it.
 - The worker reported "passed" 112 times. skep could replay 50 of those and confirmed 48.
-- The sharpest finding: 20 of my 25 manual patch approvals landed inside ten seconds. The human in the loop needs better evidence on the card.
+- The sharpest finding: of the 25 patches I approved by hand, I approved 20 in under ten seconds. The human in the loop needs better evidence on the card.
 
 In July I wrote on this blog that [governance is the product](/blog/beekeeper-fcli-skep-journey). I believed it. I had allowlists, approval cards, a sandbox, and a supervisor that re-ran the tests itself.
 
@@ -199,7 +199,7 @@ Four earlier claims need correcting.
   **Today:** the correction still holds in 1.5.0. The external engines get no per-action check, the sandbox is their wall, and they always run in one. What changed is the default: from 1.5.0, new projects run sandboxed whenever the host can sandbox ([ADR 0066](https://github.com/Anmolnoor/skep/blob/main/docs/adr/0066-sandbox-by-default.md)). Existing projects keep the mode they had.
 - **"Every MCP call passes through the same governed policy layer"** ([launch post](/blog/skep-is-live)). It didn't. MCP calls read only part of the policy plus a risk guess based on the tool's name. That is how the transfer above got through without a card.
 
-  **Today:** fixed since 1.4.0, so fixed in 1.5.0. The chat assistant's MCP calls go through the same `decide()`, baseline included, and the name-based risk guess no longer decides anything. What is still open is under "Where it still stops": whether a call counts as read-only is partly the tool's own word.
+  **Today:** fixed since 1.4.0, so fixed in 1.5.0. The chat assistant's MCP calls go through the same `decide()`, baseline included, in place of the old name-based risk ladder. What is still open is under "Where it still stops": whether a call counts as read-only is partly the tool's own word.
 - **The launch quickstart used `--execution-mode workspace`.** That mode has no sandbox. I should not have led with it.
 
   **Today:** the 1.5.0 README quickstart uses `--execution-mode sandbox`.
@@ -225,7 +225,7 @@ I had the features in July. I got the rest in November, and I only found out it 
 
 If you run coding agents and want to see what yours are doing, the governor and the hook are the cheapest way in. You can try them without dispatching a single worker; run `skep onboard` first, so there is an approved baseline to answer from.
 
-Here is the setup I use. The client is T3 Code: add a Local ACP command provider and paste what `skep acp install-hint` prints, which wraps Claude's ACP adapter in `skep acp govern`. Then put Claude in its `default` mode. That is an asking mode, so the governor answers on the advisory path. T3 Code does not run the agent's file writes or terminals itself, so the hard path never applies there. Leave Claude in `auto` and the governor only watches.
+Here is the setup I use. The client is T3 Code: add a Local ACP command provider and paste what `skep acp install-hint` prints, which wraps Claude's ACP adapter in `skep acp govern`. Then put Claude in its `default` mode. That is an asking mode, so the governor answers on the advisory path. Leave Claude in `auto` and the governor only watches.
 
 - [The ACP governor](https://github.com/Anmolnoor/skep/blob/main/docs/acp-governor.md)
 - [The Claude Code policy hook](https://github.com/Anmolnoor/skep/blob/main/docs/policy-hook.md)
