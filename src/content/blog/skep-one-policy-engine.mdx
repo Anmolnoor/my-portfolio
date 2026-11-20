@@ -14,13 +14,15 @@ In November I went looking for the place in the code where a tool call gets deci
 
 This post is the update on skep since launch, and it is mostly about that one finding: what my own records said, what I built instead, how it works, and where it stops. That July post said "I won't map the internals here." This one does.
 
+*Version note: this describes skep 1.4.2 and 1.5.0, which was tagged the day I wrote it. Two things below exist only from 1.5.0 on, and I mark them. The numbers come from the run store and decision log on one machine, read on 19 November 2026; the queries are at the end.*
+
 ## The record that embarrassed me
 
 Three things from skep's own store, on my own machine.
 
 **There was no single policy.** An audit against the real model showed five decision paths, each reading a different subset of the policy layers, each with its own private answer for "no rule matched." Asked the same question, they disagreed on 6 of 19 kinds of probe. The three most dangerous actions in that test session — a money transfer through an MCP tool, a private file passed to web search, and a fetch grant for a whole host — produced no approval card at all. Meanwhile about 9 of the 23 cards that did appear were noise. It is all written down in [ADR 0059](https://github.com/Anmolnoor/skep/blob/main/docs/adr/0059-policy-v3.md).
 
-**Most of my coding runs had no sandbox.** Of the 57 coding runs in my store, 46 ran in `workspace` mode: skep's built-in worker, checked on every tool call but with no OS wall around it. Count every run in the store, early experiments and script runs included, and it is 121 of 198. The setup defaults said `workspace`, projects inherited it, and my own quickstart told people to type it. The fix ([ADR 0066](https://github.com/Anmolnoor/skep/blob/main/docs/adr/0066-sandbox-by-default.md)) makes new projects sandboxed whenever the host can sandbox, and leaves existing projects as they are. It is on main and not in a release yet.
+**Most of my coding runs had no sandbox.** Of the 57 coding runs in my store, 46 ran in `workspace` mode: skep's built-in worker, checked on every tool call but with no OS wall around it. Count every run in the store, early experiments and script runs included, and it is 121 of 198. The setup defaults said `workspace`, projects inherited it, and my own quickstart told people to type it. The fix ([ADR 0066](https://github.com/Anmolnoor/skep/blob/main/docs/adr/0066-sandbox-by-default.md)) makes new projects sandboxed whenever the host can sandbox, and leaves existing projects as they are. The ADR counted 41 of 49 a day earlier; eight runs later it is 46 of 57. The fix is in 1.5.0 and not in 1.4.2 or earlier.
 
 **The worker reported "passed" 112 times. skep confirmed 48.** skep re-runs a project's check on a clean copy after the worker finishes. My store has 112 of these records, and the worker reported a pass in every one. In 35 there was no patch, so nothing to check. In 27 the worker said it had changed files but left no patch to check. Of the 50 that skep could replay, 48 passed and 2 failed.
 
@@ -44,7 +46,7 @@ An agent asking permission is only governed if something other than the agent de
 
 ## One function decides
 
-So the REST API, the CLI, the Claude Code hook, the ACP proxy, and the chat assistant's file, shell, web and MCP checks now share one `decide()`. It takes a scope, an action and a value, and it checks in a fixed order:
+So the REST API, the CLI, the Claude Code hook, the ACP proxy, and the chat assistant's file, shell, web and MCP checks now share one `decide()`. That is one function for the requests skep intercepts. It does not make every agent action interceptable, and the table further down says which ones are. It takes a scope, an action and a value, and it checks in a fixed order:
 
 ```
  tool call  →  (scope, action, value)
@@ -90,7 +92,7 @@ This is the part that is new in kind, not just in quality. As of this autumn the
 
 **The Claude Code hook.** One entry in Claude Code's settings runs `skep policy hook` before every shell, file-edit and web call. skep answers allow, ask or deny, and Claude Code obeys.
 
-**The ACP governor.** Editors and agent apps that speak the Agent Client Protocol spawn an agent as a subprocess. You give them `skep acp govern -- <agent command>` instead, and skep sits on the wire between them:
+**The ACP governor.** Editors and agent apps that speak the Agent Client Protocol spawn an agent as a subprocess. You give them `skep acp govern -- <agent command>` instead, and skep sits on the wire between them. One caution before the picture: in most setups, mine included, this is advice the agent chooses to ask for, not a wall.
 
 ```
  client (editor)        skep acp govern          agent (Claude / Codex)
@@ -164,8 +166,9 @@ Four earlier claims need correcting.
 - **Not everything goes through `decide()` yet.** The permissions compiled for a dispatched worker, and a few smaller checks, still read the policy on their own path. The ADR lists them as open.
 - **Reads are mostly open.** In sandbox mode, writes are confined to the run's worktree and a few designated folders. Reads outside it are not confined, apart from a list of credential paths. The Claude Code hook has no opinion on the `Read` tool at all, so `cat ~/.ssh/id_ed25519` is denied and a `Read` of the same file is never seen.
 - **The floor catches what it can read.** `python deploy.py` can run `git push` inside the script, and a word matcher never sees it. If `python deploy.py` is allowed, whatever is inside it runs. A sandboxed worker has a wall behind that. The hook has nothing.
+- **"Read-only" is partly the tool's own word.** An MCP tool call counts as read-only when its server marks it that way and its name starts with a read verb. skep does not check what the tool actually does, so a wrong or dishonest server can get a call through without a card.
 - **The governor does not sandbox and does not verify.** It governs the wire.
-- **Verification is as strong as the command you pin.** A thin check confirms a bad patch. skep refuses to auto-land on the obviously empty ones, like `true`, but it cannot tell a weak test suite from a good one. And installing dependencies for the re-run can execute a patch's build code before you have approved anything.
+- **Verification is as strong as the command you pin.** A thin check confirms a bad patch. From 1.5.0 skep refuses to auto-land on the obviously empty ones, like `true`, but it cannot tell a weak test suite from a good one. And installing dependencies for the re-run can execute a patch's build code before you have approved anything.
 - **I approve my own baseline, and I approve fast.** Across 46 patch-approval records, 13 were approved automatically after a confirmed re-verify and 25 I approved by hand — 20 of those within ten seconds. Eight ended denied: three by me, the rest stale, redundant or failed to apply. All three of mine were patches whose re-verify had passed. That is the best argument I have for keeping a human in the loop, and the ten-second figure is the best argument that the human needs better evidence on the card.
 - **It is one operator on one machine.** The decision log has entries on 9 of the last 29 days, and the governor on 2. This is early field data, not a track record.
 
@@ -184,5 +187,24 @@ If you run coding agents and want to see what yours are doing, the governor and 
 - [The invariants](https://github.com/Anmolnoor/skep/blob/main/docs/invariants.md) — the file I most want challenged
 
 **GitHub:** [github.com/Anmolnoor/skep](https://github.com/Anmolnoor/skep)
+
+## How I counted
+
+You cannot check my numbers, because they come from my own store. You can run the same queries on yours. The store is `~/.skep/supervisor/supervisor.sqlite3` and the decision log is `~/.skep/supervisor/audit/policy/decisions.jsonl`.
+
+```sql
+-- runs by kind and mode (46 of 57 coding runs; 121 of 198 overall)
+SELECT worker_kind, execution_mode, count(*) FROM runs GROUP BY 1, 2;
+
+-- what the worker reported against what skep's replay found (112 records)
+SELECT worker_outcome, outcome, count(*) FROM reverifications GROUP BY 1, 2;
+
+-- patch approvals: who resolved them, and how many within ten seconds
+SELECT status, resolved_by, count(*),
+       sum((julianday(resolved_at) - julianday(requested_at)) * 86400 < 10)
+FROM approvals WHERE action = 'apply_patch' GROUP BY 1, 2;
+```
+
+The decision-log figures are counts of rows grouped by `verdict`, `rule_id`, `source` and the first part of `actor`. Eight rows written by a tamper test are in the totals; none of them is among the hook's 316 denials.
 
 Holes poked in any of the above are the most useful thing you can send me.
