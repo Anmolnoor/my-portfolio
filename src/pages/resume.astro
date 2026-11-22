@@ -1,57 +1,127 @@
 ---
 import Main from "@/layouts/Main.astro";
 import { getCollection } from "astro:content";
-import { stack, now } from "@/components/about/aboutData";
 import { projects, type Project } from "@/assets/projects";
 import { formatDateUTC, getPostSlug } from "@/lib/blog";
 
 const summary =
-  "Software engineer focused on local-first coding agents, developer tools, and full-stack products. My work explores how coding agents can operate with clear boundaries, independent verification, and human approval. I also build real-time applications and run a self-hosted homelab.";
-
-const resumeTitles = [
-  "skep",
-  "Foundation CLI",
-  "Beekeeper",
-  "agent-policy-gate",
-  "scripts",
-  "claude-dotfiles",
-  "Amend Notes",
-  "Vendro",
-];
-const resumeProjects = resumeTitles
-  .map((t) => projects.find((p) => p.title === t))
-  .filter((p): p is Project => Boolean(p));
-
-const posts = (await getCollection("blog"))
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
-  .slice(0, 5);
-
-// Substantive roles only; short trainings omitted.
-const experience = [
-  {
-    role: "Founder",
-    company: "Dynamic Nexus Solutions",
-    link: "https://www.dynamicnexussolutions.com/",
-    duration: "Present",
-  },
-  {
-    role: "Frontend Engineer",
-    company: "Huddle01",
-    link: "https://huddle01.com/",
-    duration: "5 months (2 full-time, 3 part-time)",
-  },
-];
+  "Full-stack software engineer with production experience building React, Next.js, and TypeScript web applications, real-time WebRTC/WebSocket surfaces, and Node.js/Express backend workflows. Currently focused on local-first AI coding agents with clear boundaries, independent verification, and human approval, alongside self-hosted Linux/Proxmox infrastructure.";
 
 const contacts = [
   { label: "Vancouver, BC" },
   { label: "anmolnoor59@gmail.com", href: "mailto:anmolnoor59@gmail.com" },
-  { label: "anmolnoor.com", href: "https://anmolnoor.com" },
+  { label: "anmolnoor.com", href: "https://www.anmolnoor.com" },
   { label: "github.com/Anmolnoor", href: "https://github.com/Anmolnoor" },
   {
     label: "linkedin.com/in/anmol-noor",
     href: "https://www.linkedin.com/in/anmol-noor/",
   },
 ];
+
+const workAuthorization =
+  "Authorized to work full-time in Canada (Open Work Permit valid through 2029)";
+
+const experience = [
+  {
+    role: "Frontend Engineer",
+    company: "Huddle01",
+    location: "Remote",
+    link: "https://huddle01.com/",
+    duration: "May 2023 – Sep 2023",
+    bullets: [
+      "Developed and maintained production features for real-time communication web applications using Next.js, WebRTC, and WebSockets.",
+      "Built and refined responsive UI components and collaboration flows for media-heavy meeting surfaces, integrating frontend state with REST APIs and real-time layers.",
+      "Debugged issues across UI, media, and event-driven flows, improving responsiveness, reliability, and usability across production product areas.",
+      "Collaborated in an Agile engineering workflow to ship updates, review implementation details, triage bugs, and validate behavior before release.",
+    ],
+  },
+];
+
+const resumeSkills: { group: string; items: string[] }[] = [
+  {
+    group: "Languages",
+    items: ["TypeScript", "JavaScript", "Python", "Shell", "Swift", "SQL"],
+  },
+  {
+    group: "Frontend",
+    items: [
+      "React",
+      "Next.js",
+      "Astro",
+      "Vite",
+      "Tailwind CSS",
+      "Redux Toolkit",
+      "React Native",
+    ],
+  },
+  {
+    group: "Backend & Data",
+    items: [
+      "Node.js",
+      "Express",
+      "REST APIs",
+      "PostgreSQL",
+      "MongoDB",
+      "MySQL",
+      "Prisma",
+      "Firebase",
+      "AWS / S3",
+    ],
+  },
+  {
+    group: "Realtime & AI",
+    items: [
+      "WebRTC",
+      "WebSockets",
+      "MediaSoup",
+      "Coding Agents",
+      "Local LLMs / Ollama",
+      "Claude Code",
+      "Policy & Audit Loops",
+    ],
+  },
+  {
+    group: "Infra & Tools",
+    items: [
+      "Linux",
+      "Docker",
+      "Nginx",
+      "Proxmox",
+      "Tailscale",
+      "Prometheus",
+      "Grafana",
+      "Git / GitHub",
+    ],
+  },
+];
+
+const resumeTitles = [
+  "skep",
+  "Foundation CLI",
+  "Beekeeper",
+  "agent-policy-gate",
+  "Vendro",
+];
+const resumeProjects = resumeTitles
+  .map((t) => projects.find((p) => p.title === t))
+  .filter((p): p is Project => Boolean(p));
+
+const education = [
+  {
+    program: "Network Technology Administration and Security",
+    institution: "Vancouver Community College",
+    period: "Completed 2026",
+  },
+  {
+    program: "B.Tech, Computer Science and Engineering",
+    institution: "Bhai Gurdas Institute of Engineering and Technology",
+    period: "2018 – 2022",
+  },
+];
+
+const posts = (await getCollection("blog"))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 4);
 ---
 
 <Main title="Resume — Anmol Noor">
@@ -64,7 +134,7 @@ const contacts = [
         <div>
           <h1 class="font-mono text-4xl font-bold tracking-tight">Anmol Noor</h1>
           <p class="mt-1 font-mono text-sm uppercase tracking-widest text-primary">
-            Software Engineer
+            Software Engineer · Full-Stack TypeScript, Node.js & AI Systems
           </p>
         </div>
         <button
@@ -75,47 +145,38 @@ const contacts = [
           Print / Save PDF
         </button>
       </div>
-      <p class="mt-3 flex flex-wrap gap-x-2 gap-y-1 font-mono text-xs text-muted-foreground">
+
+      <ul class="mt-3 flex flex-wrap gap-x-4 gap-y-1 font-mono text-xs text-muted-foreground">
         {
-          contacts.map((c, i) => (
-            <span>
-              {i > 0 && <span aria-hidden="true">· </span>}
+          contacts.map((c) => (
+            <li>
               {c.href ? (
-                <a href={c.href} class="transition-colors hover:text-primary">
+                <a
+                  href={c.href}
+                  target={c.href.startsWith("http") ? "_blank" : undefined}
+                  rel={c.href.startsWith("http") ? "noreferrer" : undefined}
+                  class="transition-colors hover:text-primary"
+                >
                   {c.label}
                 </a>
               ) : (
                 c.label
               )}
-            </span>
+            </li>
           ))
         }
+      </ul>
+
+      <p class="mt-1.5 font-mono text-xs text-muted-foreground">
+        {workAuthorization}
       </p>
+
       <p class="mt-4 text-sm leading-relaxed text-muted-foreground">
         {summary}
       </p>
     </header>
 
-    <div class="flex flex-col gap-9 pt-8">
-      <!-- focus -->
-      <section>
-        <h2
-          class="mb-4 border-b border-border pb-2 font-mono text-xs font-bold uppercase tracking-widest text-primary"
-        >
-          Focus
-        </h2>
-        <ul class="space-y-2">
-          {
-            now.map((item) => (
-              <li class="text-sm">
-                <span class="font-semibold text-foreground">{item.title}</span>
-                <span class="text-muted-foreground"> — {item.note}</span>
-              </li>
-            ))
-          }
-        </ul>
-      </section>
-
+    <div class="flex flex-col gap-8 pt-7">
       <!-- experience -->
       <section>
         <h2
@@ -123,47 +184,39 @@ const contacts = [
         >
           Experience
         </h2>
-        <div class="space-y-3">
+        <div class="space-y-5">
           {
             experience.map((e) => (
-              <div class="flex break-inside-avoid flex-wrap items-baseline justify-between gap-x-3">
-                <h3 class="font-mono text-sm font-bold">
-                  {e.role}
-                  <span class="font-normal text-primary">
-                    {" "}
-                    · <a href={e.link} target="_blank" rel="noreferrer" class="hover:underline">{e.company}</a>
-                  </span>
-                </h3>
-                <span class="font-mono text-xs text-muted-foreground">
-                  {e.duration}
-                </span>
-              </div>
-            ))
-          }
-        </div>
-      </section>
-
-      <!-- skills -->
-      <section>
-        <h2
-          class="mb-4 border-b border-border pb-2 font-mono text-xs font-bold uppercase tracking-widest text-primary"
-        >
-          Technical Skills
-        </h2>
-        <div class="space-y-3">
-          {
-            stack.map((group) => (
-              <div class="flex flex-col gap-1 sm:flex-row sm:gap-4">
-                <p class="w-36 shrink-0 font-mono text-xs uppercase tracking-wider text-muted-foreground sm:pt-0.5">
-                  {group.group}
-                </p>
-                <div class="flex flex-wrap gap-x-2 gap-y-1.5">
-                  {group.items.map((i) => (
-                    <span class="rounded border border-lime-500/25 bg-lime-500/5 px-2 py-0.5 font-mono text-xs text-foreground">
-                      {i.name}
+              <div class="break-inside-avoid">
+                <div class="flex flex-wrap items-baseline justify-between gap-x-3">
+                  <h3 class="font-mono text-sm font-bold">
+                    {e.role}
+                    <span class="font-normal text-primary">
+                      {" "}
+                      ·{" "}
+                      <a
+                        href={e.link}
+                        target="_blank"
+                        rel="noreferrer"
+                        class="hover:underline"
+                      >
+                        {e.company}
+                      </a>
                     </span>
-                  ))}
+                    <span class="font-normal text-muted-foreground">
+                      {" "}
+                      ({e.location})
+                    </span>
+                  </h3>
+                  <span class="font-mono text-xs text-muted-foreground">
+                    {e.duration}
+                  </span>
                 </div>
+                <ul class="mt-2 list-disc space-y-1.5 pl-4 text-sm text-muted-foreground">
+                  {e.bullets.map((bullet) => (
+                    <li>{bullet}</li>
+                  ))}
+                </ul>
               </div>
             ))
           }
@@ -177,7 +230,7 @@ const contacts = [
         >
           Selected Projects
         </h2>
-        <div class="space-y-5">
+        <div class="space-y-4">
           {
             resumeProjects.map((p) => {
               const external = p.link.startsWith("http");
@@ -197,7 +250,7 @@ const contacts = [
                       href={p.link}
                       target={external ? "_blank" : undefined}
                       rel={external ? "noreferrer" : undefined}
-                      class="font-mono text-xs text-muted-foreground transition-colors hover:text-primary"
+                      class="font-mono text-xs text-muted-foreground transition-colors hover:text-primary print:hidden"
                     >
                       {external ? "View ↗" : "View →"}
                     </a>
@@ -206,7 +259,7 @@ const contacts = [
                     {p.description}
                   </p>
                   {p.techTags && p.techTags.length > 0 && (
-                    <p class="mt-1.5 font-mono text-xs text-muted-foreground">
+                    <p class="mt-1 font-mono text-xs text-muted-foreground">
                       {p.techTags.join(" · ")}
                     </p>
                   )}
@@ -217,14 +270,65 @@ const contacts = [
         </div>
       </section>
 
+      <!-- skills -->
+      <section>
+        <h2
+          class="mb-4 border-b border-border pb-2 font-mono text-xs font-bold uppercase tracking-widest text-primary"
+        >
+          Technical Skills
+        </h2>
+        <div class="space-y-3">
+          {
+            resumeSkills.map((group) => (
+              <div class="flex flex-col gap-1 sm:flex-row sm:gap-4">
+                <p class="w-36 shrink-0 font-mono text-xs uppercase tracking-wider text-muted-foreground sm:pt-0.5">
+                  {group.group}
+                </p>
+                <div class="flex flex-wrap gap-x-2 gap-y-1.5">
+                  {group.items.map((item) => (
+                    <span class="rounded border border-lime-500/25 bg-lime-500/5 px-2 py-0.5 font-mono text-xs text-foreground">
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </section>
+
+      <!-- education -->
+      <section>
+        <h2
+          class="mb-4 border-b border-border pb-2 font-mono text-xs font-bold uppercase tracking-widest text-primary"
+        >
+          Education
+        </h2>
+        <div class="space-y-3">
+          {
+            education.map((ed) => (
+              <div class="flex break-inside-avoid flex-wrap items-baseline justify-between gap-x-4">
+                <div>
+                  <h3 class="font-mono text-sm font-bold">{ed.program}</h3>
+                  <p class="text-sm text-muted-foreground">{ed.institution}</p>
+                </div>
+                <span class="shrink-0 font-mono text-xs text-muted-foreground">
+                  {ed.period}
+                </span>
+              </div>
+            ))
+          }
+        </div>
+      </section>
+
       <!-- writing -->
       <section>
         <h2
           class="mb-4 border-b border-border pb-2 font-mono text-xs font-bold uppercase tracking-widest text-primary"
         >
-          Writing
+          Recent Writing
         </h2>
-        <div class="space-y-2.5">
+        <div class="space-y-2">
           {
             posts.map((post) => (
               <div class="flex break-inside-avoid items-baseline justify-between gap-x-4">
@@ -236,7 +340,10 @@ const contacts = [
                   {post.data.title}
                 </a>
                 <span class="shrink-0 font-mono text-xs text-muted-foreground">
-                  {formatDateUTC(post.data.date, { month: "short", year: "numeric" })}
+                  {formatDateUTC(post.data.date, {
+                    month: "short",
+                    year: "numeric",
+                  })}
                 </span>
               </div>
             ))
