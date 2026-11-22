@@ -176,14 +176,16 @@ describe("built site (.vercel/output)", () => {
     }
   });
 
-  test("blog index lazy-loads covers and keeps tag filters outside card links", async () => {
+  test("blog index lazy-loads covers and keeps tag filter trigger outside card links", async () => {
     const html = await built("blog/index.html");
     const lazyImgs = html.match(/<img\b[^>]*\bloading="lazy"[^>]*>/g) ?? [];
     assert.equal(lazyImgs.length, posts.length, "every post card cover should be lazy");
 
-    const filter = html.match(/<div[^>]*aria-label="Filter posts by tag"[^>]*>([\s\S]*?)<\/div>/);
-    assert.ok(filter, "tag filter group missing");
-    assert.ok((filter[1].match(/<button\b/g) ?? []).length > 1, "tag filter has no buttons");
+    assert.match(
+      html,
+      /<button\b[^>]*aria-label="Filter posts by tag"[^>]*>/,
+      "compact tag filter trigger button missing"
+    );
 
     const anchors = [...html.matchAll(/<a\b[^>]*>([\s\S]*?)<\/a>/g)];
     assert.ok(anchors.length >= posts.length);

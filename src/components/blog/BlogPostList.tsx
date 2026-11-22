@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { FunnelSimple, X } from "@phosphor-icons/react";
 import { formatDateUTC } from "@/lib/blog";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -35,14 +36,6 @@ const countTags = (posts: BlogPostListItem[]) => {
   return [...counts].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
 };
 
-const tagPillClass = (active: boolean) =>
-  cn(
-    "h-7 rounded-full border px-3 font-mono text-xs",
-    active
-      ? "border-primary bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
-      : "text-muted-foreground"
-  );
-
 const GridIcon = () => (
   <span
     aria-hidden="true"
@@ -70,9 +63,31 @@ export default function BlogPostList({ posts }: BlogPostListProps) {
   const [layout, setLayout] = useState<BlogLayout>("grid");
   const [isSwitching, setIsSwitching] = useState(false);
   const [activeTag, setActiveTag] = useState<string | null>(null);
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [tagQuery, setTagQuery] = useState("");
   const animationTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const allTagButtonRef = useRef<HTMLButtonElement | null>(null);
+  const filterContainerRef = useRef<HTMLDivElement | null>(null);
+  const filterTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const tagSearchInputRef = useRef<HTMLInputElement | null>(null);
+
   const tagCounts = useMemo(() => countTags(posts), [posts]);
+  const normalizedQuery = normalizeTag(tagQuery);
+  const filteredTags = useMemo(
+    () =>
+      normalizedQuery
+        ? tagCounts.filter(([tag]) => tag.includes(normalizedQuery))
+        : tagCounts,
+    [tagCounts, normalizedQuery]
+  );
+  const recurringTags = useMemo(
+    () => filteredTags.filter(([, count]) => count >= 2),
+    [filteredTags]
+  );
+  const singlePostTags = useMemo(
+    () => filteredTags.filter(([, count]) => count === 1),
+    [filteredTags]
+  );
+
   const visiblePosts = activeTag
     ? posts.filter((post) => post.tags.map(normalizeTag).includes(activeTag))
     : posts;
@@ -90,6 +105,34 @@ export default function BlogPostList({ posts }: BlogPostListProps) {
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (!filterOpen) return;
+    tagSearchInputRef.current?.focus();
+
+    const handlePointerDown = (event: MouseEvent) => {
+      if (
+        filterContainerRef.current &&
+        !filterContainerRef.current.contains(event.target as Node)
+      ) {
+        setFilterOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setFilterOpen(false);
+        filterTriggerRef.current?.focus();
+      }
+    };
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [filterOpen]);
 
   const changeLayout = (nextLayout: BlogLayout) => {
     if (nextLayout === layout) {
@@ -110,6 +153,8 @@ export default function BlogPostList({ posts }: BlogPostListProps) {
 
   const selectTag = (tag: string | null) => {
     setActiveTag(tag);
+    setFilterOpen(false);
+    setTagQuery("");
     const url = new URL(window.location.href);
     if (tag) {
       url.searchParams.set("tag", tag);
@@ -119,10 +164,43 @@ export default function BlogPostList({ posts }: BlogPostListProps) {
     window.history.replaceState(window.history.state, "", url);
   };
 
+  const clearTagAndFocusTrigger = () => {
+    selectTag(null);
+    filterTriggerRef.current?.focus();
+  };
+
+  const renderTagOption = ([tag, count]: [string, number]) => {
+    const isSelected = activeTag === tag;
+    return (
+      <button
+        aria-pressed={isSelected}
+        className={cn(
+          "flex w-full items-center justify-between rounded-sm px-2.5 py-1.5 text-left font-mono text-xs transition-colors",
+          isSelected
+            ? "bg-primary text-primary-foreground"
+            : "text-foreground hover:bg-muted"
+        )}
+        key={tag}
+        onClick={() => selectTag(tag)}
+        type="button"
+      >
+        <span className="truncate">{tag}</span>
+        <span
+          className={cn(
+            "ml-2 shrink-0",
+            isSelected ? "text-primary-foreground/80" : "text-muted-foreground"
+          )}
+        >
+          {count}
+        </span>
+      </button>
+    );
+  };
+
   return (
     <div className="flex flex-col gap-6">
-      <header className="mb-8 flex flex-col gap-3">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <header className="mb-2 flex flex-col gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <span className="h-1.5 w-1.5 rounded-full bg-primary" />
             <span className="font-mono text-xs font-bold uppercase tracking-widest text-primary">
@@ -130,7 +208,7 @@ export default function BlogPostList({ posts }: BlogPostListProps) {
             </span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2.5">
             <a
               className="font-mono text-xs text-muted-foreground no-underline hover:text-primary"
               href="/rss.xml"
@@ -138,6 +216,111 @@ export default function BlogPostList({ posts }: BlogPostListProps) {
             >
               RSS
             </a>
+
+            {tagCounts.length > 0 && (
+              <div className="relative" ref={filterContainerRef}>
+                <Button
+                  aria-controls="blog-tag-filter-popover"
+                  aria-expanded={filterOpen}
+                  aria-haspopup="dialog"
+                  aria-label={
+                    activeTag
+                      ? `Filter posts by tag, active: ${activeTag}`
+                      : "Filter posts by tag"
+                  }
+                  className={cn(
+                    "h-10 rounded-full border px-3.5 font-mono text-xs",
+                    activeTag
+                      ? "border-primary/40 bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary"
+                      : "bg-card text-muted-foreground hover:text-foreground"
+                  )}
+                  onClick={() => setFilterOpen((open) => !open)}
+                  ref={filterTriggerRef}
+                  size="sm"
+                  type="button"
+                  variant="ghost"
+                >
+                  <FunnelSimple className="h-3.5 w-3.5 shrink-0" />
+                  <span>{activeTag ? activeTag : "Filter"}</span>
+                </Button>
+
+                {filterOpen && (
+                  <div
+                    aria-label="Filter posts by tag"
+                    className="absolute left-0 z-40 mt-2 w-64 rounded-md border bg-popover p-2.5 shadow-lg sm:left-auto sm:right-0"
+                    id="blog-tag-filter-popover"
+                    role="dialog"
+                  >
+                    <input
+                      aria-label="Search tags"
+                      className="mb-2 h-8 w-full rounded-sm border border-input bg-background px-2.5 font-mono text-xs text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                      onChange={(e) => setTagQuery(e.target.value)}
+                      placeholder="Search tags..."
+                      ref={tagSearchInputRef}
+                      type="search"
+                      value={tagQuery}
+                    />
+
+                    <div className="max-h-72 space-y-1 overflow-y-auto pr-0.5">
+                      {!normalizedQuery && (
+                        <button
+                          aria-pressed={activeTag === null}
+                          className={cn(
+                            "flex w-full items-center justify-between rounded-sm px-2.5 py-1.5 text-left font-mono text-xs transition-colors",
+                            activeTag === null
+                              ? "bg-primary text-primary-foreground"
+                              : "text-foreground hover:bg-muted"
+                          )}
+                          onClick={() => selectTag(null)}
+                          type="button"
+                        >
+                          <span>All posts</span>
+                          <span
+                            className={cn(
+                              "ml-2 shrink-0",
+                              activeTag === null
+                                ? "text-primary-foreground/80"
+                                : "text-muted-foreground"
+                            )}
+                          >
+                            {posts.length}
+                          </span>
+                        </button>
+                      )}
+
+                      {recurringTags.length > 0 && (
+                        <div className="pt-1">
+                          <p className="px-2.5 pb-1 font-mono text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                            Topics
+                          </p>
+                          <div className="space-y-0.5">
+                            {recurringTags.map(renderTagOption)}
+                          </div>
+                        </div>
+                      )}
+
+                      {singlePostTags.length > 0 && (
+                        <div className="pt-2">
+                          <p className="px-2.5 pb-1 font-mono text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                            More tags
+                          </p>
+                          <div className="space-y-0.5">
+                            {singlePostTags.map(renderTagOption)}
+                          </div>
+                        </div>
+                      )}
+
+                      {filteredTags.length === 0 && (
+                        <p className="px-2.5 py-3 text-center font-mono text-xs text-muted-foreground">
+                          No matching tags
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             <div
               aria-label="Blog layout"
               className="inline-flex w-fit items-center rounded-full border bg-card p-1"
@@ -186,63 +369,27 @@ export default function BlogPostList({ posts }: BlogPostListProps) {
           AI agents, systems, homelab, and developer tooling — written as I
           learn.
         </p>
-      </header>
 
-      {tagCounts.length > 0 && (
-        <div className="flex flex-col gap-3">
-          <div
-            aria-label="Filter posts by tag"
-            className="flex flex-wrap gap-2"
-            role="group"
-          >
+        {activeTag && (
+          <div className="flex flex-wrap items-center gap-2 pt-1 font-mono text-xs text-muted-foreground">
+            <span>
+              {visiblePosts.length}{" "}
+              {visiblePosts.length === 1 ? "post" : "posts"} tagged{" "}
+              <span className="text-primary">{activeTag}</span>
+            </span>
             <Button
-              aria-pressed={activeTag === null}
-              className={tagPillClass(activeTag === null)}
-              onClick={() => selectTag(null)}
-              ref={allTagButtonRef}
+              className="h-6 gap-1 rounded-full border px-2 font-mono text-xs text-muted-foreground hover:text-foreground"
+              onClick={clearTagAndFocusTrigger}
               size="sm"
               type="button"
               variant="ghost"
             >
-              All ({posts.length})
+              <X className="h-3 w-3" />
+              <span>Clear</span>
             </Button>
-            {tagCounts.map(([tag, count]) => (
-              <Button
-                aria-pressed={activeTag === tag}
-                className={tagPillClass(activeTag === tag)}
-                key={tag}
-                onClick={() => selectTag(tag)}
-                size="sm"
-                type="button"
-                variant="ghost"
-              >
-                {tag} ({count})
-              </Button>
-            ))}
           </div>
-          {activeTag && (
-            <div className="flex flex-wrap items-center gap-2 font-mono text-xs text-muted-foreground">
-              <span>
-                {visiblePosts.length}{" "}
-                {visiblePosts.length === 1 ? "post" : "posts"} tagged{" "}
-                <span className="text-primary">{activeTag}</span>
-              </span>
-              <Button
-                className="h-7 px-2 font-mono text-xs"
-                onClick={() => {
-                  selectTag(null);
-                  allTagButtonRef.current?.focus();
-                }}
-                size="sm"
-                type="button"
-                variant="ghost"
-              >
-                Clear filter
-              </Button>
-            </div>
-          )}
-        </div>
-      )}
+        )}
+      </header>
 
       {posts.length === 0 ? (
         <div className="rounded-lg border bg-card p-12 text-center">
