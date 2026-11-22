@@ -17,8 +17,8 @@ export const currentlyBuilding: CurrentlyBuildingItem[] = [
   },
   {
     iconKey: "server",
-    label: "HOMELAB / INFRA",
-    title: "Homelab / Infra",
+    label: "HOMELAB",
+    title: "Self-Hosted Infra",
     description:
       "Experimenting with self-hosted infra, automation, and observability.",
     link: "/blog/homelab-current-setup",

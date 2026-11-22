@@ -44,6 +44,7 @@ const NavLinkItem = ({
     <a
       href={to}
       onClick={onClick}
+      aria-current={isActive ? "page" : undefined}
       className={cn(
         "font-mono text-sm font-medium transition-colors",
         isActive
@@ -74,16 +75,28 @@ const ThemeToggle = () => {
   );
 };
 
-const TopNav = () => {
+const TopNav = ({ currentPath: initialPath }: { currentPath?: string }) => {
   const [open, setOpen] = useState(false);
-  const [currentPath, setCurrentPath] = useState("/");
+  const [currentPath, setCurrentPath] = useState(initialPath ?? "/");
 
   useEffect(() => {
-    setCurrentPath(window.location.pathname);
+    if (initialPath === undefined) setCurrentPath(window.location.pathname);
+  }, [initialPath]);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(min-width: 768px)");
+    const handleChange = (e: MediaQueryListEvent) => {
+      if (e.matches) setOpen(false);
+    };
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header
+      data-site-header
+      className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+    >
       <div className="container mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
         <Logo />
         <nav className="hidden items-center gap-8 md:flex">

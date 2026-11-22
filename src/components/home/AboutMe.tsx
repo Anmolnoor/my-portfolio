@@ -20,7 +20,7 @@ const MetaRow = ({
   <div className="flex items-start gap-2">
     <span className="mt-0.5 shrink-0 text-muted-foreground">{icon}</span>
     <div>
-      <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground text-lime-400">
+      <p className="font-mono text-xs uppercase tracking-wider text-primary">
         {label}
       </p>
       <p className="text-sm font-medium">{value}</p>
@@ -41,7 +41,7 @@ const AboutMe = () => {
               className="h-[72px] w-[72px] shrink-0 rounded-full object-cover"
             />
             <div className="min-w-0 flex-1 space-y-1">
-              <p className="font-mono text-lg font-bold text-lime-500">
+              <p className="font-mono text-lg font-bold text-primary">
                 Anmol Noor
               </p>
               <p className="text-sm text-muted-foreground">

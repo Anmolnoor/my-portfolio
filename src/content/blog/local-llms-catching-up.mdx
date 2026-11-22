@@ -6,7 +6,7 @@ date: 2026-10-14
 slug: local-llms-catching-up
 author: "Anmol"
 tags: ["local-llm", "ollama", "benchmarks", "homelab", "coding-agents"]
-cover: /blog/local-llms-catching-up.png
+cover: /blog/local-llms-catching-up.webp
 readingMinutes: 17
 ---
 
@@ -120,7 +120,7 @@ All models ran with thinking on and one attempt per problem unless I say otherwi
 
 ## Results
 
-![Problems solved on the first try](/blog/local-llms-solved-first-try.png)
+![Problems solved on the first try](/blog/local-llms-solved-first-try.webp)
 
 | | Basic, first try | Hard, first try | Hard, after one repair round |
 |---|---|---|---|
@@ -144,7 +144,7 @@ Every hard-tier solution that passed on the first try, from every run, agreed wi
 | Undo/redo editor | ✅ 101 s | ✅ 415 s | ✅ 259 s | ✅ 133 s |
 | JSON Pointer | ❌ 67 s | ✅ 406 s | ✅ 165 s | ✅ 92 s |
 
-![Total time to finish each tier](/blog/local-llms-time-per-tier.png)
+![Total time to finish each tier](/blog/local-llms-time-per-tier.webp)
 
 | | Basic: time | Basic: tokens | Hard (7, no glob): time | Hard (7, no glob): tokens |
 |---|---|---|---|---|
@@ -187,7 +187,7 @@ What my tests don't measure is breadth of knowledge. A 35B model holds less of t
 
 ### 2. The gap that's left is speed, and that's hardware
 
-![Generation speed by model and hardware](/blog/local-llms-generation-speed.png)
+![Generation speed by model and hardware](/blog/local-llms-generation-speed.webp)
 
 GLM didn't win by thinking less. It generated the **most** tokens on the hard tier. It just generated them faster: about 6 times faster than Ornith on the mini PC, and about 2.7 times faster than the same model on my MacBook.
 

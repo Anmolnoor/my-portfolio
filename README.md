@@ -1,6 +1,6 @@
 # anmolnoor.com
 
-My personal portfolio and blog, live at **[anmolnoor.com](https://anmolnoor.com)**.
+My personal portfolio and blog, live at **[anmolnoor.com](https://www.anmolnoor.com)**.
 
 It's where I keep my projects, write about what I'm building, and document my homelab and infrastructure tinkering.
 
@@ -13,11 +13,11 @@ find me tinkering with self-hosted infrastructure, reading, or chasing down a ne
 technology.
 
 - **Focus:** Software · Systems · AI tools
-- **Currently building:** [Foundation CLI](https://github.com/Anmolnoor/fcli) and my homelab/infra setup
+- **Currently building:** [skep](https://skep.anmolnoor.com), a local-first supervisor for AI coding agents, plus [Foundation CLI](https://github.com/Anmolnoor/fcli) and my homelab/infra setup
 
 ## Connect
 
-- **Website:** [anmolnoor.com](https://anmolnoor.com)
+- **Website:** [anmolnoor.com](https://www.anmolnoor.com)
 - **GitHub:** [@anmolnoor](https://github.com/anmolnoor)
 - **LinkedIn:** [in/anmol-noor](https://www.linkedin.com/in/anmol-noor/)
 - **X (Twitter):** [@noor_anmol](https://twitter.com/noor_anmol)
@@ -28,6 +28,7 @@ technology.
 - **Home** — a quick intro, what I'm currently building, and selected projects
 - **Blog** — posts on building in public, AI-assisted development, and my homelab
 - **Projects** — an archive of things I've shipped, from SaaS apps to weekend hacks
+- **Resume** — roles, selected projects, and recent writing on one page
 
 ## Tech stack
 
@@ -38,11 +39,13 @@ technology.
 
 ## Running locally
 
-Requires Node `>=22`.
+Requires Node `>=22.23.4`. Uses npm (`package-lock.json`).
 
 ```bash
-yarn install
-yarn dev      # start the dev server
-yarn build    # production build
-yarn preview  # preview the build
+npm install
+npm run dev      # start the dev server
+npm run check    # type-check with astro check
+npm run build    # production build (dist/ and .vercel/output/)
+npm test         # tests; the site-build suite reads the built output, so build first
+npm run preview  # preview the build
 ```

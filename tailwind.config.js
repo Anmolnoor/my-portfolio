@@ -29,6 +29,14 @@ export default {
           "Menlo",
           "monospace",
         ],
+        prose: [
+          "Inter",
+          "ui-sans-serif",
+          "system-ui",
+          "-apple-system",
+          "Segoe UI",
+          "sans-serif",
+        ],
         display: [
           "JetBrains Mono",
           "ui-monospace",

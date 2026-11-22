@@ -2,11 +2,10 @@
 title: "Why I Open-Sourced Beekeeper Behind a Wall — and What's Inside It"
 date: 2026-04-30
 author: Anmol Noor
-canonical: https://anmolnoor.com/blog/beekeeper-launch
 description: A governed multi-agent runtime where every tool call hits a policy gate, and a contribution model designed for the AI-slop era. Apache 2.0.
 tldr: "I'm open-sourcing Beekeeper under Apache 2.0: a multi-agent runtime where no worker calls a tool directly. Every call goes through a registry that runs guardrails, high-risk tools pause for human review that can't be turned off globally, and every decision is logged so runs can be replayed. Issues and PRs from contributors not yet on the allowlist auto-close."
 tags: [agents, llm, open-source, governance, python]
-cover: /blog/beekeeper.png
+cover: /blog/beekeeper.webp
 slug: beekeeper
 ---
 
@@ -32,7 +31,7 @@ Beekeeper is my answer to that. Today I'm open-sourcing it.
 
 A multi-agent runtime built around four things:
 
-![Beekeeper architecture: Queen plans → Worker forge dispatches → Tool Registry mediates → Honeycomb records](/blog/beearch.png)
+![Beekeeper architecture: Queen plans → Worker forge dispatches → Tool Registry mediates → Honeycomb records](/blog/beearch.webp)
 
 **Queen.** A planner / router. Decomposes an intent into tasks and decides which worker handles each one. The Queen does not execute tools.
 

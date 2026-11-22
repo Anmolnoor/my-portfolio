@@ -4,11 +4,12 @@ import { ArrowLeft } from "@phosphor-icons/react";
 import Main from "@/layouts/Main.astro";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { formatDateUTC, getOgImageForCover, getPostSlug } from "@/lib/blog";
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog");
   return posts.map((post) => ({
-    params: { slug: post.data.slug ?? post.id.replace(/\.mdx$/, "") },
+    params: { slug: getPostSlug(post) },
     props: { post },
   }));
 }
@@ -16,20 +17,13 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 const { Content } = await render(post);
 
-const formatDate = (d: Date) =>
-  d.toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-
 const summary = post.data.excerpt ?? post.data.description ?? "";
 ---
 
 <Main
   title={`${post.data.title} — Anmol Noor`}
   description={summary}
-  image={post.data.cover}
+  socialImage={getOgImageForCover(post.data.cover)}
   canonical={post.data.canonical}
 >
   <Card className="p-6">
@@ -44,7 +38,7 @@ const summary = post.data.excerpt ?? post.data.description ?? "";
           <ArrowLeft className="h-4 w-4" />
         </a>
         <div class="flex items-center gap-2 font-mono text-xs text-muted-foreground">
-          <span>{formatDate(post.data.date)}</span>
+          <span>{formatDateUTC(post.data.date)}</span>
           <span>·</span>
           <span>{post.data.readingMinutes} min read</span>
         </div>
@@ -55,7 +49,9 @@ const summary = post.data.excerpt ?? post.data.description ?? "";
           <img
             src={post.data.cover}
             alt={post.data.title}
-            class="w-full rounded-md"
+            loading="eager"
+            decoding="async"
+            class="aspect-video w-full rounded-md object-cover"
           />
         )
       }

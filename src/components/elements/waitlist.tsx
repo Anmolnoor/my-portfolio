@@ -15,20 +15,9 @@ const formStates = [INIT, SUBMITTING, ERROR, SUCCESS] as const;
 const formStyles = {
   id: "clkpx2a15015vjr0pt1wn5b8r",
   name: "Default",
-  formStyle: "inline",
   placeholderText: "you@example.com",
-  formFont: "Open Sans",
-  formFontColor: "#000000",
-  formFontSizePx: 14,
   buttonText: "Join Waitlist",
-  buttonFont: "Inter",
-  buttonFontColor: "#ffffff",
-  buttonColor: "#0D9488",
-  buttonFontSizePx: 14,
   successMessage: "Thanks! We'll be in touch!",
-  successFont: "Inter",
-  successFontColor: "#ffffff",
-  successFontSizePx: 14,
   userGroup: "",
 };
 const domain = "app.loops.so";
@@ -67,7 +56,7 @@ export default function SignUpFormReact() {
     return false;
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     // Prevent the default form submission
     event.preventDefault();
 
@@ -87,62 +76,57 @@ export default function SignUpFormReact() {
     )}&email=${encodeURIComponent(email)}`;
 
     // API request to add user to newsletter
-    fetch(`https://${domain}/api/newsletter-form/${formStyles.id}`, {
-      method: "POST",
-      body: formBody,
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    })
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .then((res: any) => [res.ok, res.json(), res])
-      .then(([ok, dataPromise, res]) => {
-        if (ok) {
-          resetForm();
-          setFormState(SUCCESS);
-        } else {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          dataPromise.then((data: any) => {
-            setFormState(ERROR);
-            setErrorMessage(data.message || res.statusText);
-            localStorage.setItem("loops-form-timestamp", "");
-          });
+    try {
+      const res = await fetch(
+        `https://${domain}/api/newsletter-form/${formStyles.id}`,
+        {
+          method: "POST",
+          body: formBody,
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
         }
-      })
-      .catch((error) => {
-        setFormState(ERROR);
-        // check for cloudflare error
-        if (error.message === "Failed to fetch") {
-          setErrorMessage(
-            "Too many signups, please try again in a little while"
-          );
-        } else if (error.message) {
-          setErrorMessage(error.message);
-        }
-        localStorage.setItem("loops-form-timestamp", "");
-      });
-  };
+      );
+      if (res.ok) {
+        resetForm();
+        setFormState(SUCCESS);
+        return;
+      }
 
-  const isInline = formStyles.formStyle === "inline";
+      let message = "";
+      try {
+        const data = (await res.json()) as { message?: unknown };
+        if (typeof data?.message === "string") {
+          message = data.message;
+        }
+      } catch {
+        // Non-JSON error response (e.g. proxy HTML 502); fall back to status text.
+      }
+      setFormState(ERROR);
+      setErrorMessage(
+        message || res.statusText || `Request failed (${res.status})`
+      );
+      localStorage.setItem("loops-form-timestamp", "");
+    } catch (error) {
+      setFormState(ERROR);
+      const errMessage = error instanceof Error ? error.message : "";
+      // check for cloudflare error
+      if (errMessage === "Failed to fetch") {
+        setErrorMessage(
+          "Too many signups, please try again in a little while"
+        );
+      } else if (errMessage) {
+        setErrorMessage(errMessage);
+      }
+      localStorage.setItem("loops-form-timestamp", "");
+    }
+  };
 
   switch (formState) {
     case SUCCESS:
       return (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            width: "100%",
-          }}
-        >
-          <p
-            style={{
-              fontFamily: `'${formStyles.successFont}', sans-serif`,
-              color: formStyles.successFontColor,
-              fontSize: `${formStyles.successFontSizePx}px`,
-            }}
-          >
+        <div className="flex w-full items-center justify-center">
+          <p className="text-sm font-medium text-primary">
             {formStyles.successMessage}
           </p>
         </div>
@@ -159,36 +143,17 @@ export default function SignUpFormReact() {
         <>
           <form
             onSubmit={handleSubmit}
-            style={{
-              display: "flex",
-              flexDirection: isInline ? "row" : "column",
-              alignItems: "center",
-              justifyContent: "center",
-              width: "100%",
-            }}
+            className="flex w-full flex-row items-center justify-center gap-2.5"
           >
             <input
               type="text"
               name="email"
+              aria-label="Email address"
               placeholder={formStyles.placeholderText}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required={true}
-              style={{
-                color: formStyles.formFontColor,
-                fontFamily: `'${formStyles.formFont}', sans-serif`,
-                fontSize: `${formStyles.formFontSizePx}px`,
-                margin: isInline ? "0px 10px 0px 0px" : "0px 0px 10px",
-                width: "100%",
-                maxWidth: "300px",
-                minWidth: "100px",
-                background: "#FFFFFF",
-                border: "1px solid #D1D5DB",
-                boxSizing: "border-box",
-                boxShadow: "rgba(0, 0, 0, 0.05) 0px 1px 2px",
-                borderRadius: "6px",
-                padding: "8px 12px",
-              }}
+              className="h-[38px] w-full min-w-[100px] max-w-[300px] rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
             <SignUpFormButton />
           </form>
@@ -198,20 +163,8 @@ export default function SignUpFormReact() {
 
   function SignUpFormError() {
     return (
-      <div
-        style={{
-          alignItems: "center",
-          justifyContent: "center",
-          width: "100%",
-        }}
-      >
-        <p
-          style={{
-            fontFamily: "Inter, sans-serif",
-            color: "rgb(185, 28, 28)",
-            fontSize: "14px",
-          }}
-        >
+      <div className="w-full text-center">
+        <p className="text-sm text-red-700 dark:text-red-400">
           {errorMessage || "Oops! Something went wrong, please try again"}
         </p>
       </div>
@@ -219,22 +172,10 @@ export default function SignUpFormReact() {
   }
 
   function BackButton() {
-    const [isHovered, setIsHovered] = useState(false);
-
     return (
       <button
-        style={{
-          color: "#6b7280",
-          font: "14px, Inter, sans-serif",
-          margin: "10px auto",
-          textAlign: "center",
-          background: "transparent",
-          border: "none",
-          cursor: "pointer",
-          textDecoration: isHovered ? "underline" : "none",
-        }}
-        onMouseOut={() => setIsHovered(false)}
-        onMouseOver={() => setIsHovered(true)}
+        type="button"
+        className="mx-auto my-2.5 block cursor-pointer bg-transparent text-center text-sm text-muted-foreground hover:text-foreground hover:underline"
         onClick={resetForm}
       >
         &larr; Back
@@ -246,28 +187,8 @@ export default function SignUpFormReact() {
     return (
       <button
         type="submit"
-        style={{
-          background: formStyles.buttonColor,
-          fontSize: `${formStyles.buttonFontSizePx}px`,
-          color: formStyles.buttonFontColor,
-          fontFamily: `'${formStyles.buttonFont}', sans-serif`,
-          width: isInline ? "min-content" : "100%",
-          maxWidth: "300px",
-          whiteSpace: isInline ? "nowrap" : "normal",
-          height: "38px",
-          alignItems: "center",
-          justifyContent: "center",
-          flexDirection: "row",
-          padding: "9px 17px",
-          boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.05)",
-          borderRadius: "6px",
-          textAlign: "center",
-          fontStyle: "normal",
-          fontWeight: 500,
-          lineHeight: "20px",
-          border: "none",
-          cursor: "pointer",
-        }}
+        disabled={formState === SUBMITTING}
+        className="inline-flex h-[38px] shrink-0 cursor-pointer items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 disabled:cursor-wait disabled:opacity-70"
       >
         {formState === SUBMITTING ? "Please wait..." : formStyles.buttonText}
       </button>
