@@ -2,6 +2,7 @@
 import { getCollection } from "astro:content";
 import Main from "@/layouts/Main.astro";
 import BlogPostList from "@/components/blog/BlogPostList";
+import { getPostSlug } from "@/lib/blog";
 
 const posts = (await getCollection("blog")).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
@@ -11,7 +12,7 @@ const blogPosts = posts.map((post) => ({
   cover: post.data.cover,
   date: post.data.date.toISOString(),
   readingMinutes: post.data.readingMinutes,
-  slug: post.data.slug ?? post.id.replace(/\.mdx$/, ""),
+  slug: getPostSlug(post),
   summary: post.data.excerpt ?? post.data.description ?? "",
   tags: post.data.tags,
   title: post.data.title,
@@ -20,7 +21,7 @@ const blogPosts = posts.map((post) => ({
 
 <Main
   title="Blog — Anmol Noor"
-  description="Notes on shipping software — frontend, distributed systems, infra, and developer tooling."
+  description="Notes on shipping software — AI agents, systems, homelab, and developer tooling."
 >
   <BlogPostList posts={blogPosts} client:load />
 </Main>

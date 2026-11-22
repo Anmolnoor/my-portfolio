@@ -3,6 +3,7 @@ import Main from "@/layouts/Main.astro";
 import { getCollection } from "astro:content";
 import { stack, now } from "@/components/about/aboutData";
 import { projects, type Project } from "@/assets/projects";
+import { formatDateUTC, getPostSlug } from "@/lib/blog";
 
 const summary =
   "Software engineer focused on local-first coding agents, developer tools, and full-stack products. My work explores how coding agents can operate with clear boundaries, independent verification, and human approval. I also build real-time applications and run a self-hosted homelab.";
@@ -25,22 +26,70 @@ const posts = (await getCollection("blog"))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, 5);
 
-const formatDate = (d: Date) =>
-  d.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+// Substantive roles only; short trainings omitted.
+const experience = [
+  {
+    role: "Founder",
+    company: "Dynamic Nexus Solutions",
+    link: "https://www.dynamicnexussolutions.com/",
+    duration: "Present",
+  },
+  {
+    role: "Frontend Engineer",
+    company: "Huddle01",
+    link: "https://huddle01.com/",
+    duration: "5 months (2 full-time, 3 part-time)",
+  },
+];
 
-const slugFor = (post: (typeof posts)[number]) =>
-  post.data.slug ?? post.id.replace(/\.mdx$/, "");
+const contacts = [
+  { label: "Vancouver, BC" },
+  { label: "anmolnoor59@gmail.com", href: "mailto:anmolnoor59@gmail.com" },
+  { label: "anmolnoor.com", href: "https://anmolnoor.com" },
+  { label: "github.com/Anmolnoor", href: "https://github.com/Anmolnoor" },
+  {
+    label: "linkedin.com/in/anmol-noor",
+    href: "https://www.linkedin.com/in/anmol-noor/",
+  },
+];
 ---
 
 <Main title="Resume — Anmol Noor">
   <article
-    class="mx-auto w-[210mm] max-w-full rounded-xl border border-border bg-card p-6 sm:p-8 md:p-10"
+    class="resume mx-auto w-[210mm] max-w-full rounded-xl border border-border bg-card p-6 sm:p-8 md:p-10 print:w-full print:max-w-none print:rounded-none print:border-0 print:bg-white print:p-0 print:text-black print:shadow-none"
   >
     <!-- header -->
     <header class="pb-2">
-      <h1 class="font-mono text-4xl font-bold tracking-tight">Anmol Noor</h1>
-      <p class="mt-1 font-mono text-sm uppercase tracking-widest text-primary">
-        Software Engineer
+      <div class="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 class="font-mono text-4xl font-bold tracking-tight">Anmol Noor</h1>
+          <p class="mt-1 font-mono text-sm uppercase tracking-widest text-primary">
+            Software Engineer
+          </p>
+        </div>
+        <button
+          type="button"
+          onclick="window.print()"
+          class="rounded-md border border-border px-3 py-1.5 font-mono text-xs text-muted-foreground transition-colors hover:border-primary hover:text-primary print:hidden"
+        >
+          Print / Save PDF
+        </button>
+      </div>
+      <p class="mt-3 flex flex-wrap gap-x-2 gap-y-1 font-mono text-xs text-muted-foreground">
+        {
+          contacts.map((c, i) => (
+            <span>
+              {i > 0 && <span aria-hidden="true">· </span>}
+              {c.href ? (
+                <a href={c.href} class="transition-colors hover:text-primary">
+                  {c.label}
+                </a>
+              ) : (
+                c.label
+              )}
+            </span>
+          ))
+        }
       </p>
       <p class="mt-4 text-sm leading-relaxed text-muted-foreground">
         {summary}
@@ -65,6 +114,33 @@ const slugFor = (post: (typeof posts)[number]) =>
             ))
           }
         </ul>
+      </section>
+
+      <!-- experience -->
+      <section>
+        <h2
+          class="mb-4 border-b border-border pb-2 font-mono text-xs font-bold uppercase tracking-widest text-primary"
+        >
+          Experience
+        </h2>
+        <div class="space-y-3">
+          {
+            experience.map((e) => (
+              <div class="flex break-inside-avoid flex-wrap items-baseline justify-between gap-x-3">
+                <h3 class="font-mono text-sm font-bold">
+                  {e.role}
+                  <span class="font-normal text-primary">
+                    {" "}
+                    · <a href={e.link} target="_blank" rel="noreferrer" class="hover:underline">{e.company}</a>
+                  </span>
+                </h3>
+                <span class="font-mono text-xs text-muted-foreground">
+                  {e.duration}
+                </span>
+              </div>
+            ))
+          }
+        </div>
       </section>
 
       <!-- skills -->
@@ -106,7 +182,7 @@ const slugFor = (post: (typeof posts)[number]) =>
             resumeProjects.map((p) => {
               const external = p.link.startsWith("http");
               return (
-                <div>
+                <div class="break-inside-avoid">
                   <div class="flex flex-wrap items-baseline justify-between gap-x-3">
                     <h3 class="font-mono text-sm font-bold">
                       {p.title}
@@ -130,7 +206,7 @@ const slugFor = (post: (typeof posts)[number]) =>
                     {p.description}
                   </p>
                   {p.techTags && p.techTags.length > 0 && (
-                    <p class="mt-1.5 font-mono text-xs text-muted-foreground/70">
+                    <p class="mt-1.5 font-mono text-xs text-muted-foreground">
                       {p.techTags.join(" · ")}
                     </p>
                   )}
@@ -151,16 +227,16 @@ const slugFor = (post: (typeof posts)[number]) =>
         <div class="space-y-2.5">
           {
             posts.map((post) => (
-              <div class="flex items-baseline justify-between gap-x-4">
+              <div class="flex break-inside-avoid items-baseline justify-between gap-x-4">
                 <a
-                  href={`/blog/${slugFor(post)}`}
+                  href={`/blog/${getPostSlug(post)}`}
                   title={post.data.title}
                   class="min-w-0 truncate text-sm text-foreground transition-colors hover:text-primary"
                 >
                   {post.data.title}
                 </a>
                 <span class="shrink-0 font-mono text-xs text-muted-foreground">
-                  {formatDate(post.data.date)}
+                  {formatDateUTC(post.data.date, { month: "short", year: "numeric" })}
                 </span>
               </div>
             ))
@@ -170,3 +246,27 @@ const slugFor = (post: (typeof posts)[number]) =>
     </div>
   </article>
 </Main>
+
+<style>
+  @media print {
+    /* Print the resume alone: hide site nav/footer and use light-theme colors
+       even when the page is in dark mode. */
+    :global(body) {
+      background: white;
+    }
+    :global(body > div > :not(main)) {
+      display: none;
+    }
+    :global(main) {
+      max-width: none;
+      padding: 0;
+    }
+    .resume {
+      --foreground: 20 10% 10%;
+      --card-foreground: 20 10% 10%;
+      --muted-foreground: 30 5% 40%;
+      --primary: 82 75% 27%;
+      --border: 60 8% 88%;
+    }
+  }
+</style>

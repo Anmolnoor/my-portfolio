@@ -7,18 +7,18 @@ interface StatusLine {
 }
 
 const statusLines: StatusLine[] = [
-  { name: "foundation-cli", meta: "v0.4.0 · scaffolding" },
+  { name: "skep", meta: "live · agent supervisor" },
+  { name: "foundation-cli", meta: "shell-native agent" },
   { name: "vendro", meta: "live · multi-tenant" },
-  { name: "amend-notes", meta: "live · notes + tags" },
   { name: "homelab", meta: "12 svc · proxmox" },
 ];
 
 const cyclingPrompts = [
+  "skep status",
+  "claude --resume",
   "ssh homelab",
   "git push origin main",
   "pnpm dev foundation-cli",
-  "code feat/ai-tools",
-  "claude --resume",
 ];
 
 const TYPE_SPEED = 55;
@@ -59,8 +59,7 @@ const TerminalVisual = () => {
 
   return (
     <div
-      className="w-full max-w-md overflow-hidden rounded-lg border bg-card text-left shadow-sm"
-      style={{ fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace" }}
+      className="w-full max-w-md overflow-hidden rounded-lg border bg-card text-left font-mono shadow-sm"
     >
       <div className="flex items-center gap-2 border-b bg-muted/40 px-3 py-2">
         <span className="h-2.5 w-2.5 rounded-full bg-red-400" />

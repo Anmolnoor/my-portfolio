@@ -12,47 +12,43 @@ import CurrentlyBuilding from "@/components/home/CurrentlyBuilding";
 import SelectedProjects from "@/components/home/SelectedProjects";
 import AboutMe from "@/components/home/AboutMe";
 import TerminalVisual from "@/components/home/TerminalVisual";
-import SectionHeader from "@/components/home/SectionHeader.astro";
+import SectionHeader from "@/components/home/SectionHeader";
 import { Card } from "@/components/ui/card";
 import IconTile from "@/components/home/IconTile";
+import { formatDateUTC, getPostSlug } from "@/lib/blog";
 
 const allPosts = (await getCollection("blog")).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
 );
 const posts = allPosts.slice(0, 3);
 const blogIconsByIndex = [FileText, Layers, Radio];
-
-const formatDate = (d: Date) =>
-  d.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
 ---
 
 <Main>
   <div class="flex flex-col gap-12">
-    <section class="relative py-6">
-      <span
-        class="absolute right-0 top-2 inline-flex items-center gap-2 rounded-md border border-primary/30 bg-primary/10 px-3 py-1 font-mono text-sm font-medium text-primary"
-      >
-        <span class="relative flex h-2 w-2">
-          <span
-            class="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"
-          ></span>
-          <span class="relative inline-flex h-2 w-2 rounded-full bg-primary">
-          </span>
-        </span>
-        Available for work
-      </span>
+    <section class="py-6">
       <div class="grid grid-cols-1 gap-10 lg:grid-cols-2">
         <div class="flex flex-col justify-center gap-6">
-          <div class="flex items-center gap-2">
-            <span class="h-1.5 w-1.5 rounded-full bg-primary"></span>
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+              <span class="h-1.5 w-1.5 rounded-full bg-primary"></span>
+              <span
+                class="font-mono text-xs font-bold uppercase tracking-widest text-primary"
+              >
+                Software Engineer
+              </span>
+            </div>
             <span
-              class="font-mono text-xs font-bold uppercase tracking-widest text-primary"
+              class="inline-flex items-center gap-2 rounded-md border border-primary/30 bg-primary/10 px-3 py-1 font-mono text-sm font-medium text-primary"
             >
-              Software Engineer
+              <span class="relative flex h-2 w-2">
+                <span
+                  class="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"
+                ></span>
+                <span class="relative inline-flex h-2 w-2 rounded-full bg-primary">
+                </span>
+              </span>
+              Available for work
             </span>
           </div>
           <h1
@@ -104,7 +100,7 @@ const formatDate = (d: Date) =>
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {
           posts.map((post, i) => {
-            const slug = post.data.slug ?? post.id.replace(/\.mdx$/, "");
+            const slug = getPostSlug(post);
             const Icon = blogIconsByIndex[i % blogIconsByIndex.length];
             const summary = post.data.excerpt ?? post.data.description ?? "";
             return (
@@ -122,7 +118,7 @@ const formatDate = (d: Date) =>
                     {summary}
                   </p>
                   <div class="flex items-center gap-2 font-mono text-xs text-muted-foreground">
-                    <span>{formatDate(post.data.date)}</span>
+                    <span>{formatDateUTC(post.data.date)}</span>
                     <span>·</span>
                     <span>{post.data.readingMinutes} min read</span>
                   </div>

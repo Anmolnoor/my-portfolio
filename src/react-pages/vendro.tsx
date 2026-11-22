@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { LinkSimple as LinkIcon } from "@phosphor-icons/react";
 import NewCard from "@/components/elements/newCard";
 import TitleWithDot from "@/components/elements/titleWithDot";
@@ -9,22 +8,13 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import SignUpFormReact from "@/components/elements/waitlist";
 
 const Vendro = () => {
-  const [showModal, setShowModal] = useState(false);
   return (
     <NewCard title="Vendro" viewAll>
-      <Dialog open={showModal} onOpenChange={setShowModal}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Sign up for waitlist</DialogTitle>
-          </DialogHeader>
-          <SignUpFormReact />
-        </DialogContent>
-      </Dialog>
-
       <div className="flex flex-col gap-4">
         <Card className="p-6 shadow-sm">
           <p className="pb-3 text-sm">
@@ -43,13 +33,19 @@ const Vendro = () => {
             loop and let you know as soon as our platform is live.
           </p>
           <div className="pt-3">
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => setShowModal(true)}
-            >
-              Sign up for waitlist
-            </Button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="w-full">
+                  Sign up for waitlist
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Sign up for waitlist</DialogTitle>
+                </DialogHeader>
+                <SignUpFormReact />
+              </DialogContent>
+            </Dialog>
           </div>
         </Card>
 

@@ -39,6 +39,8 @@ export interface Project {
     | "gear";
   techTags?: string[];
   featured?: boolean;
+  /** Early bootcamp/tutorial work — shown only in the collapsed archive on /projects. */
+  archived?: boolean;
 }
 
 export const projects: Project[] = [
@@ -50,16 +52,6 @@ export const projects: Project[] = [
     link: "https://skep.anmolnoor.com",
     iconKey: "server",
     techTags: ["Python", "Agents", "Security"],
-    featured: true,
-  },
-  {
-    title: "AuthWAPI",
-    tagline: "Auth-as-a-service API",
-    description:
-      "A drop-in authentication API — registration, login, email password resets, and S3 profile-image uploads — built with TypeScript, Express, and MongoDB.",
-    link: "https://github.com/Anmolnoor/authwapi",
-    iconKey: "lock",
-    techTags: ["TypeScript", "Express", "MongoDB"],
     featured: true,
   },
   {
@@ -90,6 +82,16 @@ export const projects: Project[] = [
     link: "https://github.com/Anmolnoor/agent-policy-gate",
     iconKey: "shield",
     techTags: ["Python", "Policy", "Audit"],
+    featured: true,
+  },
+  {
+    title: "AuthWAPI",
+    tagline: "Auth-as-a-service API",
+    description:
+      "A drop-in authentication API — registration, login, email password resets, and S3 profile-image uploads — built with TypeScript, Express, and MongoDB.",
+    link: "https://github.com/Anmolnoor/authwapi",
+    iconKey: "lock",
+    techTags: ["TypeScript", "Express", "MongoDB"],
     featured: true,
   },
   {
@@ -186,6 +188,7 @@ export const projects: Project[] = [
     link: "https://next-event-livid.vercel.app/",
     iconKey: "calendar",
     techTags: ["Next.js", "React"],
+    archived: true,
   },
   {
     title: "Meetup",
@@ -194,6 +197,7 @@ export const projects: Project[] = [
     link: "https://meetup-smoky.vercel.app/",
     iconKey: "users",
     techTags: ["React", "JavaScript"],
+    archived: true,
   },
   {
     title: "Next Routing",
@@ -202,6 +206,7 @@ export const projects: Project[] = [
     link: "https://next-routing-ebon.vercel.app/",
     iconKey: "route",
     techTags: ["Next.js", "React"],
+    archived: true,
   },
   {
     title: "natours",
@@ -210,6 +215,7 @@ export const projects: Project[] = [
     link: "https://github.com/Anmolnoor/natours",
     iconKey: "mountain",
     techTags: ["Node.js", "Express", "MongoDB"],
+    archived: true,
   },
   {
     title: "Reservation System",
@@ -219,6 +225,7 @@ export const projects: Project[] = [
     link: "https://reservation-system-ten.vercel.app/",
     iconKey: "ticket",
     techTags: ["React", "TypeScript", "Redux"],
+    archived: true,
   },
   {
     title: "College Task Management System",
@@ -228,6 +235,7 @@ export const projects: Project[] = [
     link: "https://github.com/Anmolnoor/bgiet",
     iconKey: "checklist",
     techTags: ["Node.js", "Express", "EJS"],
+    archived: true,
   },
   {
     title: "Node Farm",
@@ -236,6 +244,7 @@ export const projects: Project[] = [
     link: "https://github.com/Anmolnoor/nodefarm",
     iconKey: "leaf",
     techTags: ["Node.js"],
+    archived: true,
   },
   {
     title: "Security",
@@ -245,6 +254,7 @@ export const projects: Project[] = [
     link: "https://github.com/Anmolnoor/Security",
     iconKey: "lock",
     techTags: ["Node.js", "Express", "Passport.js"],
+    archived: true,
   },
   {
     title: "Todo List",
@@ -254,6 +264,7 @@ export const projects: Project[] = [
     link: "https://github.com/Anmolnoor/todolist",
     iconKey: "list",
     techTags: ["Node.js", "Express", "MongoDB"],
+    archived: true,
   },
   {
     title: "Daily Journal",
@@ -263,6 +274,7 @@ export const projects: Project[] = [
     link: "https://github.com/Anmolnoor/Blog-with-Database",
     iconKey: "book",
     techTags: ["Node.js", "Express", "MongoDB"],
+    archived: true,
   },
   {
     title: "News letter",
@@ -271,6 +283,7 @@ export const projects: Project[] = [
     link: "https://github.com/Anmolnoor/Newsletter-Singup",
     iconKey: "mail",
     techTags: ["Node.js", "Express", "Mailchimp"],
+    archived: true,
   },
   {
     title: "Weather Project",
@@ -280,6 +293,7 @@ export const projects: Project[] = [
     link: "https://github.com/Anmolnoor/weather-project",
     iconKey: "cloud",
     techTags: ["Node.js", "Express", "API"],
+    archived: true,
   },
   {
     title: "Simon Game",
@@ -288,6 +302,7 @@ export const projects: Project[] = [
     link: "https://anmolnoor.github.io/Simon-Game/",
     iconKey: "device",
     techTags: ["HTML", "CSS", "JavaScript"],
+    archived: true,
   },
   {
     title: "Drum Kit",
@@ -296,6 +311,7 @@ export const projects: Project[] = [
     link: "https://anmolnoor.github.io/Drum_Kit/",
     iconKey: "music",
     techTags: ["HTML", "CSS", "JavaScript"],
+    archived: true,
   },
   {
     title: "Dice Roll",
@@ -304,6 +320,7 @@ export const projects: Project[] = [
     link: "https://anmolnoor.github.io/Dice_Roller/",
     iconKey: "dice",
     techTags: ["HTML", "CSS", "JavaScript"],
+    archived: true,
   },
   {
     title: "Tindog",
@@ -312,6 +329,7 @@ export const projects: Project[] = [
     link: "https://tin-dog-roan.vercel.app/",
     iconKey: "dog",
     techTags: ["HTML", "CSS", "Bootstrap"],
+    archived: true,
   },
   {
     title: "Vim Cheatsheet",
@@ -320,6 +338,7 @@ export const projects: Project[] = [
     link: "https://github.com/Anmolnoor/vimCS/blob/main/README.md",
     iconKey: "terminal",
     techTags: ["Vim", "Reference"],
+    archived: true,
   },
   {
     title: "Markdown Syntax Cheat Sheet",
@@ -328,5 +347,6 @@ export const projects: Project[] = [
     link: "https://github.com/Anmolnoor/markdownSCS/blob/main/README.md",
     iconKey: "markdown",
     techTags: ["Markdown", "Reference"],
+    archived: true,
   },
 ];

@@ -1,12 +1,14 @@
 ---
 import "@/index.css";
-import "highlight.js/styles/github-dark.css";
 import TopNav from "@/components/header/TopNav";
 import SiteFooter from "@/components/footer/SiteFooter.astro";
+import { DEFAULT_SOCIAL_IMAGE } from "@/lib/blog";
 
 interface Props {
   title?: string;
   description?: string;
+  socialImage?: string;
+  /** @deprecated use socialImage */
   image?: string;
   canonical?: string;
 }
@@ -14,13 +16,17 @@ interface Props {
 const {
   title = "Anmol Noor — Software Engineer",
   description = "I build full-stack applications, real-time systems, and developer tools. I care about clean architecture, performance, and great developer experience.",
-  image = "/anmol.jpg",
+  socialImage: socialImageProp,
+  image,
   canonical,
 } = Astro.props;
 
+const socialImage = socialImageProp ?? image ?? DEFAULT_SOCIAL_IMAGE;
+const isOgCard = /^\/og\/.+\.jpg$/.test(socialImage);
+
 const canonicalUrl =
   canonical ?? new URL(Astro.url.pathname, Astro.site).toString();
-const ogImage = new URL(image, Astro.site).toString();
+const ogImage = new URL(socialImage, Astro.site).toString();
 ---
 
 <!doctype html>
@@ -37,6 +43,8 @@ const ogImage = new URL(image, Astro.site).toString();
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={ogImage} />
+    {isOgCard && <meta property="og:image:width" content="1200" />}
+    {isOgCard && <meta property="og:image:height" content="630" />}
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:type" content="website" />
 
@@ -46,11 +54,17 @@ const ogImage = new URL(image, Astro.site).toString();
     <meta name="twitter:image" content={ogImage} />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="Anmol Noor — Blog"
+      href="/rss.xml"
+    />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
 
@@ -70,7 +84,7 @@ const ogImage = new URL(image, Astro.site).toString();
   </head>
   <body class="min-h-screen bg-background font-sans text-foreground antialiased">
     <div class="flex min-h-screen flex-col">
-      <TopNav client:load />
+      <TopNav client:load currentPath={Astro.url.pathname} />
       <main class="container mx-auto w-full max-w-6xl flex-1 px-4 py-10">
         <slot />
       </main>
